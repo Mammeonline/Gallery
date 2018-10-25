@@ -1,0 +1,1495 @@
+album.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+album.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+album.php:$user->session_begin();
+album.php:$auth->acl($user->data);
+album.php:$user->setup(array('mods/gallery_ucp', 'mods/gallery'));
+album.php:	$db->sql_query($sql);
+album.php:	$result = $db->sql_query_limit($sql, CONTEST_IMAGES);
+album.php:	$first = (int) $db->sql_fetchfield('image_id');
+album.php:	$second = (int) $db->sql_fetchfield('image_id');
+album.php:	$third = (int) $db->sql_fetchfield('image_id');
+album.php:	$db->sql_freeresult($result);
+album.php:	$db->sql_query($sql);
+album.php:	$db->sql_query($sql_update);
+album.php:	$db->sql_query($sql_update);
+album.php:	$db->sql_query($sql_update);
+album.php:* Build auth-list
+album.php:	if ($user->data['is_bot'])
+album.php:	if (!$user->data['is_registered'])
+album.php:		$template->assign_var('U_MCP', append_sid("{$phpbb_root_path}{$gallery_root_path}mcp.$phpEx", "album_id=$album_id"));
+album.php:			$l_moderator = (sizeof($album_moderators[$album_id]) == 1) ? $user->lang['MODERATOR'] : $user->lang['MODERATORS'];
+album.php:	$limit_days = array(0 => $user->lang['ALL_IMAGES'], 1 => $user->lang['1_DAY'], 7 => $user->lang['7_DAYS'], 14 => $user->lang['2_WEEKS'], 30 => $user->lang['1_MONTH'], 90 => $user->lang['3_MONTHS'], 180 => $user->lang['6_MONTHS'], 365 => $user->lang['1_YEAR']);
+album.php:	$sort_by_text = array('t' => $user->lang['TIME'], 'n' => $user->lang['IMAGE_NAME'], 'vc' => $user->lang['VIEWS']);
+album.php:	// Do not sort images after upload-username on running contests, and of course ratings aswell!
+album.php:		$sort_by_text['u'] = $user->lang['SORT_USERNAME'];
+album.php:			$sort_by_text['ra'] = $user->lang['RATING'];
+album.php:			$sort_by_text['r'] = $user->lang['RATES_COUNT'];
+album.php:		$sort_by_text['c'] = $user->lang['COMMENTS'];
+album.php:		$sort_by_text['lc'] = $user->lang['NEW_COMMENT'];
+album.php:			* Slideshow - Using message_body.html
+album.php:			$result = $db->sql_query($sql);
+album.php:			$db->sql_freeresult($result);
+album.php:			$template->assign_vars(array(
+album.php:				'MESSAGE_TITLE'		=> $user->lang['SLIDE_SHOW'],
+album.php:			page_header($user->lang['SLIDE_SHOW']);
+album.php:			$template->set_filenames(array(
+album.php:			$result = $db->sql_query_limit($sql, $images_per_page, $start);
+album.php:		while ($row = $db->sql_fetchrow($result))
+album.php:		$db->sql_freeresult($result);
+album.php:				$template->assign_block_vars('imageblock', array(
+album.php:			$template->assign_block_vars('imageblock.imagerow', array());
+album.php:					$template->assign_block_vars('imageblock.imagerow.no_image', array());
+album.php:				// Assign the image to the template-block
+album.php:	if ($album_data['album_user_id'] == $user->data['user_id'])
+album.php:				WHERE album_user_id = ' . $user->data['user_id'];
+album.php:			$result = $db->sql_query($sql);
+album.php:			$albums = (int) $db->sql_fetchfield('albums');
+album.php:			$db->sql_freeresult($result);
+album.php:$template->assign_vars(array(
+album.php:	'UPLOAD_IMG'				=> ($album_data['album_status'] == ITEM_LOCKED) ? $user->img('button_topic_locked', 'ALBUM_LOCKED') : $user->img('button_upload_image', 'UPLOAD_IMAGE'),
+album.php:	'U_UPLOAD_IMAGE'			=> ((!$album_data['album_user_id'] || ($album_data['album_user_id'] == $user->data['user_id'])) && (($user->data['user_id'] == ANONYMOUS) || gallery_acl_check('i_upload', $album_id, $album_data['album_user_id']))) ?
+album.php:	'U_CREATE_ALBUM'			=> (($album_data['album_user_id'] == $user->data['user_id']) && $allowed_create) ?
+album.php:	'U_EDIT_ALBUM'				=> ($album_data['album_user_id'] == $user->data['user_id']) ?
+album.php:	'S_DISPLAY_SEARCHBOX'		=> ($auth->acl_get('u_search') && $config['load_search']) ? true : false,
+album.php:	'S_RETURN_LINK'				=> $user->lang['GALLERY'],
+album.php:	'TOTAL_IMAGES'				=> ($image_counter == 1) ? $user->lang['IMAGE_#'] : sprintf($user->lang['IMAGES_#'], $image_counter),
+album.php:	'L_WATCH_TOPIC'				=> ($album_data['watch_id']) ? $user->lang['UNWATCH_ALBUM'] : $user->lang['WATCH_ALBUM'],
+album.php:	'U_WATCH_TOPIC'				=> (($album_data['album_type'] != ALBUM_CAT) && ($user->data['user_id'] != ANONYMOUS)) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "mode=album&amp;submode=" . (($album_data['watch_id']) ?  'unwatch' : 'watch') . "&amp;album_id=$album_id") : '',
+album.php:	page_header($user->lang['VIEW_ALBUM'] . ' - ' . $album_data['album_name'], true, $album_id, 'album');
+album.php:	page_header($user->lang['VIEW_ALBUM'] . ' - ' . $album_data['album_name']);
+album.php:$template->set_filenames(array(
+image_page.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+image_page.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+image_page.php:$user->session_begin();
+image_page.php:$auth->acl($user->data);
+image_page.php:$user->setup(array('mods/gallery', 'mods/exif_data'));
+image_page.php:* - Check the request and get image_data
+image_page.php:* - Check the permissions and approval
+image_page.php:* - Main work here...
+image_page.php:* - Exif-Data
+image_page.php:* - Rating
+image_page.php:* - Posting comment
+image_page.php:* - Listing comment
+image_page.php:	$db->sql_query($sql);
+image_page.php:	// Since we display error-images, we still view this page!
+image_page.php:	if (!$user->data['is_registered'])
+image_page.php:		login_box("{$gallery_root_path}image_page.$phpEx", "album_id=$album_id&amp;image_id=$image_id", $user->lang['LOGIN_INFO']);
+image_page.php:// Increase the counter, as we load the image with increment-blocker from this site it's no problem.
+image_page.php:if (isset($user->data['session_page']) && !$user->data['is_bot'] && (strpos($user->data['session_page'], '&image_id=' . $image_id) === false || isset($user->data['session_created'])))
+image_page.php:	$db->sql_query($sql);
+image_page.php:		AND (($sql_sort_by = '" . $db->sql_escape($image_data[$sql_sort_by]) . "' AND image_id $sql_next_condition {$image_id})
+image_page.php:		OR $sql_sort_by $sql_next_condition '" . $db->sql_escape($image_data[$sql_sort_by]) . "')
+image_page.php:$result = $db->sql_query_limit($sql, 1);
+image_page.php:$next_data = $db->sql_fetchrow($result);
+image_page.php:$db->sql_freeresult($result);
+image_page.php:		AND (($sql_sort_by = '" . $db->sql_escape($image_data[$sql_sort_by]) . "' AND image_id $sql_previous_condition {$image_id})
+image_page.php:		OR $sql_sort_by $sql_previous_condition '" . $db->sql_escape($image_data[$sql_sort_by]) . "')
+image_page.php:$result = $db->sql_query_limit($sql, 1);
+image_page.php:$previous_data = $db->sql_fetchrow($result);
+image_page.php:$db->sql_freeresult($result);
+image_page.php:$template->assign_vars(array(
+image_page.php:	'UC_IMAGE'			=> generate_image_link('medium', $gallery_config['link_imagepage'], $image_id, $image_data['image_name'], $album_id, ((substr($image_data['image_filename'], 0 -3) == 'gif') ? true : false), false),
+image_page.php:	'EDIT_IMG'			=> $user->img('icon_post_edit', 'EDIT_IMAGE'),
+image_page.php:	'DELETE_IMG'		=> $user->img('icon_post_delete', 'DELETE_IMAGE'),
+image_page.php:	'REPORT_IMG'		=> $user->img('icon_post_report', 'REPORT_IMAGE'),
+image_page.php:	'STATUS_IMG'		=> $user->img('icon_post_info', 'STATUS_IMAGE'),
+image_page.php:	'U_DELETE'			=> ((gallery_acl_check('i_delete', $album_id, $album_data['album_user_id']) && ($image_data['image_user_id'] == $user->data['user_id']) && ($album_data['album_status'] != ITEM_LOCKED)) || gallery_acl_check('m_delete', $album_id, $album_data['album_user_id'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "mode=image&amp;submode=delete&amp;album_id=$album_id&amp;image_id=$image_id") : '',
+image_page.php:	'U_EDIT'			=> ((gallery_acl_check('i_edit', $album_id, $album_data['album_user_id']) && ($image_data['image_user_id'] == $user->data['user_id']) && ($album_data['album_status'] != ITEM_LOCKED)) || gallery_acl_check('m_edit', $album_id, $album_data['album_user_id'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "mode=image&amp;submode=edit&amp;album_id=$album_id&amp;image_id=$image_id") : '',
+image_page.php:	'U_REPORT'			=> (gallery_acl_check('i_report', $album_id, $album_data['album_user_id']) && ($image_data['image_user_id'] != $user->data['user_id'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "mode=image&amp;submode=report&amp;album_id=$album_id&amp;image_id=$image_id") : '',
+image_page.php:	'CONTEST_RANK'		=> ($image_data['image_contest_rank']) ? $user->lang['CONTEST_RESULT_' . $image_data['image_contest_rank']] : '',
+image_page.php:	'POSTER'			=> (gallery_acl_check('m_status', $album_id, $album_data['album_user_id']) || ($image_data['image_contest'] != IMAGE_CONTEST)) ? get_username_string('full', $image_data['image_user_id'], ($image_data['image_username']) ? $image_data['image_username'] : $user->lang['GUEST'], $image_data['image_user_colour']) : sprintf($user->lang['CONTEST_USERNAME_LONG'], $user->format_date(($album_data['contest_start'] + $album_data['contest_end']), false, true)),
+image_page.php:	'IMAGE_TIME'		=> $user->format_date($image_data['image_time']),
+image_page.php:	'L_BOOKMARK_TOPIC'	=> ($image_data['favorite_id']) ? $user->lang['UNFAVORITE_IMAGE'] : $user->lang['FAVORITE_IMAGE'],
+image_page.php:	'U_BOOKMARK_TOPIC'	=> ($user->data['user_id'] != ANONYMOUS) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "mode=image&amp;submode=" . (($image_data['favorite_id']) ?  'un' : '') . "favorite&amp;album_id=$album_id&amp;image_id=$image_id") : '',
+image_page.php:	'L_WATCH_TOPIC'		=> ($image_data['watch_id']) ? $user->lang['UNWATCH_IMAGE'] : $user->lang['WATCH_IMAGE'],
+image_page.php:	'U_WATCH_TOPIC'		=> ($user->data['user_id'] != ANONYMOUS) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "mode=image&amp;submode=" . (($image_data['watch_id']) ?  'un' : '') . "watch&amp;album_id=$album_id&amp;image_id=$image_id") : '',
+image_page.php:* Exif-Data
+image_page.php:if ($gallery_config['exif_data'] && ($image_data['image_has_exif'] != EXIF_UNAVAILABLE) && (substr($image_data['image_filename'], -4) == '.jpg') && function_exists('exif_read_data') && (gallery_acl_check('m_status', $album_id, $album_data['album_user_id']) || ($image_data['image_contest'] != IMAGE_CONTEST)))
+image_page.php:		$image_tools->set_image_data($phpbb_root_path . GALLERY_UPLOAD_PATH . $image_data['image_filename']);
+image_page.php:		$image_tools->read_exif_data();
+image_page.php:		$exif = $image_tools->exif_data;
+image_page.php:				$exif_data['exif_date'] = $user->format_date($timestamp + EXIFTIME_OFFSET);
+image_page.php:				$exif_data['exif_focal'] = sprintf($user->lang['EXIF_FOCAL_EXP'], ($num / $den));
+image_page.php:				$exif_data['exif_exposure'] = sprintf($user->lang['EXIF_EXPOSURE_EXP'], $exif_exposure);
+image_page.php:			$exif_data['exif_whiteb'] = $user->lang['EXIF_WHITEB_' . (($exif["EXIF"]["WhiteBalance"]) ? 'MANU' : 'AUTO')];
+image_page.php:			if (isset($user->lang['EXIF_FLASH_CASE_' . $exif["EXIF"]["Flash"]]))
+image_page.php:				$exif_data['exif_flash'] = $user->lang['EXIF_FLASH_CASE_' . $exif["EXIF"]["Flash"]];
+image_page.php:			if (isset($user->lang['EXIF_EXPOSURE_PROG_' . $exif["EXIF"]["ExposureProgram"]]))
+image_page.php:				$exif_data['exif_exposure_prog'] = $user->lang['EXIF_EXPOSURE_PROG_' . $exif["EXIF"]["ExposureProgram"]];
+image_page.php:				$exif_data['exif_exposure_bias'] = sprintf($user->lang['EXIF_EXPOSURE_BIAS_EXP'], $exif_exposure_bias);
+image_page.php:			if (isset($user->lang['EXIF_METERING_MODE_' . $exif["EXIF"]["MeteringMode"]]))
+image_page.php:				$exif_data['exif_metering_mode'] = $user->lang['EXIF_METERING_MODE_' . $exif["EXIF"]["MeteringMode"]];
+image_page.php:				$template->assign_block_vars('exif_value', array(
+image_page.php:					'EXIF_NAME'			=> $user->lang[strtoupper($exif)],
+image_page.php:			$template->assign_vars(array(
+image_page.php:				'S_VIEWEXIF'	=> $user->gallery['user_viewexif'],
+image_page.php:				$db->sql_query($sql);
+image_page.php:		$db->sql_query($sql);
+image_page.php:	if ($user->data['is_registered'])
+image_page.php:				AND rate_user_id = ' . (int) $user->data['user_id'];
+image_page.php:		$result = $db->sql_query($sql);
+image_page.php:		if ($db->sql_affectedrows($result) > 0)
+image_page.php:			$rated = $db->sql_fetchrow($result);
+image_page.php:		$db->sql_freeresult($result);
+image_page.php:		$contest_result_hidden = sprintf($user->lang['CONTEST_RESULT_HIDDEN'], $user->format_date(($album_data['contest_start'] + $album_data['contest_end']), false, true));
+image_page.php:	if (!$your_rating && gallery_acl_check('i_rate', $album_id, $album_data['album_user_id']) && ($user->data['user_id'] != $image_data['image_user_id']) && ($user->data['user_id'] != ANONYMOUS) && ($album_data['album_status'] != ITEM_LOCKED) && ($image_data['image_status'] != IMAGE_LOCKED))
+image_page.php:				$contest_rating_msg = sprintf($user->lang['CONTEST_RATING_STARTS'], $user->format_date(($album_data['contest_start'] + $album_data['contest_rating']), false, true));
+image_page.php:				$contest_rating_msg = sprintf($user->lang['CONTEST_RATING_ENDED'], $user->format_date(($album_data['contest_start'] + $album_data['contest_end']), false, true));
+image_page.php:				$template->assign_block_vars('rate_scale', array(
+image_page.php:	$template->assign_vars(array(
+image_page.php:		'IMAGE_RATING'			=> ($image_data['image_rates'] != 0) ? sprintf((($image_data['image_rates'] == 1) ? $user->lang['RATE_STRING'] : $user->lang['RATES_STRING']), $image_data['image_rate_avg'] / 100, $image_data['image_rates']) : $user->lang['NOT_RATED'],
+image_page.php:	$user->add_lang('posting');
+image_page.php:	$template->assign_vars(array(
+image_page.php:		'CONTEST_COMMENTS'		=> sprintf($user->lang['CONTEST_COMMENTS_STARTS'], $user->format_date(($album_data['contest_start'] + $album_data['contest_end']), false, true)),
+image_page.php:		'BBCODE_STATUS'			=> ($bbcode_status) ? sprintf($user->lang['BBCODE_IS_ON'], '<a href="' . append_sid("{$phpbb_root_path}faq.$phpEx", 'mode=bbcode') . '">', '</a>') : sprintf($user->lang['BBCODE_IS_OFF'], '<a href="' . append_sid("{$phpbb_root_path}faq.$phpEx", 'mode=bbcode') . '">', '</a>'),
+image_page.php:		'IMG_STATUS'			=> ($img_status) ? $user->lang['IMAGES_ARE_ON'] : $user->lang['IMAGES_ARE_OFF'],
+image_page.php:		'FLASH_STATUS'			=> ($flash_status) ? $user->lang['FLASH_IS_ON'] : $user->lang['FLASH_IS_OFF'],
+image_page.php:		'SMILIES_STATUS'		=> ($smilies_status) ? $user->lang['SMILIES_ARE_ON'] : $user->lang['SMILIES_ARE_OFF'],
+image_page.php:		'URL_STATUS'			=> ($bbcode_status && $url_status) ? $user->lang['URL_IS_ON'] : $user->lang['URL_IS_OFF'],
+image_page.php:		'L_COMMENT_LENGTH'		=> sprintf($user->lang['COMMENT_LENGTH'], $gallery_config['comment_length']),
+image_page.php:		$captcha->init(CONFIRM_POST);
+image_page.php:		$template->assign_vars(array(
+image_page.php:			'CAPTCHA_TEMPLATE'		=> $captcha->get_template(),
+image_page.php:		$template->assign_var('S_COMMENT_ACTION', append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=add"));
+image_page.php:	$user->add_lang('viewtopic');
+image_page.php:	$template->assign_vars(array(
+image_page.php:		$result = $db->sql_query_limit($sql, $config['posts_per_page'], $start);
+image_page.php:		while ($row = $db->sql_fetchrow($result))
+image_page.php:		$db->sql_freeresult($result);
+image_page.php:		$sql = $db->sql_build_query('SELECT', array(
+image_page.php:			'WHERE'		=> $db->sql_in_set('u.user_id', $users),
+image_page.php:		$result = $db->sql_query($sql);
+image_page.php:		while ($row = $db->sql_fetchrow($result))
+image_page.php:		$db->sql_freeresult($result);
+image_page.php:			// Load online-information
+image_page.php:				WHERE ' . $db->sql_in_set('session_user_id', $users) . '
+image_page.php:			$result = $db->sql_query($sql);
+image_page.php:			while ($row = $db->sql_fetchrow($result))
+image_page.php:				$user_cache[$row['session_user_id']]['online'] = (time() - $update_time < $row['online_time'] && (($row['viewonline']) || $auth->acl_get('u_viewonline'))) ? true : false;
+image_page.php:			$db->sql_freeresult($result);
+image_page.php:				$edit_info = ($row['comment_edit_count'] == 1) ? $user->lang['EDITED_TIME_TOTAL'] : $user->lang['EDITED_TIMES_TOTAL'];
+image_page.php:				$edit_info = sprintf($edit_info, get_username_string('full', $user_cache[$row['comment_edit_user_id']]['user_id'], $user_cache[$row['comment_edit_user_id']]['username'], $user_cache[$row['comment_edit_user_id']]['user_colour']), $user->format_date($row['comment_edit_time'], false, true), $row['comment_edit_count']);
+image_page.php:					$bbcode->bbcode_second_pass($user_cache[$user_id]['sig'], $user_cache[$user_id]['sig_bbcode_uid'], $user_cache[$user_id]['sig_bbcode_bitfield']);
+image_page.php:			$template->assign_block_vars('commentrow', array(
+image_page.php:				'TIME'			=> $user->format_date($row['comment_time']),
+image_page.php:				'U_DELETE'		=> (gallery_acl_check('m_comments', $album_id, $album_data['album_user_id']) || (gallery_acl_check('c_delete', $album_id, $album_data['album_user_id']) && ($row['comment_user_id'] == $user->data['user_id']) && $user->data['is_registered'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=delete&amp;comment_id=" . $row['comment_id']) : '',
+image_page.php:				'U_EDIT'		=> (gallery_acl_check('m_comments', $album_id, $album_data['album_user_id']) || (gallery_acl_check('c_edit', $album_id, $album_data['album_user_id']) && ($row['comment_user_id'] == $user->data['user_id']) && $user->data['is_registered'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=edit&amp;comment_id=" . $row['comment_id']) : '',
+image_page.php:				'U_INFO'		=> ($auth->acl_get('a_')) ? append_sid("{$phpbb_root_path}{$gallery_root_path}mcp.$phpEx", 'mode=whois&amp;ip=' . $row['comment_user_ip']) : '',
+image_page.php:				'ONLINE_IMG'		=> ($user_id == ANONYMOUS || !$config['load_onlinetrack']) ? '' : (($user_cache[$user_id]['online']) ? $user->img('icon_user_online', 'ONLINE') : $user->img('icon_user_offline', 'OFFLINE')),
+image_page.php:				'U_PM'			=> ($user_id != ANONYMOUS && $config['allow_privmsg'] && $auth->acl_get('u_sendpm') && ($user_cache[$user_id]['allow_pm'] || $auth->acl_gets('a_', 'm_'))) ? append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=pm&amp;mode=compose&amp;u=' . $user_id) : '',
+image_page.php:		$db->sql_freeresult($result);
+image_page.php:		$template->assign_vars(array(
+image_page.php:			'DELETE_IMG'		=> $user->img('icon_post_delete', 'DELETE_COMMENT'),
+image_page.php:			'EDIT_IMG'			=> $user->img('icon_post_edit', 'EDIT_COMMENT'),
+image_page.php:			'INFO_IMG'			=> $user->img('icon_post_info', 'IP'),
+image_page.php:			'MINI_POST_IMG'		=> $user->img('icon_post_target_unread', 'COMMENT'),
+image_page.php:			'PROFILE_IMG'		=> $user->img('icon_user_profile', 'READ_PROFILE'),
+image_page.php:			'SEARCH_IMG' 		=> $user->img('icon_user_search', 'SEARCH_USER_POSTS'),
+image_page.php:			'PM_IMG' 			=> $user->img('icon_contact_pm', 'SEND_PRIVATE_MESSAGE'),
+image_page.php:			'EMAIL_IMG' 		=> $user->img('icon_contact_email', 'SEND_EMAIL'),
+image_page.php:			'WWW_IMG' 			=> $user->img('icon_contact_www', 'VISIT_WEBSITE'),
+image_page.php:			'ICQ_IMG' 			=> $user->img('icon_contact_icq', 'ICQ'),
+image_page.php:			'AIM_IMG' 			=> $user->img('icon_contact_aim', 'AIM'),
+image_page.php:			'MSN_IMG' 			=> $user->img('icon_contact_msnm', 'MSNM'),
+image_page.php:			'YIM_IMG' 			=> $user->img('icon_contact_yahoo', 'YIM'),
+image_page.php:			'JABBER_IMG'		=> $user->img('icon_contact_jabber', 'JABBER') ,
+image_page.php:			'GALLERY_IMG'		=> $user->img('icon_contact_gallery', 'PERSONAL_ALBUM'),
+image_page.php:			'PAGE_NUMBER'		=> sprintf($user->lang['PAGE_OF'], (floor($start / $config['posts_per_page']) + 1), ceil($image_data['image_comments'] / $config['posts_per_page'])),
+image_page.php:page_header($user->lang['VIEW_IMAGE'] . ' - ' . $image_data['image_name'], false);
+image_page.php:$template->set_filenames(array(
+image.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+image.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+image.php:$user->session_begin(false);
+image.php:$auth->acl($user->data);
+image.php:$user->setup('mods/gallery');
+image.php:$image_filetype = utf8_substr($image_data['image_filename'], strlen($image_data['image_filename']) - 4, 4);
+image.php:	$db->sql_query($sql);
+image.php:		if (!gallery_hookup_image_view($user->data['user_id']))
+image.php:			// Cash-MOD HookUp failed and denies to view the image
+image.php:		if (!$user->data['is_bot'] && !$image_error && ($view != 'no_count'))
+image.php:			$db->sql_query($sql);
+image.php:// There was a reason to not display the image, so we send an error-image
+image.php:	$image_data['image_filename'] = $user->data['user_lang'] . '_' . $image_error;
+image.php:$image_tools->set_image_options($gallery_config['max_file_size'], $gallery_config['max_height'], $gallery_config['max_width']);
+image.php:$image_tools->set_image_data($image_source, $image_data['image_name']);
+image.php:		$image_tools->set_image_data($phpbb_root_path . GALLERY_UPLOAD_PATH . $image_data['image_filename']);
+image.php:		$image_tools->read_image(true);
+image.php:		$image_size['file'] = $image_tools->image_size['file'];
+image.php:		$image_size['width'] = $image_tools->image_size['width'];
+image.php:		$image_size['height'] = $image_tools->image_size['height'];
+image.php:		$image_tools->set_image_data($image_source);
+image.php:			$image_tools->create_thumbnail($resize_width, $resize_height, $put_details, THUMBNAIL_INFO_HEIGHT, $image_size);
+image.php:			$image_tools->write_image($image_source, (($mode == 'thumbnail') ? $gallery_config['thumbnail_quality'] : $gallery_config['jpg_quality']), false);
+image.php:			$sql = 'UPDATE ' . GALLERY_IMAGES_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+image.php:				WHERE ' . $db->sql_in_set('image_id', $image_id);
+image.php:			$db->sql_query($sql);
+image.php:	$image_tools->watermark_image($phpbb_root_path . $gallery_config['watermark_source'], $gallery_config['watermark_position'], $gallery_config['watermark_height'], $gallery_config['watermark_width']);
+image.php:$image_tools->send_image_to_browser();
+Binary file images/icon_edit_disabled.gif matches
+Binary file images/upload/3e396c8a5ff9a9c41c00a6f25324230d.jpg matches
+Binary file images/upload/no_hotlinking.jpg matches
+Binary file images/upload/a22331a8a4ed08ba04b66740d9589c76.jpg matches
+Binary file images/upload/d72d57f469d7affa2fc1ffc9b4c28ffa.jpg matches
+Binary file images/upload/47a9c1d9c43ca78056f8c2fcc3566bc8.jpg matches
+Binary file images/upload/9c0947d780a8c36dc605af80a9f85b14.jpg matches
+Binary file images/upload/not_authorised.jpg matches
+Binary file images/upload/88f651050101a3430a9d10939a9879aa.jpg matches
+Binary file images/upload/ee675a3881ce7ff9d2142b4fd67e5d23.jpg matches
+Binary file images/upload/de_not_authorised.jpg matches
+Binary file images/upload/de_no_hotlinking.jpg matches
+Binary file images/upload/de_image_not_exist.jpg matches
+Binary file images/upload/2e4e43029f29ce21bb9324ad87e3bdc9.jpg matches
+Binary file images/upload/image_not_exist.jpg matches
+Binary file images/medium/a22331a8a4ed08ba04b66740d9589c76.jpg matches
+Binary file images/medium/d72d57f469d7affa2fc1ffc9b4c28ffa.jpg matches
+Binary file images/medium/47a9c1d9c43ca78056f8c2fcc3566bc8.jpg matches
+Binary file images/medium/9c0947d780a8c36dc605af80a9f85b14.jpg matches
+Binary file images/medium/ee675a3881ce7ff9d2142b4fd67e5d23.jpg matches
+Binary file images/medium/2e4e43029f29ce21bb9324ad87e3bdc9.jpg matches
+Binary file images/icon_down.gif matches
+Binary file images/icon_up.gif matches
+Binary file images/icon_delete_disabled.gif matches
+Binary file images/icon_delete.gif matches
+Binary file images/icon_up_disabled.gif matches
+Binary file images/watermark.png matches
+images/index.htm:<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+Binary file images/cache/3e396c8a5ff9a9c41c00a6f25324230d.jpg matches
+Binary file images/cache/a22331a8a4ed08ba04b66740d9589c76.jpg matches
+Binary file images/cache/d72d57f469d7affa2fc1ffc9b4c28ffa.jpg matches
+Binary file images/cache/47a9c1d9c43ca78056f8c2fcc3566bc8.jpg matches
+Binary file images/cache/9c0947d780a8c36dc605af80a9f85b14.jpg matches
+Binary file images/cache/not_authorised.jpg matches
+Binary file images/cache/88f651050101a3430a9d10939a9879aa.jpg matches
+Binary file images/cache/ee675a3881ce7ff9d2142b4fd67e5d23.jpg matches
+Binary file images/cache/2e4e43029f29ce21bb9324ad87e3bdc9.jpg matches
+includes/phpbb_integration.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/phpbb_integration.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/phpbb_integration.php:	$user->add_lang('mods/gallery');
+includes/phpbb_integration.php:	$memberdays = max(1, round((time() - $member['user_regdate']) / 86400));
+includes/phpbb_integration.php:	$result = $db->sql_query_limit($sql, 1);
+includes/phpbb_integration.php:	$member_gallery = $db->sql_fetchrow($result);
+includes/phpbb_integration.php:	$db->sql_freeresult($result);
+includes/phpbb_integration.php:	$template->assign_vars(array(
+includes/phpbb_integration.php:		'IMAGES_DAY'		=> sprintf($user->lang['IMAGE_DAY'], $images_per_day),
+includes/phpbb_integration.php:		'IMAGES_PCT'		=> sprintf($user->lang['IMAGE_PCT'], $percentage_images),
+includes/phpbb_integration.php:		'SHOW_PERSONAL_ALBUM_OF'	=> sprintf($user->lang['SHOW_PERSONAL_ALBUM_OF'], $member['username']),
+includes/phpbb_integration.php:		$user->add_lang('mods/gallery');
+includes/phpbb_integration.php:		$album_data = $cache->obtain_album_list();
+includes/phpbb_integration.php:	$location = $user->lang['GALLERY'];
+includes/phpbb_integration.php:				$location = sprintf($user->lang['VIEWING_ALBUM'], $album_data[$album_id]['album_name']);
+includes/phpbb_integration.php:				$location = sprintf($user->lang['VIEWING_IMAGE'], $album_data[$album_id]['album_name']);
+includes/phpbb_integration.php:				preg_match('#mode=([a-z]+)#', $session_page, $on_page);
+includes/phpbb_integration.php:						$location = sprintf($user->lang['COMMENT_IMAGE'], $album_data[$album_id]['album_name']);
+includes/phpbb_integration.php:						$location = sprintf($user->lang['VIEWING_ALBUM'], $album_data[$album_id]['album_name']);
+includes/phpbb_integration.php:		preg_match('#mode=([a-z]+)#', $session_page, $on_page);
+includes/phpbb_integration.php:			$location = $user->lang['PERSONAL_ALBUMS'];
+includes/phpbb_integration.php:				SET $field = '" . $db->sql_escape($new_name) . "'
+includes/phpbb_integration.php:				WHERE $field = '" . $db->sql_escape($old_name) . "'";
+includes/phpbb_integration.php:			$db->sql_query($sql);
+includes/phpbb_integration.php:				SET $field = '" . $db->sql_escape(utf8_clean_string($new_name)) . "'
+includes/phpbb_integration.php:				WHERE $field = '" . $db->sql_escape(utf8_clean_string($old_name)) . "'";
+includes/phpbb_integration.php:			$db->sql_query($sql);
+includes/phpbb_integration.php:		SET album_name = '" . $db->sql_escape($new_name) . "'
+includes/phpbb_integration.php:		WHERE album_name = '" . $db->sql_escape($old_name) . "'
+includes/phpbb_integration.php:	$db->sql_query($sql);
+includes/phpbb_integration.php:	$db->sql_query($sql);
+includes/phpbb_integration.php:	// Because some tables/caches use username-specific data we need to purge this here.
+includes/phpbb_integration.php:	$cache->destroy('_albums');
+includes/phpbb_integration.php:	$cache->destroy('sql', GALLERY_ALBUMS_TABLE);
+includes/phpbb_integration.php:	$cache->destroy('sql', GALLERY_MODSCACHE_TABLE);
+includes/phpbb_integration.php:		$sql = 'UPDATE ' . GALLERY_ALBUMS_TABLE . " SET album_last_user_colour = '" . $db->sql_escape($sql_ary['user_colour']) . "'
+includes/phpbb_integration.php:			WHERE " . $db->sql_in_set('album_last_user_id', $user_id_ary);
+includes/phpbb_integration.php:		$db->sql_query($sql);
+includes/phpbb_integration.php:		$sql = 'UPDATE ' . GALLERY_COMMENTS_TABLE . " SET comment_user_colour = '" . $db->sql_escape($sql_ary['user_colour']) . "'
+includes/phpbb_integration.php:			WHERE " . $db->sql_in_set('comment_user_id', $user_id_ary);
+includes/phpbb_integration.php:		$db->sql_query($sql);
+includes/phpbb_integration.php:		$sql = 'UPDATE ' . GALLERY_IMAGES_TABLE . " SET image_user_colour = '" . $db->sql_escape($sql_ary['user_colour']) . "'
+includes/phpbb_integration.php:			WHERE " . $db->sql_in_set('image_user_id', $user_id_ary);
+includes/phpbb_integration.php:		$db->sql_query($sql);
+includes/phpbb_integration.php:			$db->sql_return_on_error(true);
+includes/phpbb_integration.php:			$result = $db->sql_query($sql);
+includes/phpbb_integration.php:			while ($row = $db->sql_fetchrow($result))
+includes/phpbb_integration.php:			$db->sql_freeresult($result);
+includes/phpbb_integration.php:			$db->sql_return_on_error(false);
+includes/functions_phpbb.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/functions_phpbb.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_phpbb.php:* This file contains functions, to be backwards and forwards compatible with phpBB-versions
+includes/functions_phpbb.php:	$time = (time() - (intval($config['load_online_time']) * 60));
+includes/functions_phpbb.php:	if ($db->sql_layer === 'sqlite')
+includes/functions_phpbb.php:					AND s.session_time >= ' . ($time - ((int) ($time % 60))) .
+includes/functions_phpbb.php:				AND s.session_time >= ' . ($time - ((int) ($time % 60))) .
+includes/functions_phpbb.php:	$result = $db->sql_query($sql, 60);
+includes/functions_phpbb.php:	$guests_online = (int) $db->sql_fetchfield('num_guests');
+includes/functions_phpbb.php:	$db->sql_freeresult($result);
+includes/functions_phpbb.php:	$time = (time() - (intval($config['load_online_time']) * 60));
+includes/functions_phpbb.php:		WHERE s.session_time >= ' . ($time - ((int) ($time % 30))) .
+includes/functions_phpbb.php:	$result = $db->sql_query($sql);
+includes/functions_phpbb.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions_phpbb.php:	$db->sql_freeresult($result);
+includes/functions_phpbb.php:	// for the language-string
+includes/functions_phpbb.php:				WHERE ' . $db->sql_in_set('user_id', $online_users['online_users']) . '
+includes/functions_phpbb.php:		$result = $db->sql_query($sql);
+includes/functions_phpbb.php:		while ($row = $db->sql_fetchrow($result))
+includes/functions_phpbb.php:				if (!isset($online_users['hidden_users'][$row['user_id']]) || $auth->acl_get('u_viewonline'))
+includes/functions_phpbb.php:		$db->sql_freeresult($result);
+includes/functions_phpbb.php:		$online_userlist = $user->lang['NO_ONLINE_USERS'];
+includes/functions_phpbb.php:		$online_userlist = $user->lang['REGISTERED_USERS'] . ' ' . $online_userlist;
+includes/functions_phpbb.php:		$l_online = ($online_users['guests_online'] === 1) ? $user->lang['BROWSING_' . $caps_mode . '_GUEST'] : $user->lang['BROWSING_' . $caps_mode . '_GUESTS'];
+includes/functions_phpbb.php:		$online_userlist = sprintf($user->lang['BROWSING_' . $caps_mode], $online_userlist);
+includes/functions_phpbb.php:				${$var_ary[1]} = $user->lang[$l_prefix . '_USERS_ZERO_TOTAL' . $l_suffix];
+includes/functions_phpbb.php:				${$var_ary[1]} = $user->lang[$l_prefix . '_USER_TOTAL' . $l_suffix];
+includes/functions_phpbb.php:				${$var_ary[1]} = $user->lang[$l_prefix . '_USERS_TOTAL' . $l_suffix];
+includes/functions_phpbb.php:		$l_online_time = sprintf($user->lang[$l_online_time], $config['load_online_time']);
+includes/functions_phpbb.php:		$template->assign_vars(array(
+includes/functions_phpbb.php:		switch ($db->sql_layer)
+includes/functions_phpbb.php:		$db->sql_query('UPDATE ' . CONFIG_TABLE . ' SET config_value = ' . $sql_update . " WHERE config_name = '" . $db->sql_escape($config_name) . "'");
+includes/functions_phpbb.php:			$cache->destroy('config');
+includes/functions_phpbb.php:		if (!isset($user->data["hash_$link_name"]))
+includes/functions_phpbb.php:			$user->data["hash_$link_name"] = substr(sha1($user->data['user_form_salt'] . $link_name), 0, 8);
+includes/functions_phpbb.php:		return $user->data["hash_$link_name"];
+includes/functions_phpbb.php:	* checks a link hash - for GET requests
+includes/permissions.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/permissions.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/permissions.php:		$result = $db->sql_query($sql);
+includes/permissions.php:		while ($row = $db->sql_fetchrow($result))
+includes/permissions.php:		$db->sql_freeresult($result);
+includes/permissions.php:	$albums = $cache->obtain_album_list();
+includes/permissions.php:			$album_access_array[-1][$permission] = GALLERY_ACL_NO;
+includes/permissions.php:		$album_access_array[-1]['m_'] = GALLERY_ACL_NO;
+includes/permissions.php:		$user_id = ($user->data['user_perm_from'] == 0) ? $user->data['user_id'] : $user->data['user_perm_from'];
+includes/permissions.php:		$result = $db->sql_query($sql);
+includes/permissions.php:		while ($row = $db->sql_fetchrow($result))
+includes/permissions.php:		$db->sql_freeresult($result);
+includes/permissions.php:			'WHERE'			=> 'p.perm_user_id = ' . $user_id . ' OR ' . $db->sql_in_set('p.perm_group_id', $user_groups_ary, false, true),
+includes/permissions.php:		$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/permissions.php:		$result = $db->sql_query($sql);
+includes/permissions.php:		while ($row = $db->sql_fetchrow($result))
+includes/permissions.php:		$db->sql_freeresult($result);
+includes/permissions.php:function gallery_acl_check($mode, $album_id, $album_user_id = -1)
+includes/permissions.php:			$_album_list = $cache->obtain_album_list();
+includes/permissions.php:		if ($album_user_id == $user->data['user_id'])
+includes/permissions.php:		if ($album_user_id == $user->data['user_id'])
+includes/permissions.php:	$albums = $cache->obtain_album_list();
+includes/permissions.php:		if ($album['album_user_id'] == $user->data['user_id'])
+includes/permissions.php:function gen_album_auth_level($mode, $album_id, $album_status, $album_user_id = -1)
+includes/permissions.php:		(gallery_acl_check('i_view', $album_id, $album_user_id) && !$locked) ? $user->lang['ALBUM_VIEW_CAN'] : $user->lang['ALBUM_VIEW_CANNOT'],
+includes/permissions.php:		(gallery_acl_check('i_upload', $album_id, $album_user_id) && !$locked) ? $user->lang['ALBUM_UPLOAD_CAN'] : $user->lang['ALBUM_UPLOAD_CANNOT'],
+includes/permissions.php:		(gallery_acl_check('i_edit', $album_id, $album_user_id) && !$locked) ? $user->lang['ALBUM_EDIT_CAN'] : $user->lang['ALBUM_EDIT_CANNOT'],
+includes/permissions.php:		(gallery_acl_check('i_delete', $album_id, $album_user_id) && !$locked) ? $user->lang['ALBUM_DELETE_CAN'] : $user->lang['ALBUM_DELETE_CANNOT'],
+includes/permissions.php:		$rules[] = (gallery_acl_check('c_post', $album_id, $album_user_id) && !$locked) ? $user->lang['ALBUM_COMMENT_CAN'] : $user->lang['ALBUM_COMMENT_CANNOT'];
+includes/permissions.php:		$rules[] = (gallery_acl_check('i_rate', $album_id, $album_user_id) && !$locked) ? $user->lang['ALBUM_RATE_CAN'] : $user->lang['ALBUM_RATE_CANNOT'];
+includes/permissions.php:		$template->assign_block_vars('rules', array('RULE' => $rule));
+includes/functions_posting.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/functions_posting.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_posting.php:		'image_user_id'			=> $user->data['user_id'],
+includes/functions_posting.php:		'image_user_colour'		=> $user->data['user_colour'],
+includes/functions_posting.php:		'image_user_ip'			=> $user->ip,
+includes/functions_posting.php:	$message_parser->message	= utf8_normalize_nfc($image_data['image_desc']);
+includes/functions_posting.php:	if($message_parser->message)
+includes/functions_posting.php:		$message_parser->parse(true, true, true, true, false, true, true, true);
+includes/functions_posting.php:		$sql_ary['image_desc']			= $message_parser->message;
+includes/functions_posting.php:		$sql_ary['image_desc_uid']		= $message_parser->bbcode_uid;
+includes/functions_posting.php:		$sql_ary['image_desc_bitfield']	= $message_parser->bbcode_bitfield;
+includes/functions_posting.php:	$sql = 'INSERT INTO ' . GALLERY_IMAGES_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+includes/functions_posting.php:	$db->sql_query($sql);
+includes/functions_posting.php:	$image_id = $db->sql_nextid();
+includes/functions_posting.php:	if ($user->gallery['watch_own'])
+includes/functions_posting.php:			'user_id'			=> $user->data['user_id'],
+includes/functions_posting.php:		$sql = 'INSERT INTO ' . GALLERY_WATCH_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+includes/functions_posting.php:		$db->sql_query($sql);
+includes/functions_posting.php:	$result = $db->sql_query($sql);
+includes/functions_posting.php:	$sql_ignore_users = ANONYMOUS . ', ' . $user->data['user_id'];
+includes/functions_posting.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions_posting.php:	$db->sql_freeresult($result);
+includes/functions_posting.php:	// -- get album_userids	|| image_userids
+includes/functions_posting.php:	$result = $db->sql_query($sql);
+includes/functions_posting.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions_posting.php:	$db->sql_freeresult($result);
+includes/functions_posting.php:	$result = $db->sql_query($sql);
+includes/functions_posting.php:	$album = $db->sql_fetchrow($result);
+includes/functions_posting.php:	$db->sql_freeresult($result);
+includes/functions_posting.php:	$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions_posting.php:	$result = $db->sql_query($sql);
+includes/functions_posting.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions_posting.php:	$db->sql_freeresult($result);
+includes/functions_posting.php:			WHERE ' . $db->sql_in_set('group_id', $groups_ary) . '
+includes/functions_posting.php:		$result = $db->sql_query($sql);
+includes/functions_posting.php:		while ($row = $db->sql_fetchrow($result))
+includes/functions_posting.php:		$db->sql_freeresult($result);
+includes/functions_posting.php:				$messenger->template($email_template, $addr['lang']);
+includes/functions_posting.php:				$messenger->to($addr['email'], $addr['name']);
+includes/functions_posting.php:				$messenger->im($addr['jabber'], $addr['name']);
+includes/functions_posting.php:				$messenger->assign_vars(array(
+includes/functions_posting.php:				$messenger->send($addr['method']);
+includes/functions_posting.php:		$messenger->save_queue();
+includes/functions_posting.php:				AND " . $db->sql_in_set('user_id', $delete_ids['image']);
+includes/functions_posting.php:		$db->sql_query($sql);
+includes/functions_posting.php:				AND " . $db->sql_in_set('user_id', $delete_ids['album']);
+includes/functions_posting.php:		$db->sql_query($sql);
+includes/functions_posting.php:	$db->sql_query('INSERT INTO ' . GALLERY_ALBUMS_TABLE . ' ' . $db->sql_build_array('INSERT', $album_data));
+includes/functions_posting.php:	$personal_album_id = $db->sql_nextid();
+includes/functions_posting.php:		$db->sql_query($sql);
+includes/functions_posting.php:		$db->sql_query('INSERT INTO ' . GALLERY_USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $gallery_settings));
+includes/functions_posting.php:	$cache->destroy('_albums');
+includes/functions_posting.php:	$cache->destroy('sql', GALLERY_ALBUMS_TABLE);
+includes/constants.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/constants.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/constants.php:// Exif-data
+includes/constants.php:define('EXIFTIME_OFFSET', 0); // Use this constant, to change the exif-timestamp. Offset in seconds
+includes/constants.php:define('SETTING_PERMISSIONS', -39839);
+includes/constants.php:define('OWN_GALLERY_PERMISSIONS', -2);
+includes/constants.php:define('PERSONAL_GALLERY_PERMISSIONS', -3);
+includes/constants.php:// ACL - slightly different
+includes/constants.php:// Display-options for RRC-Feature
+includes/constants.php:// Mode-options for RRC-Feature
+includes/functions_version_check.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_version_check.php:		$mod_version = $user->lang['NO_INFO'];
+includes/functions_version_check.php:			'description'	=> $user->lang['NO_INFO'],
+includes/functions_version_check.php:			'download'		=> $user->lang['NO_INFO'],
+includes/functions_version_check.php:			'announcement'	=> $user->lang['NO_INFO'],
+includes/functions_version_check.php:			if (isset($mod->$var['tag']))
+includes/functions_version_check.php:				$row = $mod->$var['tag'];
+includes/functions_version_check.php:				$mod_version = $row->mod_version->major . '.' . $row->mod_version->minor . '.' . $row->mod_version->revision . $row->mod_version->release;
+includes/functions_version_check.php:					'title'			=> $row->title,
+includes/functions_version_check.php:					'description'	=> $row->description,
+includes/functions_version_check.php:					'download'		=> $row->download,
+includes/functions_version_check.php:					'announcement'	=> $row->announcement,
+includes/functions_version_check.php:	$template->assign_block_vars('mods', array(
+includes/functions_version_check.php:		'UP_TO_DATE'		=> sprintf((!$version_compare) ? $user->lang['NOT_UP_TO_DATE'] : $user->lang['UP_TO_DATE'], $data['title']),
+includes/functions_version_check.php:	// Fire up the built-in XML parser
+includes/functions.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/functions.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions.php:	WHERE user_id = ' . (int) $user->data['user_id'];
+includes/functions.php:$result = $db->sql_query($sql);
+includes/functions.php:$array = $db->sql_fetchrow($result);
+includes/functions.php:$db->sql_freeresult($result);
+includes/functions.php:if ($db->sql_affectedrows())
+includes/functions.php:	$user->gallery = array_map('intval', $array);
+includes/functions.php:	$user->gallery['exists'] = true;
+includes/functions.php:	$user->gallery = $array;
+includes/functions.php:	$db->sql_return_on_error(true);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$db->sql_return_on_error(false);
+includes/functions.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:		SET config_value = '" . $db->sql_escape($config_value) . "'
+includes/functions.php:		WHERE config_name = '" . $db->sql_escape($config_name) . "'";
+includes/functions.php:	$db->sql_query($sql);
+includes/functions.php:	if (!$db->sql_affectedrows() && !isset($gallery_config[$config_name]))
+includes/functions.php:		$sql = 'INSERT INTO ' . GALLERY_CONFIG_TABLE . ' ' . $db->sql_build_array('INSERT', array(
+includes/functions.php:		$db->sql_query($sql);
+includes/functions.php:		$cache->destroy('config');
+includes/functions.php:	switch ($db->sql_layer)
+includes/functions.php:	$db->sql_query('UPDATE ' . GALLERY_CONFIG_TABLE . ' SET config_value = ' . $sql_update . " WHERE config_name = '" . $db->sql_escape($config_name) . "'");
+includes/functions.php:		$cache->destroy('config');
+includes/functions.php:				'ON'		=> 'a.album_id = w.album_id AND w.user_id = ' . $user->data['user_id'],
+includes/functions.php:	$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$row = $db->sql_fetchrow($result);
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:				'ON'		=> 'i.image_id = w.image_id AND w.user_id = ' . $user->data['user_id'],
+includes/functions.php:				'ON'		=> 'i.image_id = f.image_id AND f.user_id = ' . $user->data['user_id'],
+includes/functions.php:	$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$row = $db->sql_fetchrow($result);
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:	if (!$user->gallery['personal_album_id'])
+includes/functions.php:			AND album_user_id = ' . $user->data['user_id'];
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	if (!$row = $db->sql_fetchrow($result))
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:* Generate gallery-albumbox
+includes/functions.php:* @param	string				$select_name			request_var() for the select-box
+includes/functions.php:* @param	int					$album_user_id			for the select-boxes of the ucp so you only can attach to your own albums
+includes/functions.php:* @return	string				$gallery_albumbox		if ($select_name) {full select-box} else {list with options}
+includes/functions.php:function gallery_albumbox($ignore_personals, $select_name, $select_id = false, $requested_permission = false, $ignore_id = false, $album_user_id = NON_PERSONAL_ALBUMS, $requested_album_type = -1)
+includes/functions.php:	$album_data = $cache->obtain_album_list();
+includes/functions.php:				$album_list .= '<option disabled="disabled" class="disabled-option">' . $user->lang['PERSONAL_ALBUMS'] . '</option>';
+includes/functions.php:			if ($row['album_user_id'] == $user->data['user_id'])
+includes/functions.php:			$album_list .= '<option value="' . $row['album_id'] . '"' . (($disabled) ? ' disabled="disabled" class="disabled-option"' : $selected) . '>' . $padding . $row['album_name'] . ' (ID: ' . $row['album_id'] . ')</option>';
+includes/functions.php:* - album_images, _real
+includes/functions.php:* - album_last_image_id, _time, _name
+includes/functions.php:* - album_last_username, _user_colour, _user_id
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$album_user_id = $db->sql_fetchfield('album_user_id');
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$images = $db->sql_fetchfield('images');
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$images_real = $db->sql_fetchfield('images_real');
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	if ($row = $db->sql_fetchrow($result))
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:	$sql = 'UPDATE ' . GALLERY_ALBUMS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+includes/functions.php:		WHERE ' . $db->sql_in_set('album_id', $album_id);
+includes/functions.php:	$db->sql_query($sql);
+includes/functions.php:* Handle user- & total image_counter
+includes/functions.php:			AND ' . $db->sql_in_set('image_id', $image_id_ary) . '
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	$num_comments = $db->sql_fetchfield('comments');
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:			AND ' . $db->sql_in_set('image_id', $image_id_ary) . '
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions.php:		gallery_hookup_image_counter($row['image_user_id'], (($add) ? $row['images'] : 0 - $row['images']));
+includes/functions.php:			SET user_images = user_images ' . (($add) ? '+ ' : '- ') . $row['images'] . '
+includes/functions.php:			WHERE ' . $db->sql_in_set('user_id', $row['image_user_id']);
+includes/functions.php:		$db->sql_query($sql);
+includes/functions.php:		if ($db->sql_affectedrows() != 1)
+includes/functions.php:			$sql = 'INSERT INTO ' . GALLERY_USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+includes/functions.php:			$db->sql_query($sql);
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:	set_config_count('num_images', (($add) ? $num_images : 0 - $num_images), true);
+includes/functions.php:	set_gallery_config_count('num_comments', (($add) ? $num_comments : 0 - $num_comments), true);
+includes/functions.php:	$result = $db->sql_query($sql);
+includes/functions.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions.php:	$db->sql_freeresult($result);
+includes/functions.php:* @param	bool	$is_gif		we need to know whether we display a gif, so we can use a better medium-image
+includes/functions.php:* @param	bool	$count		shall the image-link be counted as view? (Set to false from image_page.php to deny double increment)
+includes/functions.php:			$content = '<span style="font-weight: bold;">' . $shorten_image_name . '</span>';
+includes/functions.php:			$content = '<img src="{U_THUMBNAIL}" alt="{IMAGE_NAME}" title="{IMAGE_NAME}" style="max-width: {FAKE_THUMB_SIZE}px; max-height: {FAKE_THUMB_SIZE}px;" />';
+includes/functions.php:				$content = '<img src="{U_MEDIUM}" alt="{IMAGE_NAME}" title="{IMAGE_NAME}" style="max-width: {MEDIUM_WIDTH_SIZE}px; max-height: {MEDIUM_HEIGHT_SIZE}px;" />';
+includes/functions.php:			$content = $user->img('icon_topic_latest', 'VIEW_LATEST_IMAGE');
+includes/functions.php:			$tpl = '<a href="{IMAGE_URL}" title="{IMAGE_NAME}" class="right-box right">{CONTENT}</a>';
+includes/functions.php:			$tpl = '<a href="{IMAGE_URL}" title="{IMAGE_NAME}" class="left-box left">{CONTENT}</a>';
+includes/functions.php:	if ($user->data['user_id'] == ANONYMOUS)
+includes/functions.php:				WHERE user_id = ' . $user->data['user_id'];
+includes/functions.php:			$db->sql_query($sql);
+includes/functions.php:				WHERE user_id = ' . $user->data['user_id'];
+includes/functions.php:			$db->sql_query($sql);
+includes/functions.php:			if ($db->sql_affectedrows() <= 0)
+includes/functions.php:					'user_id'			=> $user->data['user_id'],
+includes/functions.php:				$sql = 'INSERT INTO ' . GALLERY_USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+includes/functions.php:				$db->sql_query($sql);
+includes/functions.php:			WHERE user_id = {$user->data['user_id']}
+includes/functions.php:				AND " . $db->sql_in_set('album_id', $album_id);
+includes/functions.php:		$result = $db->sql_query($sql);
+includes/functions.php:		while ($row = $db->sql_fetchrow($result))
+includes/functions.php:		$db->sql_freeresult($result);
+includes/functions.php:				WHERE user_id = {$user->data['user_id']}
+includes/functions.php:					AND " . $db->sql_in_set('album_id', $sql_update);
+includes/functions.php:			$db->sql_query($sql);
+includes/functions.php:					'user_id'	=> (int) $user->data['user_id'],
+includes/functions.php:			$db->sql_multi_insert(GALLERY_ATRACK_TABLE, $sql_ary);
+includes/functions.php:			WHERE user_id = {$user->data['user_id']}
+includes/functions.php:		$db->sql_query($sql);
+includes/functions.php:		if (!$db->sql_affectedrows())
+includes/functions.php:			$db->sql_return_on_error(true);
+includes/functions.php:				'user_id'		=> (int) $user->data['user_id'],
+includes/functions.php:			$db->sql_query('INSERT INTO ' . GALLERY_ATRACK_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary));
+includes/functions.php:			$db->sql_return_on_error(false);
+includes/functions.php:	$gallery_display_captcha = ($user->data['user_id'] == ANONYMOUS) && $gallery_config['captcha_' . $mode] && (version_compare($config['version'], '3.0.5', '>'));
+includes/functions_users.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/functions_users.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_users.php:			'avatar'			=> ($user->optionget('viewavatars')) ? get_user_avatar($row['user_avatar'], $row['user_avatar_type'], $row['user_avatar_width'], $row['user_avatar_height']) : '',
+includes/functions_users.php:		if ($row['user_sig'] && $config['allow_sig'] && $user->optionget('viewsigs'))
+includes/functions_users.php:			'joined'		=> $user->format_date($row['user_regdate']),
+includes/functions_users.php:			'avatar'		=> ($user->optionget('viewavatars')) ? get_user_avatar($row['user_avatar'], $row['user_avatar_type'], $row['user_avatar_width'], $row['user_avatar_height']) : '',
+includes/functions_users.php:			'aim'			=> ($row['user_aim'] && $auth->acl_get('u_sendim')) ? append_sid("{$phpbb_root_path}memberlist.$phpEx", "mode=contact&amp;action=aim&amp;u=$user_id") : '',
+includes/functions_users.php:			'msn'			=> ($row['user_msnm'] && $auth->acl_get('u_sendim')) ? append_sid("{$phpbb_root_path}memberlist.$phpEx", "mode=contact&amp;action=msnm&amp;u=$user_id") : '',
+includes/functions_users.php:			'jabber'		=> ($row['user_jabber'] && $auth->acl_get('u_sendim')) ? append_sid("{$phpbb_root_path}memberlist.$phpEx", "mode=contact&amp;action=jabber&amp;u=$user_id") : '',
+includes/functions_users.php:			'search'		=> ($auth->acl_get('u_search')) ? append_sid("{$phpbb_root_path}search.$phpEx", "author_id=$user_id&amp;sr=posts") : '',
+includes/functions_users.php:		if (!empty($row['user_allow_viewemail']) || $auth->acl_get('a_email'))
+includes/functions_users.php:			$user_cache[$user_id]['email'] = ($config['board_email_form'] && $config['email_enable']) ? append_sid("{$phpbb_root_path}memberlist.$phpEx", "mode=email&amp;u=$user_id") : (($config['board_hide_emails'] && !$auth->acl_get('a_email')) ? '' : 'mailto:' . $row['user_email']);
+includes/functions_users.php:			list($bday_day, $bday_month, $bday_year) = array_map('intval', explode('-', $row['user_birthday']));
+includes/functions_users.php:				$now = getdate(time() + $user->timezone + $user->dst - date('Z'));
+includes/functions_users.php:				$diff = $now['mon'] - $bday_month;
+includes/functions_users.php:					$diff = ($now['mday'] - $bday_day < 0) ? 1 : 0;
+includes/functions_users.php:				$user_cache[$user_id]['age'] = (int) ($now['year'] - $bday_year - $diff);
+includes/functions_image.php:* @copyright (c) 2009 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org/
+includes/functions_image.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_image.php:	* Constructor - init some basic stuff
+includes/functions_image.php:			define('EXIFTIME_OFFSET', 0); // Use this constant, to change the exif-timestamp. Offset in seconds
+includes/functions_image.php:			$this->gd_version = $gd_version;
+includes/functions_image.php:		$this->max_file_size = $max_file_size;
+includes/functions_image.php:		$this->max_height = $max_height;
+includes/functions_image.php:		$this->max_width = $max_width;
+includes/functions_image.php:			$this->image_source = $source;
+includes/functions_image.php:			$this->image_name = $name;
+includes/functions_image.php:			$this->image_size['file'] = $size;
+includes/functions_image.php:		switch (utf8_substr(strtolower($filename), -4))
+includes/functions_image.php:		if (!file_exists($this->image_source))
+includes/functions_image.php:		switch (utf8_substr(strtolower($this->image_source), -4))
+includes/functions_image.php:				$this->image = imagecreatefrompng($this->image_source);
+includes/functions_image.php:				$this->image_type = 'png';
+includes/functions_image.php:				$this->image = imagecreatefromgif($this->image_source);
+includes/functions_image.php:				$this->image_type = 'gif';
+includes/functions_image.php:				$this->image = imagecreatefromjpeg($this->image_source);
+includes/functions_image.php:				$this->image_type = 'jpeg';
+includes/functions_image.php:		if (isset($this->image_size['file']))
+includes/functions_image.php:			$file_size = $this->image_size['file'];
+includes/functions_image.php:			$file_size = @filesize($this->image_source);
+includes/functions_image.php:		$image_size = getimagesize($this->image_source);
+includes/functions_image.php:		$this->image_size['file'] = $file_size;
+includes/functions_image.php:		$this->image_size['width'] = $image_size[0];
+includes/functions_image.php:		$this->image_size['height'] = $image_size[1];
+includes/functions_image.php:		$this->image_content_type = $image_size['mime'];
+includes/functions_image.php:		switch ($this->image_type)
+includes/functions_image.php:				@imagejpeg($this->image, $destination, $quality);
+includes/functions_image.php:				@imagepng($this->image, $destination);
+includes/functions_image.php:				@imagegif($this->image, $destination);
+includes/functions_image.php:		@chmod($destination, $this->chmod);
+includes/functions_image.php:			imagedestroy($this->image);
+includes/functions_image.php:		if (!$this->image_content_type)
+includes/functions_image.php:			$this->image_content_type = $this->mimetype_by_filename($this->image_source);
+includes/functions_image.php:			if (!$this->image_content_type)
+includes/functions_image.php:		$is_ie8 = (strpos(strtolower($user->browser), 'msie 8.0') !== false);
+includes/functions_image.php:		header('Content-Type: ' . $this->image_content_type);
+includes/functions_image.php:			header('X-Content-Type-Options: nosniff');
+includes/functions_image.php:		* Get a browser friendly UTF-8 encoded filename
+includes/functions_image.php:			return "filename*=UTF-8''" . rawurlencode($file);
+includes/functions_image.php:		if (empty($user->browser) || (!$is_ie8 && (strpos(strtolower($user->browser), 'msie') !== false)))
+includes/functions_image.php:			header('Content-Disposition: attachment; ' . header_filename(htmlspecialchars_decode($this->image_name)));
+includes/functions_image.php:			if (empty($user->browser) || (strpos(strtolower($user->browser), 'msie 6.0') !== false))
+includes/functions_image.php:				header('expires: -1');
+includes/functions_image.php:			header('Content-Disposition: inline; ' . header_filename(htmlspecialchars_decode($this->image_name)));
+includes/functions_image.php:				header('X-Download-Options: noopen');
+includes/functions_image.php:			header('Content-Length: ' . $content_length);
+includes/functions_image.php:		$db->sql_close();
+includes/functions_image.php:		if ($this->image)
+includes/functions_image.php:			$image_function = 'image' . $this->image_type;
+includes/functions_image.php:			$image_function($this->image);
+includes/functions_image.php:			$fp = @fopen($this->image_source, 'rb');
+includes/functions_image.php:				@readfile($this->image_source);
+includes/functions_image.php:		$this->resize_image($max_width, $max_height, (($print_details) ? $additional_height : 0));
+includes/functions_image.php:			$dimension_colour = imagecolorallocate($this->image, 255, 255, 255);
+includes/functions_image.php:			$dimension_x = ($this->image_size['width'] - $dimension_width) / 2;
+includes/functions_image.php:			$dimension_y = $this->image_size['height'] + (($additional_height - $dimension_height) / 2);
+includes/functions_image.php:			imagestring($this->image, 1, $dimension_x, $dimension_y, $dimension_string, $dimension_colour);
+includes/functions_image.php:		if (!$this->image)
+includes/functions_image.php:			$this->read_image();
+includes/functions_image.php:		if (($this->image_size['height'] <= $max_height) && ($this->image_size['width'] <= $max_width))
+includes/functions_image.php:		if (($this->image_size['height'] / $max_height) > ($this->image_size['width'] / $max_width))
+includes/functions_image.php:			$this->thumb_height	= $max_height;
+includes/functions_image.php:			$this->thumb_width	= round($max_width * (($this->image_size['width'] / $max_width) / ($this->image_size['height'] / $max_height)));
+includes/functions_image.php:			$this->thumb_height	= round($max_height * (($this->image_size['height'] / $max_height) / ($this->image_size['width'] / $max_width)));
+includes/functions_image.php:			$this->thumb_width	= $max_width;
+includes/functions_image.php:		$image_copy = (($this->gd_version == GDLIB1) ? @imagecreate($this->thumb_width, $this->thumb_height + $additional_height) : @imagecreatetruecolor($this->thumb_width, $this->thumb_height + $additional_height));
+includes/functions_image.php:		$resize_function = ($this->gd_version == GDLIB1) ? 'imagecopyresized' : 'imagecopyresampled';
+includes/functions_image.php:		$resize_function($image_copy, $this->image, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height, $this->image_size['width'], $this->image_size['height']);
+includes/functions_image.php:		$this->image = $image_copy;
+includes/functions_image.php:		$this->image_size['height'] = $this->thumb_height;
+includes/functions_image.php:		$this->image_size['width'] = $this->thumb_width;
+includes/functions_image.php:		$this->resized = true;
+includes/functions_image.php:		$this->exif_data_force_db = true;
+includes/functions_image.php:			$this->errors[] = array('ROTATE_IMAGE_FUNCTION', $angle);
+includes/functions_image.php:			$this->errors[] = array('ROTATE_IMAGE_ANGLE', $angle);
+includes/functions_image.php:		if (!$this->image)
+includes/functions_image.php:			$this->read_image();
+includes/functions_image.php:			if (!$ignore_dimensions && (($this->image_size['height'] > $this->max_width) || ($this->image_size['width'] > $this->max_height)))
+includes/functions_image.php:				if ($this->image_size['height'] > $this->max_width)
+includes/functions_image.php:					$this->errors[] = array('ROTATE_IMAGE_WIDTH');
+includes/functions_image.php:				if ($this->image_size['width'] > $this->max_height)
+includes/functions_image.php:					$this->errors[] = array('ROTATE_IMAGE_HEIGHT');
+includes/functions_image.php:			$new_width = $this->image_size['height'];
+includes/functions_image.php:			$this->image_size['height'] = $this->image_size['width'];
+includes/functions_image.php:			$this->image_size['width'] = $new_width;
+includes/functions_image.php:		$this->image = imagerotate($this->image, $angle, 0);
+includes/functions_image.php:		$this->rotated = true;
+includes/functions_image.php:		$this->exif_data_force_db = true;
+includes/functions_image.php:		$this->watermark_source = $watermark_source;
+includes/functions_image.php:		if (!$this->watermark_source || !file_exists($this->watermark_source))
+includes/functions_image.php:			$this->errors[] = array('WATERMARK_IMAGE_SOURCE');
+includes/functions_image.php:		if (!$this->image)
+includes/functions_image.php:			$this->read_image();
+includes/functions_image.php:		if (($min_height && ($this->image_size['height'] < $min_height)) || ($min_width && ($this->image_size['width'] < $min_width)))
+includes/functions_image.php:			//$this->errors[] = array('WATERMARK_IMAGE_DIMENSION');
+includes/functions_image.php:		$this->watermark_size = getimagesize($this->watermark_source);
+includes/functions_image.php:		switch ($this->watermark_size['mime'])
+includes/functions_image.php:		if (($this->watermark = $imagecreate($this->watermark_source)) === false)
+includes/functions_image.php:			$this->errors[] = array('WATERMARK_IMAGE_IMAGECREATE');
+includes/functions_image.php:		// Where do we display the watermark? up-left, down-right, ...?
+includes/functions_image.php:		$dst_x = (($this->image_size['width'] * 0.5) - ($this->watermark_size[0] * 0.5));
+includes/functions_image.php:		$dst_y = ($this->image_size['height'] - $this->watermark_size[1] - 5);
+includes/functions_image.php:			$dst_x = ($this->image_size['width'] - $this->watermark_size[0] - 5);
+includes/functions_image.php:			$dst_y = (($this->image_size['height'] * 0.5) - ($this->watermark_size[1] * 0.5));
+includes/functions_image.php:		imagecopy($this->image, $this->watermark, $dst_x, $dst_y, 0, 0, $this->watermark_size[0], $this->watermark_size[1]);
+includes/functions_image.php:		imagedestroy($this->watermark);
+includes/functions_image.php:		$this->watermarked = true;
+includes/functions_image.php:		if (!function_exists('exif_read_data') || !$this->image_source)
+includes/functions_image.php:		$this->exif_data = @exif_read_data($this->image_source, 0, true);
+includes/functions_image.php:		if (!empty($this->exif_data["EXIF"]))
+includes/functions_image.php:			foreach ($this->exif_data as $key => $array)
+includes/functions_image.php:					unset($this->exif_data[$key]);
+includes/functions_image.php:					foreach ($this->exif_data[$key] as $subkey => $array)
+includes/functions_image.php:							unset($this->exif_data[$key][$subkey]);
+includes/functions_image.php:			$this->exif_data_serialized = serialize($this->exif_data);
+includes/functions_image.php:			$this->exif_data_exist = EXIF_DBSAVED;
+includes/functions_image.php:			$this->exif_data_exist = EXIF_UNAVAILABLE;
+includes/functions_display.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/functions_display.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_display.php:			// Loop the ASCII: a-z
+includes/functions_display.php:				$sql_where .= ' AND u.username_clean NOT ' . $db->sql_like_expression(chr($i) . $db->any_char);
+includes/functions_display.php:			$sql_where .= ' AND u.username_clean ' . $db->sql_like_expression(substr($first_char, 0, 1) . $db->any_char);
+includes/functions_display.php:			$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions_display.php:			$result = $db->sql_query($sql);
+includes/functions_display.php:			$num_pgalleries = $db->sql_fetchfield('pgalleries');
+includes/functions_display.php:			$db->sql_freeresult($result);
+includes/functions_display.php:		$template->assign_vars(array(
+includes/functions_display.php:			'TOTAL_PGALLERIES_SHORT'	=> sprintf($user->lang['TOTAL_PGALLERIES_SHORT'], $num_pgalleries),
+includes/functions_display.php:				'ON'	=> 'at.user_id = ' . $user->data['user_id'] . ' AND a.album_id = at.album_id'
+includes/functions_display.php:	$sql = $db->sql_build_query('SELECT', array(
+includes/functions_display.php:	$result = $db->sql_query($sql);
+includes/functions_display.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions_display.php:		$album_tracking_info[$album_id] = (!empty($row['mark_time'])) ? $row['mark_time'] : ((isset($user->gallery['user_lastmark'])) ? $user->gallery['user_lastmark'] : 0);
+includes/functions_display.php:	$db->sql_freeresult($result);
+includes/functions_display.php:				$message = sprintf($user->lang['RETURN_INDEX'], '<a href="' . $redirect . '">', '</a>');
+includes/functions_display.php:				$message = sprintf($user->lang['RETURN_ALBUM'], '<a href="' . $redirect . '">', '</a>');
+includes/functions_display.php:			trigger_error($user->lang['ALBUMS_MARKED'] . '<br /><br />' . $message);
+includes/functions_display.php:			$message = sprintf($user->lang['RETURN_PAGE'], '<a href="' . $redirect . '">', '</a>');
+includes/functions_display.php:			$template->assign_block_vars('albumrow', array(
+includes/functions_display.php:		$album_unread = (isset($album_tracking_info[$album_id]) && ($row['orig_album_last_image_time'] > $album_tracking_info[$album_id]) && ($user->data['user_id'] != ANONYMOUS)) ? true : false;
+includes/functions_display.php:				$subalbum_unread = (isset($album_tracking_info[$subalbum_id]) && $subalbum_row['orig_album_last_image_time'] > $album_tracking_info[$subalbum_id] && ($user->data['user_id'] != ANONYMOUS)) ? true : false;
+includes/functions_display.php:				if (!$subalbum_unread && !empty($subalbum_row['children']) && ($user->data['user_id'] != ANONYMOUS))
+includes/functions_display.php:			$l_subalbums = (sizeof($subalbums[$album_id]) == 1) ? $user->lang['SUBALBUM'] . ': ' : $user->lang['SUBALBUMS'] . ': ';
+includes/functions_display.php:			$lastimage_time = $user->format_date($row['album_last_image_time']);
+includes/functions_display.php:			$l_moderator = (sizeof($album_moderators[$album_id]) == 1) ? $user->lang['MODERATOR'] : $user->lang['MODERATORS'];
+includes/functions_display.php:			$s_subalbums_list[] = '<a href="' . $subalbum['link'] . '" class="subforum ' . (($subalbum['unread']) ? 'unread' : 'read') . '" title="' . (($subalbum['unread']) ? $user->lang['NEW_IMAGES'] : $user->lang['NO_NEW_IMAGES']) . '">' . $subalbum['name'] . '</a>';
+includes/functions_display.php:		$template->assign_block_vars('albumrow', array(
+includes/functions_display.php:			'UNAPPROVED_IMAGES'		=> (gallery_acl_check('m_status', $album_id, $row['album_user_id'])) ? ($row['album_images_real'] - $row['album_images']) : 0,
+includes/functions_display.php:			'ALBUM_FOLDER_IMG'		=> $user->img($folder_image, $folder_alt),
+includes/functions_display.php:			'ALBUM_FOLDER_IMG_SRC'	=> $user->img($folder_image, $folder_alt, false, '', 'src'),
+includes/functions_display.php:			'ALBUM_FOLDER_IMG_ALT'	=> isset($user->lang[$folder_alt]) ? $user->lang[$folder_alt] : '',
+includes/functions_display.php:			'LAST_USER_FULL'		=> (($lastimage_album_type == ALBUM_CONTEST) && ($lastimage_contest_marked && !gallery_acl_check('m_status', $album_id, $row['album_user_id']))) ? $user->lang['CONTEST_USERNAME'] : get_username_string('full', $row['album_last_user_id'], $row['album_last_username'], $row['album_last_user_colour']),
+includes/functions_display.php:			$template->assign_block_vars('albumrow.subalbum', array(
+includes/functions_display.php:	$template->assign_vars(array(
+includes/functions_display.php:		'U_MARK_ALBUMS'		=> ($user->data['is_registered']) ? append_sid("{$phpbb_root_path}{$gallery_root_path}album.$phpEx", 'hash=' . generate_link_hash('global') . '&amp;album_id=' . $root_data['album_id'] . '&amp;mark=albums') : '',
+includes/functions_display.php:		'L_SUBFORUM'		=> ($visible_albums == 1) ? $user->lang['SUBALBUM'] : $user->lang['SUBALBUMS'],
+includes/functions_display.php:		'LAST_POST_IMG'		=> $user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
+includes/functions_display.php:		$result = $db->sql_query($sql);
+includes/functions_display.php:		while ($row = $db->sql_fetchrow($result))
+includes/functions_display.php:			$template->assign_block_vars('navlinks', array(
+includes/functions_display.php:				'FORUM_NAME'	=> $user->lang['PERSONAL_ALBUMS'],
+includes/functions_display.php:		$db->sql_freeresult($result);
+includes/functions_display.php:			$template->assign_block_vars('navlinks', array(
+includes/functions_display.php:	$template->assign_block_vars('navlinks', array(
+includes/functions_display.php:	$template->assign_vars(array(
+includes/functions_display.php:		'ALBUM_CONTEST_START'	=> ($album_data['contest_id']) ? sprintf($user->lang['CONTEST_START' . ((($album_data['contest_start']) < time())? 'ED' : 'S')], $user->format_date(($album_data['contest_start']), false, true)) : '',
+includes/functions_display.php:		'ALBUM_CONTEST_RATING'	=> ($album_data['contest_id']) ? sprintf($user->lang['CONTEST_RATING_START' . ((($album_data['contest_start'] + $album_data['contest_rating']) < time())? 'ED' : 'S')], $user->format_date(($album_data['contest_start'] + $album_data['contest_rating']), false, true)) : '',
+includes/functions_display.php:		'ALBUM_CONTEST_END'		=> ($album_data['contest_id']) ? sprintf($user->lang['CONTEST_END' . ((($album_data['contest_start'] + $album_data['contest_end']) < time())? 'ED' : 'S')], $user->format_date(($album_data['contest_start'] + $album_data['contest_end']), false, true)) : '',
+includes/functions_display.php:			$result = $db->sql_query($sql);
+includes/functions_display.php:			while ($row = $db->sql_fetchrow($result))
+includes/functions_display.php:			$db->sql_freeresult($result);
+includes/functions_display.php:				SET album_parents = '" . $db->sql_escape($album_data['album_parents']) . "'
+includes/functions_display.php:			$db->sql_query($sql);
+includes/functions_display.php:	$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions_display.php:	$result = $db->sql_query($sql, 3600);
+includes/functions_display.php:	while ($row = $db->sql_fetchrow($result))
+includes/functions_display.php:			$group_name = (($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name']);
+includes/functions_display.php:			if ($user->data['user_id'] != ANONYMOUS && !$auth->acl_get('u_viewprofile'))
+includes/functions_display.php:	$db->sql_freeresult($result);
+includes/functions_display.php:* Assigns an image with all data to the defined template-block
+includes/functions_display.php:* @param string	$template_block	Name of the template-block
+includes/functions_display.php:* @param array	$image_data		Array with the image-data, all columns of GALLERY_IMAGES_TABLE are needed. album_name may be additionally assigned
+includes/functions_display.php:function assign_image_block($template_block, &$image_data, $album_status, $display = 126, $album_user_id = -1)
+includes/functions_display.php:	$image_data['rating'] = $user->lang['NOT_RATED'];
+includes/functions_display.php:		$image_data['rating'] = sprintf((($image_data['image_rates'] == 1) ? $user->lang['RATE_STRING'] : $user->lang['RATES_STRING']), $image_data['image_rate_avg'] / 100, $image_data['image_rates']);
+includes/functions_display.php:		$image_data['rating'] = $user->lang['CONTEST_RATING_HIDDEN'];
+includes/functions_display.php:	$perm_user_id = ($user->data['user_perm_from'] == 0) ? $user->data['user_id'] : $user->data['user_perm_from'];
+includes/functions_display.php:	$template->assign_block_vars($template_block, array(
+includes/functions_display.php:		'POSTER'		=> ($display & RRC_DISPLAY_USERNAME) ? (($image_data['image_contest'] && !gallery_acl_check('m_status', $image_data['image_album_id'], $album_user_id)) ? $user->lang['CONTEST_USERNAME'] : get_username_string('full', $image_data['image_user_id'], $image_data['image_username'], $image_data['image_user_colour'])) : '',
+includes/functions_display.php:		'TIME'			=> ($display & RRC_DISPLAY_IMAGETIME) ? $user->format_date($image_data['image_time']) : '',
+includes/functions_display.php:		'VIEW'			=> ($display & RRC_DISPLAY_IMAGEVIEWS) ? $image_data['image_view_count'] : -1,
+includes/functions_display.php:		'CONTEST_RANK'		=> ($image_data['image_contest_rank']) ? $user->lang['CONTEST_RESULT_' . $image_data['image_contest_rank']] : '',
+includes/functions_display.php:		'L_COMMENTS'	=> ($image_data['image_comments'] == 1) ? $user->lang['COMMENT'] : $user->lang['COMMENTS'],
+includes/functions_display.php:		'S_COMMENTS'	=> (($display & RRC_DISPLAY_COMMENTS) ? (($gallery_config['allow_comments'] && gallery_acl_check('c_read', $image_data['image_album_id'], $album_user_id)) ? (($image_data['image_comments']) ? $image_data['image_comments'] : $user->lang['NO_COMMENTS']) : '') : ''),
+includes/functions_display.php:		'S_IP'		=> (($display & RRC_DISPLAY_IP) && $auth->acl_get('a_')) ? $image_data['image_user_ip'] : '',
+includes/functions_display.php:		'L_STATUS'	=> ($image_data['image_status'] == IMAGE_UNAPPROVED) ? $user->lang['APPROVE_IMAGE'] : (($image_data['image_status'] == IMAGE_APPROVED) ? $user->lang['CHANGE_IMAGE_STATUS'] : $user->lang['UNLOCK_IMAGE']),
+includes/functions_recent.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/functions_recent.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/functions_recent.php:	$user->add_lang('mods/gallery');
+includes/functions_recent.php:		$sql_permission_where .= ((sizeof($view_albums)) ? '(' . $db->sql_in_set('image_album_id', $view_albums) . ' AND image_status <> ' . IMAGE_UNAPPROVED . (($user_id) ? ' AND image_contest = ' . IMAGE_NO_CONTEST : '') . ')' : '');
+includes/functions_recent.php:		$sql_permission_where .= ((sizeof($moderate_albums)) ? ((sizeof($view_albums)) ? ' OR ' : '') . '(' . $db->sql_in_set('image_album_id', $moderate_albums, false, true) . ')' : '');
+includes/functions_recent.php:			$result = $db->sql_query_limit($sql, $limit_sql);
+includes/functions_recent.php:			while ($row = $db->sql_fetchrow($result))
+includes/functions_recent.php:			$db->sql_freeresult($result);
+includes/functions_recent.php:			switch ($db->sql_layer)
+includes/functions_recent.php:			$result = $db->sql_query_limit($sql, $limit_sql);
+includes/functions_recent.php:			while ($row = $db->sql_fetchrow($result))
+includes/functions_recent.php:			$db->sql_freeresult($result);
+includes/functions_recent.php:				'WHERE'			=> $db->sql_in_set('c.contest_album_id', array_unique(array_merge($view_albums, $moderate_albums))) . ' AND c.contest_marked = ' . IMAGE_NO_CONTEST,
+includes/functions_recent.php:			$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions_recent.php:			$result = $db->sql_query_limit($sql, $ints['contests']);
+includes/functions_recent.php:			while ($row = $db->sql_fetchrow($result))
+includes/functions_recent.php:			$db->sql_freeresult($result);
+includes/functions_recent.php:				'WHERE'			=> $db->sql_in_set('i.image_id', $images, false, true),
+includes/functions_recent.php:			$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions_recent.php:			$result = $db->sql_query($sql);
+includes/functions_recent.php:			while ($row = $db->sql_fetchrow($result))
+includes/functions_recent.php:			$db->sql_freeresult($result);
+includes/functions_recent.php:			$template->assign_block_vars('imageblock', array(
+includes/functions_recent.php:				'BLOCK_NAME'		=> $user->lang['RECENT_IMAGES'],
+includes/functions_recent.php:					$template->assign_block_vars('imageblock.imagerow', array());
+includes/functions_recent.php:				$template->assign_block_vars('imageblock.imagerow.no_image', array());
+includes/functions_recent.php:			$template->assign_block_vars('imageblock', array(
+includes/functions_recent.php:				'BLOCK_NAME'		=> $user->lang['RANDOM_IMAGES'],
+includes/functions_recent.php:					$template->assign_block_vars('imageblock.imagerow', array());
+includes/functions_recent.php:				$template->assign_block_vars('imageblock.imagerow.no_image', array());
+includes/functions_recent.php:				$template->assign_block_vars('imageblock', array(
+includes/functions_recent.php:					'BLOCK_NAME'		=> sprintf($user->lang['CONTEST_WINNERS_OF'], $contest_data['album_name']),
+includes/functions_recent.php:						$template->assign_block_vars('imageblock.imagerow', array());
+includes/functions_recent.php:					$template->assign_block_vars('imageblock.imagerow.no_image', array());
+includes/functions_recent.php:		$template->assign_vars(array(
+includes/functions_recent.php:		$user->add_lang('viewtopic');
+includes/functions_recent.php:			'WHERE'			=> $sql_permission_where . ' AND ' . $db->sql_in_set('i.image_album_id', $comment_albums, false, true),
+includes/functions_recent.php:		$sql = $db->sql_build_query('SELECT', $sql_array);
+includes/functions_recent.php:		$result = $db->sql_query_limit($sql, $ints['comments']);
+includes/functions_recent.php:		while ($commentrow = $db->sql_fetchrow($result))
+includes/functions_recent.php:			$template->assign_block_vars('commentrow', array(
+includes/functions_recent.php:				'TIME'			=> $user->format_date($commentrow['comment_time']),
+includes/functions_recent.php:				'U_DELETE'		=> (gallery_acl_check('m_comments', $album_id) || (gallery_acl_check('c_delete', $album_id) && ($commentrow['comment_user_id'] == $user->data['user_id']) && $user->data['is_registered'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=delete&amp;comment_id=" . $commentrow['comment_id']) : '',
+includes/functions_recent.php:				'U_EDIT'		=> (gallery_acl_check('m_comments', $album_id) || (gallery_acl_check('c_edit', $album_id) && ($commentrow['comment_user_id'] == $user->data['user_id']) && $user->data['is_registered'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=edit&amp;comment_id=" . $commentrow['comment_id']) : '',
+includes/functions_recent.php:				'U_INFO'		=> ($auth->acl_get('a_')) ? append_sid("{$phpbb_root_path}{$gallery_root_path}mcp.$phpEx", 'mode=whois&amp;ip=' . $commentrow['comment_user_ip']) : '',
+includes/functions_recent.php:				'IMAGE_TIME'			=> $user->format_date($commentrow['image_time']),
+includes/functions_recent.php:		$db->sql_freeresult($result);
+includes/functions_recent.php:		$template->assign_vars(array(
+includes/functions_recent.php:			'DELETE_IMG'		=> $user->img('icon_post_delete', 'DELETE_COMMENT'),
+includes/functions_recent.php:			'EDIT_IMG'			=> $user->img('icon_post_edit', 'EDIT_COMMENT'),
+includes/functions_recent.php:			'INFO_IMG'			=> $user->img('icon_post_info', 'IP'),
+includes/functions_recent.php:			'MINI_POST_IMG'		=> $user->img('icon_post_target_unread', 'COMMENT'),
+includes/functions_recent.php:			'PROFILE_IMG'		=> $user->img('icon_user_profile', 'READ_PROFILE'),
+includes/common.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/common.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/common.php:$user->add_lang('mods/info_acp_gallery');
+includes/common.php:if ($auth->acl_get('a_') && version_compare($gallery_config['phpbb_gallery_version'], $gallery_config['version_check_version'], '<'))
+includes/common.php:	$user->add_lang('mods/gallery_acp');
+includes/common.php:	$template->assign_vars(array(
+includes/common.php:		'GALLERY_VERSION_CHECK'			=> sprintf($user->lang['NOT_UP_TO_DATE'], $user->lang['GALLERY']),
+includes/common.php:$template->assign_vars(array(
+includes/common.php:	'GALLERY_TRANSLATION_INFO'		=> (!empty($user->lang['GALLERY_TRANSLATION_INFO'])) ? $user->lang['GALLERY_TRANSLATION_INFO'] : '',
+includes/common.php:// Do not display Gallery-NavLink / activate Gallery-Tab on "recent-random-images"
+includes/common.php:	$template->assign_block_vars('navlinks', array(
+includes/common.php:		'FORUM_NAME'	=> $user->lang['GALLERY'],
+includes/common.php:	$template->assign_var('S_IN_GALLERY', true);
+includes/root_path.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/root_path.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/root_path.php:// Give admins the easy opertunity to move the gallery beside the forum (root-path example: "photos/../forum/")
+includes/hookup_gallery.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+includes/hookup_gallery.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+includes/hookup_gallery.php:* You can add your code here, to get/substruct cash on Cash-MODs or what ever.
+includes/hookup_gallery.php:* You can add your code here, to substruct cash on Cash-MODs or what ever.
+includes/hookup_gallery.php:		// If the user has negative cash now (would be needed on return from the cash-mods function, you can deny to view the image at all,
+includes/hookup_gallery.php:		// 	// readd the cash to users-cash
+index.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+index.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+index.php:$user->session_begin();
+index.php:$auth->acl($user->data);
+index.php:$user->setup(array('mods/gallery', 'mods/info_acp_gallery'));
+index.php:	$template->assign_block_vars('navlinks', array(
+index.php:		'FORUM_NAME'	=> $user->lang['PERSONAL_ALBUMS'],
+index.php:	$template->assign_var('S_PERSONAL_GALLERY', true);
+index.php:	$result = $db->sql_query($sql);
+index.php:	while ($row = $db->sql_fetchrow($result))
+index.php:			$lastimage_time = $user->format_date($row['album_last_image_time']);
+index.php:	$db->sql_freeresult($result);
+index.php:	$template->assign_block_vars('albumrow', array(
+index.php:		'ALBUM_NAME' 			=> $user->lang['USERS_PERSONAL_ALBUMS'],
+index.php:	$template->assign_block_vars('albumrow', array(
+index.php:		'ALBUM_NAME' 			=> $user->lang['USERS_PERSONAL_ALBUMS'],
+index.php:		'ALBUM_FOLDER_IMG'		=> $user->img('forum_read_subforum', 'no'),
+index.php:		'ALBUM_FOLDER_IMG_SRC'	=> $user->img('forum_read_subforum', 'no', false, '', 'src'),
+index.php:		'SUBALBUMS'				=> ((gallery_acl_check('i_upload', OWN_GALLERY_PERMISSIONS) || $user->gallery['personal_album_id']) ? '<a href="' . (($user->gallery['personal_album_id']) ? append_sid("{$phpbb_root_path}{$gallery_root_path}album.$phpEx", 'album_id=' . $user->gallery['personal_album_id']) : append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=gallery&amp;mode=manage_albums')) . '">' . $user->data['username'] . '</a>' : ''),
+index.php:		'L_SUBALBUM_STR'		=> (gallery_acl_check('i_upload', OWN_GALLERY_PERMISSIONS) || $user->gallery['personal_album_id']) ? $user->lang['YOUR_PERSONAL_ALBUM'] . ': ' : '',
+index.php:		'UNAPPROVED_IMAGES'		=> (gallery_acl_check('m_status', PERSONAL_GALLERY_PERMISSIONS)) ? $images_real - $images : '',
+index.php:	$template->assign_block_vars('albumrow.subalbum', array(
+index.php:		'U_SUBALBUM'	=> ((gallery_acl_check('i_upload', OWN_GALLERY_PERMISSIONS)) ? ($user->gallery['personal_album_id'] > 0) ? append_sid("{$phpbb_root_path}{$gallery_root_path}album.$phpEx", 'album_id=' . $user->gallery['personal_album_id']) : append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=gallery&amp;mode=manage_albums') : ''),
+index.php:		'SUBALBUM_NAME'	=> $user->lang['YOUR_PERSONAL_ALBUM'],
+index.php:* display	int		sum of the options which should be displayed, see gallery/includes/constants.php "// Display-options for RRC-Feature" for values
+index.php:* modes		int		sum of the modes which should be displayed, see gallery/includes/constants.php "// Mode-options for RRC-Feature" for values
+index.php:	if ($auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel'))
+index.php:					AND ug.user_id = ' . $user->data['user_id'] . '
+index.php:				AND (g.group_type <> ' . GROUP_HIDDEN . ' OR ug.user_id = ' . $user->data['user_id'] . ')
+index.php:	$result = $db->sql_query($sql);
+index.php:	while ($row = $db->sql_fetchrow($result))
+index.php:		$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
+index.php:		if ($row['group_name'] == 'BOTS' || ($user->data['user_id'] != ANONYMOUS && !$auth->acl_get('u_viewprofile')))
+index.php:	$db->sql_freeresult($result);
+index.php:	$now = getdate(time() + $user->timezone + $user->dst - date('Z'));
+index.php:			AND u.user_birthday LIKE '" . $db->sql_escape(sprintf('%2d-%2d-', $now['mday'], $now['mon'])) . "%'
+index.php:	$result = $db->sql_query($sql);
+index.php:	while ($row = $db->sql_fetchrow($result))
+index.php:		if ($age = (int) substr($row['user_birthday'], -4))
+index.php:			$birthday_list .= ' (' . ($now['year'] - $age) . ')';
+index.php:	$db->sql_freeresult($result);
+index.php:$s_char_options = '<option value=""' . ((!$first_char) ? ' selected="selected"' : '') . '>' . $user->lang['ALL'] . '</option>';
+index.php:// Loop the ASCII: a-z
+index.php:	$s_char_options .= '<option value="' . chr($i) . '"' . (($first_char == chr($i)) ? ' selected="selected"' : '') . '>' . chr($i - 32) . '</option>';
+index.php:$template->assign_vars(array(
+index.php:	'TOTAL_IMAGES'		=> ($gallery_config['disp_statistic']) ? sprintf($user->lang[$l_total_image_s], $total_images) : '',
+index.php:	'TOTAL_COMMENTS'	=> ($gallery_config['allow_comments']) ? sprintf($user->lang[$l_total_comment_s], $total_comments) : '',
+index.php:	'TOTAL_PGALLERIES'	=> (gallery_acl_check('a_list', PERSONAL_GALLERY_PERMISSIONS)) ? sprintf($user->lang[$l_total_pgallery_s], $total_pgalleries) : '',
+index.php:	'NEWEST_PGALLERIES'	=> ($total_pgalleries) ? sprintf($user->lang['NEWEST_PGALLERY'], get_username_string('full', $gallery_config['newest_pgallery_user_id'], $gallery_config['newest_pgallery_username'], $gallery_config['newest_pgallery_user_colour'], '', append_sid("{$phpbb_root_path}{$gallery_root_path}album.$phpEx", 'album_id=' . $gallery_config['newest_pgallery_album_id']))) : '',
+index.php:	'U_YOUR_PERSONAL_GALLERY'		=> (gallery_acl_check('i_upload', OWN_GALLERY_PERMISSIONS)) ? ($user->gallery['personal_album_id'] > 0) ? append_sid("{$phpbb_root_path}{$gallery_root_path}album.$phpEx", 'album_id=' . $user->gallery['personal_album_id']) : append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=gallery&amp;mode=manage_albums') : '',
+index.php:	'U_MARK_ALBUMS'					=> ($user->data['is_registered']) ? append_sid("{$phpbb_root_path}{$gallery_root_path}index.$phpEx", 'hash=' . generate_link_hash('global') . '&amp;mark=albums') : '',
+index.php:page_header($user->lang['GALLERY'] . (($mode == 'personal') ? ' - ' . $user->lang['PERSONAL_ALBUMS'] : ''));
+index.php:$template->set_filenames(array(
+mcp/mcp_report.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+mcp/mcp_report.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+mcp/mcp_report.php:$sql = $db->sql_build_query('SELECT', $sql_array);
+mcp/mcp_report.php:$result = $db->sql_query($sql);
+mcp/mcp_report.php:$count_images = (int) $db->sql_fetchfield('images');
+mcp/mcp_report.php:$db->sql_freeresult($result);
+mcp/mcp_report.php:$sql = $db->sql_build_query('SELECT', $sql_array);
+mcp/mcp_report.php:$result = $db->sql_query_limit($sql, $images_per_page, $start);
+mcp/mcp_report.php:while ($row = $db->sql_fetchrow($result))
+mcp/mcp_report.php:	$template->assign_block_vars('image_row', array(
+mcp/mcp_report.php:		'REPORT_TIME'		=> $user->format_date($row['report_time']),
+mcp/mcp_report.php:		'IMAGE_TIME'		=> $user->format_date($row['image_time']),
+mcp/mcp_report.php:$db->sql_freeresult($result);
+mcp/mcp_report.php:	$desc_string = $user->lang('WAITING_REPORTED_DONE', $count_images);
+mcp/mcp_report.php:	$desc_string = $user->lang('WAITING_REPORTED_IMAGE', $count_images);
+mcp/mcp_report.php:$template->assign_vars(array(
+mcp/mcp_report.php:	'TITLE'					=> $user->lang['REPORTED_IMAGES'],
+mcp/mcp_report.php:	'TOTAL_IMAGES'			=> ($count_images == 1) ? $user->lang['VIEW_ALBUM_IMAGE'] : sprintf($user->lang['VIEW_ALBUM_IMAGES'], $count_images),
+mcp/mcp_report.php:$template->assign_vars(array(
+mcp/mcp_report.php:	'REPORTED_IMG'				=> $user->img('icon_topic_reported', 'IMAGE_REPORTED'),
+mcp/mcp_report.php:	'UNAPPROVED_IMG'			=> $user->img('icon_topic_unapproved', 'IMAGE_UNAPPROVED'),
+mcp/mcp_album.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+mcp/mcp_album.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+mcp/mcp_album.php:$sql = $db->sql_build_query('SELECT', $sql_array);
+mcp/mcp_album.php:$result = $db->sql_query_limit($sql, $images_per_page, $start);
+mcp/mcp_album.php:while ($row = $db->sql_fetchrow($result))
+mcp/mcp_album.php:	$template->assign_block_vars('image_row', array(
+mcp/mcp_album.php:		'IMAGE_TIME'		=> $user->format_date($row['image_time']),
+mcp/mcp_album.php:		'STATUS'			=> $user->lang['QUEUE_STATUS_' . $row['image_status']],
+mcp/mcp_album.php:$db->sql_freeresult($result);
+mcp/mcp_album.php:$template->assign_vars(array(
+mcp/mcp_album.php:	'TITLE'					=> $user->lang['IMAGES'],
+mcp/mcp_album.php:	'NO_IMAGES_NOTE'		=> $user->lang['NO_IMAGES'],
+mcp/mcp_album.php:	'TOTAL_IMAGES'			=> ($count_images == 1) ? $user->lang['VIEW_ALBUM_IMAGE'] : sprintf($user->lang['VIEW_ALBUM_IMAGES'], $count_images),
+mcp/mcp_album.php:$template->assign_vars(array(
+mcp/mcp_album.php:	'REPORTED_IMG'				=> $user->img('icon_topic_reported', 'IMAGE_REPORTED'),
+mcp/mcp_album.php:	'UNAPPROVED_IMG'			=> $user->img('icon_topic_unapproved', 'IMAGE_UNAPPROVED'),
+mcp/mcp_details.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+mcp/mcp_details.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+mcp/mcp_details.php:	$result = $db->sql_query_limit($sql, 1);
+mcp/mcp_details.php:	$row = $db->sql_fetchrow($result);
+mcp/mcp_details.php:	$template->assign_vars(array(
+mcp/mcp_details.php:		'STATUS'			=> $user->lang['QUEUE_STATUS_' . $row['image_status']],
+mcp/mcp_details.php:	$db->sql_freeresult($result);
+mcp/mcp_details.php:	$sql = $db->sql_build_query('SELECT', $sql_array);
+mcp/mcp_details.php:	$result = $db->sql_query_limit($sql, 1);
+mcp/mcp_details.php:	$row = $db->sql_fetchrow($result);
+mcp/mcp_details.php:	$template->assign_vars(array(
+mcp/mcp_details.php:		'REPORT_TIME'		=> $user->format_date($row['report_time']),
+mcp/mcp_details.php:		'STATUS'			=> $user->lang['REPORT_STATUS_' . $row['report_status']] . ' ' . $user->lang['QUEUE_STATUS_' . $row['image_status']],
+mcp/mcp_details.php:	$db->sql_freeresult($result);
+mcp/mcp_details.php:$template->assign_vars(array(
+mcp/mcp_details.php:	'IMAGE_TIME'		=> $user->format_date($row['image_time']),
+mcp/mcp_functions.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+mcp/mcp_functions.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+mcp/mcp_functions.php:		$template->assign_block_vars('tabs', array(
+mcp/mcp_functions.php:			'TAB_NAME'		=> $user->lang[$navtab['name']],
+mcp/mcp_functions.php:				$template->assign_block_vars('tabs.modes', array(
+mcp/mcp_functions.php:					'MODE_NAME'			=> $user->lang[$navsubsection['name']],
+mcp/mcp_functions.php:					$page_title = $user->lang[$navsubsection['name']];
+mcp/mcp_functions.php:					$template->assign_vars(array(
+mcp/mcp_queue.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+mcp/mcp_queue.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+mcp/mcp_queue.php:$result = $db->sql_query($sql);
+mcp/mcp_queue.php:$count_images = (int) $db->sql_fetchfield('images');
+mcp/mcp_queue.php:$db->sql_freeresult($result);
+mcp/mcp_queue.php:$result = $db->sql_query_limit($sql, $images_per_page, $start);
+mcp/mcp_queue.php:while ($row = $db->sql_fetchrow($result))
+mcp/mcp_queue.php:	$template->assign_block_vars('image_row', array(
+mcp/mcp_queue.php:		'IMAGE_TIME'		=> $user->format_date($row['image_time']),
+mcp/mcp_queue.php:$db->sql_freeresult($result);
+mcp/mcp_queue.php:$desc_string = $user->lang('WAITING_' . $case . '_IMAGE', $count_images);
+mcp/mcp_queue.php:$template->assign_vars(array(
+mcp/mcp_queue.php:	'TITLE'					=> $user->lang['IMAGES'],
+mcp/mcp_queue.php:	'TOTAL_IMAGES'			=> ($count_images == 1) ? $user->lang['VIEW_ALBUM_IMAGE'] : sprintf($user->lang['VIEW_ALBUM_IMAGES'], $count_images),
+mcp/mcp_queue.php:$template->assign_vars(array(
+mcp/mcp_queue.php:	'REPORTED_IMG'				=> $user->img('icon_topic_reported', 'IMAGE_REPORTED'),
+mcp/mcp_queue.php:	'UNAPPROVED_IMG'			=> $user->img('icon_topic_unapproved', 'IMAGE_UNAPPROVED'),
+mcp.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+mcp.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+mcp.php:$user->session_begin();
+mcp.php:$auth->acl($user->data);
+mcp.php:$user->setup(array('mods/gallery', 'mods/gallery_mcp'));
+mcp.php:if ($mode == 'whois' && $auth->acl_get('a_') && request_var('ip', ''))
+mcp.php:	$template->assign_var('WHOIS', user_ipwhois(request_var('ip', '')));
+mcp.php:	page_header($user->lang['WHO_IS_ONLINE']);
+mcp.php:	$template->set_filenames(array(
+mcp.php://Basic-Information && Permissions
+mcp.php:$template->assign_block_vars('navlinks', array(
+mcp.php:	'FORUM_NAME'	=> $user->lang['MCP'],
+mcp.php:$template->assign_vars(array(
+mcp.php:	'EDIT_IMG'		=> $user->img('icon_post_edit', 'EDIT_IMAGE'),
+mcp.php:	'DELETE_IMG'	=> $user->img('icon_post_delete', 'DELETE_IMAGE'),
+mcp.php:	'ALBUM_IMAGES'	=> $album_data['album_images'] . ' ' . (($album_data['album_images'] == 1) ? $user->lang['IMAGE'] : $user->lang['IMAGES']),
+mcp.php:						WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:					$db->sql_query($sql);
+mcp.php:						WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:					$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('report_image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:				$template->assign_vars(array(
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('comment_image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('rate_image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('report_image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					'report_manager'		=> $user->data['user_id'],
+mcp.php:				$sql = 'UPDATE ' . GALLERY_REPORTS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+mcp.php:					WHERE ' . $db->sql_in_set('report_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_reported', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_reported', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					'report_manager'		=> $user->data['user_id'],
+mcp.php:				$sql = 'UPDATE ' . GALLERY_REPORTS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+mcp.php:					WHERE ' . $db->sql_in_set('report_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:						AND ' . $db->sql_in_set('report_id', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:						WHERE ' . $db->sql_in_set('image_id', $row['report_image_id']);
+mcp.php:					$db->sql_query($sql);
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_reported', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('report_id', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:					WHERE ' . $db->sql_in_set('image_reported', $image_id_ary);
+mcp.php:				$result = $db->sql_query($sql);
+mcp.php:				while ($row = $db->sql_fetchrow($result))
+mcp.php:				$db->sql_freeresult($result);
+mcp.php:					WHERE ' . $db->sql_in_set('image_reported', $image_id_ary);
+mcp.php:				$db->sql_query($sql);
+mcp.php:page_header($user->lang['GALLERY'] . ' &bull; ' . $user->lang['MCP'] . ' &bull; ' . $page_title, false);
+mcp.php:$template->set_filenames(array(
+plugins/index.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+plugins/index.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+plugins/index.php:// We just set some vars the real load is in the template-file and on usage
+plugins/index.php:* License:  Creative Commons Attribution-NonCommercial 2.5 License
+plugins/index.php:*           http://creativecommons.org/licenses/by-nc/2.5/
+plugins/index.php:if (file_exists($phpbb_root_path . $gallery_root_path . 'plugins/highslide/highslide-full.js'))
+plugins/index.php:	$template->assign_var('S_GP_HIGHSLIDE', $phpbb_root_path . $gallery_root_path . 'plugins/highslide/');
+plugins/index.php:	$template->assign_var('S_GP_LYTEBOX', $phpbb_root_path . $gallery_root_path . 'plugins/lytebox/');
+plugins/index.php:* Download: http://www.shadowbox-js.com/download.html
+plugins/index.php:*           http://shadowbox-js.com/LICENSE
+plugins/index.php:	$template->assign_var('S_GP_SHADOWBOX', $phpbb_root_path . $gallery_root_path . 'plugins/shadowbox/');
+plugins/index.php:			$sort_order_options .= '<option' . (($value == 'highslide') ? ' selected="selected"' : '') . " value='highslide'>" . $user->lang['UC_LINK_HIGHSLIDE'] . '</option>';
+plugins/index.php:			$sort_order_options .= '<option' . (($value == 'lytebox') ? ' selected="selected"' : '') . " value='lytebox'>" . $user->lang['UC_LINK_LYTEBOX'] . '</option>';
+plugins/index.php:			$sort_order_options .= '<option' . (($value == 'shadowbox') ? ' selected="selected"' : '') . " value='shadowbox'>" . $user->lang['UC_LINK_SHADOWBOX'] . '</option>';
+plugins/index.php:				$tpl = '<a href="{IMAGE_URL}" title="{IMAGE_NAME}" rel="lytebox[LPI]" class="image-resize">{CONTENT}</a>';
+plugins/index.php:				$tpl = '<a href="{IMAGE_URL}" title="{IMAGE_NAME}" rel="lyteshow[album]" class="image-resize">{CONTENT}</a>';
+plugins/index.php:				$tpl = '<a href="{IMAGE_URL}" title="{IMAGE_NAME}" rel="shadowbox[flying-bits]">{CONTENT}</a>';
+plugins/index.php:				$tpl = '<a href="{IMAGE_URL}" title="{IMAGE_NAME}" rel="shadowbox[flying-bits];options={slideshowDelay: 3}">{CONTENT}</a>';
+plugins/index.php:			$trigger_message = $user->lang['SLIDE_SHOW_HIGHSLIDE'];
+plugins/index.php:			while ($row = $db->sql_fetchrow($query_result))
+plugins/index.php:			$trigger_message = $user->lang['SLIDE_SHOW_SHADOWBOX'];
+plugins/index.php:			while ($row = $db->sql_fetchrow($query_result))
+plugins/index.php:			$trigger_message = $user->lang['SLIDE_SHOW_LYTEBOX'];
+plugins/index.php:			while ($row = $db->sql_fetchrow($query_result))
+posting.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+posting.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+posting.php:$user->session_begin();
+posting.php:$auth->acl($user->data);
+posting.php:$user->setup(array('mods/gallery', 'posting'));
+posting.php:	$result = $db->sql_query($sql);
+posting.php:	$comment_data = $db->sql_fetchrow($result);
+posting.php:	$db->sql_freeresult($result);
+posting.php:if ($user->data['is_bot'])
+posting.php:				else if (($image_data['image_user_id'] != $user->data['user_id']) && !gallery_acl_check('m_edit', $album_id, $album_data['album_user_id']))
+posting.php:				if (!gallery_acl_check('i_report', $album_id, $album_data['album_user_id']) || ($image_data['image_user_id'] == $user->data['user_id']))
+posting.php:				else if (($image_data['image_user_id'] != $user->data['user_id']) && !gallery_acl_check('m_delete', $album_id, $album_data['album_user_id']))
+posting.php:				else if (($comment_data['comment_user_id'] != $user->data['user_id']) && !gallery_acl_check('m_comments', $album_id, $album_data['album_user_id']))
+posting.php:				else if (($comment_data['comment_user_id'] != $user->data['user_id']) && !gallery_acl_check('m_comments', $album_id, $album_data['album_user_id']))
+posting.php:				if (!gallery_acl_check('i_rate', $album_id, $album_data['album_user_id']) || ($image_data['image_user_id'] == $user->data['user_id']))
+posting.php:	if (!$user->data['is_registered'])
+posting.php:		if ($login_explain && isset($user->lang[$login_explain]))
+posting.php:			$login_explain = $user->lang[$login_explain];
+posting.php:$template->assign_vars(array(
+posting.php:	'BBCODE_STATUS'			=> ($bbcode_status) ? sprintf($user->lang['BBCODE_IS_ON'], '<a href="' . append_sid("{$phpbb_root_path}faq.$phpEx", 'mode=bbcode') . '">', '</a>') : sprintf($user->lang['BBCODE_IS_OFF'], '<a href="' . append_sid("{$phpbb_root_path}faq.$phpEx", 'mode=bbcode') . '">', '</a>'),
+posting.php:	'IMG_STATUS'			=> ($img_status) ? $user->lang['IMAGES_ARE_ON'] : $user->lang['IMAGES_ARE_OFF'],
+posting.php:	'FLASH_STATUS'			=> ($flash_status) ? $user->lang['FLASH_IS_ON'] : $user->lang['FLASH_IS_OFF'],
+posting.php:	'SMILIES_STATUS'		=> ($smilies_status) ? $user->lang['SMILIES_ARE_ON'] : $user->lang['SMILIES_ARE_OFF'],
+posting.php:	'URL_STATUS'			=> ($bbcode_status && $url_status) ? $user->lang['URL_IS_ON'] : $user->lang['URL_IS_OFF'],
+posting.php:					'user_id'			=> $user->data['user_id'],
+posting.php:				$sql = 'INSERT INTO ' . GALLERY_WATCH_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+posting.php:				$db->sql_query($sql);
+posting.php:				$message = $user->lang['WATCHING_ALBUM'] . '<br />';
+posting.php:						AND user_id = ' . $user->data['user_id'];
+posting.php:				$db->sql_query($sql);
+posting.php:				$message = $user->lang['UNWATCHED_ALBUM'] . '<br />';
+posting.php:				// 1. Check album-configuration Quota
+posting.php:				// 2. Check user-limit, if he is not allowed to go unlimited
+posting.php:						WHERE image_user_id = ' . $user->data['user_id'] . '
+posting.php:					$result = $db->sql_query($sql);
+posting.php:					$own_images = (int) $db->sql_fetchfield('count');
+posting.php:					$db->sql_freeresult($result);
+posting.php:						trigger_error(sprintf($user->lang['USER_REACHED_QUOTA'], gallery_acl_check('i_count', $album_id, $album_data['album_user_id'])));
+posting.php:					$captcha->init(CONFIRM_POST);
+posting.php:						$captcha_error = $captcha->validate();
+posting.php:					$fileupload->fileupload('', $allowed_extensions, (4 * $gallery_config['max_file_size']));
+posting.php:					$upload_image_files = (gallery_acl_check('i_unlimited', $album_id, $album_data['album_user_id'])) ? $gallery_config['upload_images'] : min((gallery_acl_check('i_count', $album_id, $album_data['album_user_id']) - $own_images), $gallery_config['upload_images']);
+posting.php:					$loop = ($loop != 0) ? $loop - 1 : $loop;
+posting.php:						$image_file = $fileupload->form_upload('image_file_' . $i);
+posting.php:						if (!$image_file->uploadname)
+posting.php:						$image_file->clean_filename('unique_ext'/*, $user->data['user_id'] . '_'*/);
+posting.php:						$image_file->move_file(substr(GALLERY_UPLOAD_PATH, 0, -1), false, false, CHMOD_ALL);
+posting.php:						if (sizeof($image_file->error) && $image_file->uploadname)
+posting.php:							$image_file->remove();
+posting.php:							trigger_error(implode('<br />', $image_file->error));
+posting.php:						@chmod($image_file->destination_file, 0777);
+posting.php:							switch ($image_file->mimetype)
+posting.php:								case 'image/x-png':
+posting.php:								'filename'			=> $image_file->realname,
+posting.php:								'username'			=> request_var('username', $user->data['username']),
+posting.php:							$image_data['image_name'] = ((request_var('filename', '') == 'filename') || ($image_data['image_name'] == '')) ? str_replace("_", " ", utf8_substr($image_file->uploadname, 0, utf8_strrpos($image_file->uploadname, '.'))) : $image_data['image_name'];
+posting.php:							if (!$user->data['is_registered'] && $image_data['username'])
+posting.php:							$image_tools->set_image_options($gallery_config['max_file_size'], $gallery_config['max_height'], $gallery_config['max_width']);
+posting.php:							$image_tools->set_image_data($image_file->destination_file, $image_data['image_name'], $image_file->filesize);
+posting.php:							$image_tools->read_exif_data();
+posting.php:							$image_data['image_exif_data'] = $image_tools->exif_data_serialized;
+posting.php:							$image_data['image_has_exif'] = $image_tools->exif_data_exist;
+posting.php:								$image_tools->rotate_image($rotate[$i], $gallery_config['allow_resize_images']);
+posting.php:								if ($image_tools->rotated)
+posting.php:									$image_file->height = $image_tools->image_size['height'];
+posting.php:									$image_file->width = $image_tools->image_size['width'];
+posting.php:							if (($image_file->width > $gallery_config['max_width']) || ($image_file->height > $gallery_config['max_height']))
+posting.php:									$image_tools->resize_image($gallery_config['max_width'], $gallery_config['max_height']);
+posting.php:									if ($image_tools->resized)
+posting.php:										$image_file->height = $image_tools->image_size['height'];
+posting.php:										$image_file->width = $image_tools->image_size['width'];
+posting.php:									@unlink($image_file->destination_file);
+posting.php:							if ($image_tools->resized || $image_tools->rotated)
+posting.php:								$image_tools->write_image($image_file->destination_file, $gallery_config['jpg_quality'], true);
+posting.php:								$image_file->filesize = $image_tools->image_size['file'];
+posting.php:							if (!$image_tools->exif_data_force_db && ($image_data['image_has_exif'] == EXIF_DBSAVED))
+posting.php:								// Image was not resized, so we can pull the Exif from the image to save db-memory.
+posting.php:							$image_data['image_filesize'] = $image_file->filesize;
+posting.php:								@unlink($image_file->destination_file);
+posting.php:						$error .= (($error) ? '<br />' : '') . $user->lang['UPLOAD_NO_FILE'];
+posting.php:						$db->sql_query($sql);
+posting.php:						$captcha->reset();
+posting.php:					$allowed_filetypes[] = $user->lang['FILETYPES_GIF'];
+posting.php:					$allowed_filetypes[] = $user->lang['FILETYPES_JPG'];
+posting.php:					$allowed_filetypes[] = $user->lang['FILETYPES_PNG'];
+posting.php:				$template->assign_vars(array(
+posting.php:					'L_DESCRIPTION_LENGTH'	=> sprintf($user->lang['DESCRIPTION_LENGTH'], $gallery_config['description_length']),
+posting.php:					if (!$submit || !$captcha->is_solved())
+posting.php:						$template->assign_vars(array(
+posting.php:							'CAPTCHA_TEMPLATE'			=> $captcha->get_template(),
+posting.php:					$template->assign_vars(array(
+posting.php:						$message = $user->lang['ALBUM_UPLOAD_SUCCESSFUL'];
+posting.php:						$message = $user->lang['ALBUM_UPLOAD_NEED_APPROVAL'];
+posting.php:					$message = $user->lang['UPLOAD_NO_FILE'];
+posting.php:				if (!gallery_acl_check('i_unlimited', $album_id, $album_data['album_user_id']) && ((gallery_acl_check('i_count', $album_id, $album_data['album_user_id']) - $own_images) < $upload_image_files))
+posting.php:					$upload_image_files = (gallery_acl_check('i_count', $album_id, $album_data['album_user_id']) - $own_images);
+posting.php:					$error .= (($error) ? '<br />' : '') . sprintf($user->lang['USER_NEARLY_REACHED_QUOTA'], gallery_acl_check('i_count', $album_id, $album_data['album_user_id']), $own_images, $upload_image_files);
+posting.php:					$template->assign_vars(array(
+posting.php:					$template->assign_block_vars('upload_image', array());
+posting.php:				$page_title = $user->lang['UPLOAD_IMAGE'];
+posting.php:					$message_parser->message	= utf8_normalize_nfc($image_desc);
+posting.php:					if ($message_parser->message)
+posting.php:						$message_parser->parse(true, true, true, true, false, true, true, true);
+posting.php:						'image_desc'				=> $message_parser->message,
+posting.php:						'image_desc_uid'			=> $message_parser->bbcode_uid,
+posting.php:						'image_desc_bitfield'		=> $message_parser->bbcode_bitfield,
+posting.php:						if ($user->data['user_id'] != $image_data['image_user_id'])
+posting.php:							$result = $db->sql_query($sql);
+posting.php:							$personal_album_id = (int) $db->sql_fetchfield('personal_album_id');
+posting.php:							$db->sql_freeresult($result);
+posting.php:							$user_entry_exists = ($db->sql_affectedrows()) ? true : false;
+posting.php:							$personal_album_id = $user->gallery['personal_album_id'];
+posting.php:								$user_entry_exists = ($user->gallery['exists']) ? true : false;
+posting.php:						$sql = 'UPDATE ' . GALLERY_ALBUMS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $album_sql_ary) . '
+posting.php:							WHERE ' . $db->sql_in_set('album_id', $image_data['image_album_id']);
+posting.php:						$db->sql_query($sql);
+posting.php:						$image_tools->set_image_options($gallery_config['max_file_size'], $gallery_config['max_height'], $gallery_config['max_width']);
+posting.php:						$image_tools->set_image_data($phpbb_root_path . GALLERY_UPLOAD_PATH . $image_data['image_filename']);
+posting.php:							// Store exif-data to database if there are any and we didn't already do that.
+posting.php:							$image_tools->read_exif_data();
+posting.php:							$sql_ary['image_exif_data'] = $image_tools->exif_data_serialized;
+posting.php:							$sql_ary['image_has_exif'] = $image_tools->exif_data_exist;
+posting.php:						$image_tools->rotate_image($rotate, $gallery_config['allow_resize_images']);
+posting.php:						if ($image_tools->rotated)
+posting.php:							$image_tools->write_image($image_tools->image_source, $gallery_config['jpg_quality'], true);
+posting.php:						SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+posting.php:					$db->sql_query($sql);
+posting.php:					if ($user->data['user_id'] != $image_data['image_user_id'])
+posting.php:				$message_parser->message	= $image_data['image_desc'];
+posting.php:				$message_parser->decode_message($image_data['image_desc_uid']);
+posting.php:				$template->assign_vars(array(
+posting.php:					'MESSAGE'			=> $message_parser->message,
+posting.php:					'L_DESCRIPTION_LENGTH'	=> sprintf($user->lang['DESCRIPTION_LENGTH'], $gallery_config['description_length']),
+posting.php:					'S_MOVE_PERSONAL'	=> ((gallery_acl_check('i_upload', OWN_GALLERY_PERMISSIONS) || $user->gallery['personal_album_id']) || ($user->data['user_id'] != $image_data['image_user_id'])) ? true : false,
+posting.php:					'S_MOVE_MODERATOR'	=> ($user->data['user_id'] != $image_data['image_user_id']) ? true : false,
+posting.php:				$message = $user->lang['IMAGES_UPDATED_SUCCESSFULLY'] . '<br />';
+posting.php:				$page_title = $user->lang['EDIT_IMAGE'];
+posting.php:						$error = $user->lang['MISSING_REPORT_REASON'];
+posting.php:						'reporter_id'				=> $user->data['user_id'],
+posting.php:						$sql = 'INSERT INTO ' . GALLERY_REPORTS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+posting.php:						$db->sql_query($sql);
+posting.php:						$report_id = $db->sql_nextid();
+posting.php:						$db->sql_query($sql);
+posting.php:				$template->assign_vars(array(
+posting.php:				$message = $user->lang['IMAGES_REPORTED_SUCCESSFULLY'] . '<br />';
+posting.php:				$page_title = $user->lang['REPORT_IMAGE'];
+posting.php:					'user_id'			=> $user->data['user_id'],
+posting.php:				$sql = 'INSERT INTO ' . GALLERY_WATCH_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+posting.php:				$db->sql_query($sql);
+posting.php:				$message = $user->lang['WATCHING_IMAGE'] . '<br />';
+posting.php:						AND user_id = " . $user->data['user_id'];
+posting.php:				$db->sql_query($sql);
+posting.php:				$message = $user->lang['UNWATCHED_IMAGE'] . '<br />';
+posting.php:					'user_id'			=> $user->data['user_id'],
+posting.php:				$sql = 'INSERT INTO ' . GALLERY_FAVORITES_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+posting.php:				$db->sql_query($sql);
+posting.php:				$db->sql_query($sql);
+posting.php:				if ($user->gallery['watch_favo'] && !$image_data['watch_id'])
+posting.php:						'user_id'			=> $user->data['user_id'],
+posting.php:					$sql = 'INSERT INTO ' . GALLERY_WATCH_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+posting.php:					$db->sql_query($sql);
+posting.php:				$message = $user->lang['FAVORITED_IMAGE'] . '<br />';
+posting.php:						AND user_id = " . $user->data['user_id'];
+posting.php:				$db->sql_query($sql);
+posting.php:					SET image_favorited = image_favorited - 1
+posting.php:				$db->sql_query($sql);
+posting.php:				$message = $user->lang['UNFAVORITED_IMAGE'] . '<br />';
+posting.php:					$db->sql_query($sql);
+posting.php:					$db->sql_query($sql);
+posting.php:					$db->sql_query($sql);
+posting.php:					$db->sql_query($sql);
+posting.php:					$db->sql_query($sql);
+posting.php:					$db->sql_query($sql);
+posting.php:					$message = $user->lang['DELETED_IMAGE'] . '<br />';
+posting.php:					if ($user->data['user_id'] != $image_data['image_user_id'])
+posting.php:						$message = $user->lang['DELETED_IMAGE_NOT'] . '<br />';
+posting.php:		* Rating-System: now you can comment and rate in one form
+posting.php:			if ($user->data['is_registered'])
+posting.php:						AND rate_user_id = ' . (int) $user->data['user_id'];
+posting.php:				$result = $db->sql_query($sql);
+posting.php:				if ($db->sql_affectedrows($result) > 0)
+posting.php:					$your_rating = $db->sql_fetchfield('rate_point');
+posting.php:				$db->sql_freeresult($result);
+posting.php:			if (!$your_rating && gallery_acl_check('i_rate', $album_id, $album_data['album_user_id']) && ($user->data['user_id'] != $image_data['image_user_id']) && ($user->data['user_id'] != ANONYMOUS))
+posting.php:						$contest_rating_msg = sprintf($user->lang['CONTEST_RATING_STARTS'], $user->format_date(($album_data['contest_start'] + $album_data['contest_rating']), false, true));
+posting.php:						$contest_rating_msg = sprintf($user->lang['CONTEST_RATING_ENDED'], $user->format_date(($album_data['contest_start'] + $album_data['contest_end']), false, true));
+posting.php:						'rate_user_id'	=> $user->data['user_id'],
+posting.php:						'rate_user_ip'	=> $user->ip,
+posting.php:					$db->sql_query('INSERT INTO ' . GALLERY_RATES_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary));
+posting.php:					$result = $db->sql_query($sql);
+posting.php:					while ($row = $db->sql_fetchrow($result))
+posting.php:						$db->sql_query($sql);
+posting.php:					$db->sql_freeresult($result);
+posting.php:					$message .= $user->lang['RATING_SUCCESSFUL'] . '<br />';
+posting.php:						$template->assign_block_vars('rate_scale', array(
+posting.php:			$template->assign_vars(array(
+posting.php:					$captcha->init(CONFIRM_POST);
+posting.php:						$captcha_error = $captcha->validate();
+posting.php:					if ($user->data['user_id'] == ANONYMOUS)
+posting.php:							$error .= (($error) ? '<br />' : '') . $user->lang['MISSING_USERNAME'];
+posting.php:							$error .= (($error) ? '<br />' : '') . $user->lang['INVALID_USERNAME'];
+posting.php:						$error .= (($error) ? '<br />' : '') . $user->lang['MISSING_COMMENT'];
+posting.php:						$error .= (($error) ? '<br />' : '') . $user->lang['COMMENT_TOO_LONG'];
+posting.php:					$message_parser->message	= utf8_normalize_nfc($comment_text);
+posting.php:					if ($message_parser->message)
+posting.php:						$message_parser->parse(true, true, true, true, false, true, true, true);
+posting.php:						'comment_user_id'		=> $user->data['user_id'],
+posting.php:						'comment_username'		=> ($user->data['user_id'] != ANONYMOUS) ? $user->data['username'] : $comment_username,
+posting.php:						'comment_user_colour'	=> $user->data['user_colour'],
+posting.php:						'comment_user_ip'		=> $user->ip,
+posting.php:						'comment'				=> $message_parser->message,
+posting.php:						'comment_uid'			=> $message_parser->bbcode_uid,
+posting.php:						'comment_bitfield'		=> $message_parser->bbcode_bitfield,
+posting.php:						$db->sql_query('INSERT INTO ' . GALLERY_COMMENTS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary));
+posting.php:						$newest_comment = $db->sql_nextid();
+posting.php:							$captcha->reset();
+posting.php:							WHERE " . $db->sql_in_set('image_id', $image_id);
+posting.php:						$db->sql_query($sql);
+posting.php:						if ($user->gallery['watch_com'] && !$image_data['watch_id'])
+posting.php:								'user_id'			=> $user->data['user_id'],
+posting.php:							$sql = 'INSERT INTO ' . GALLERY_WATCH_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_ary);
+posting.php:							$db->sql_query($sql);
+posting.php:						$message .= $user->lang['COMMENT_STORED'] . '<br />';
+posting.php:						$s_captcha_hidden_fields = ($captcha->is_solved()) ? build_hidden_fields($captcha->get_hidden_fields()) : '';
+posting.php:					if ($user->data['user_id'] != ANONYMOUS)
+posting.php:					if (!$submit || !$captcha->is_solved())
+posting.php:						$template->assign_vars(array(
+posting.php:							'CAPTCHA_TEMPLATE'			=> $captcha->get_template(),
+posting.php:					$template->assign_vars(array(
+posting.php:				$page_title = $user->lang['POST_COMMENT'];
+posting.php:							$error .= (($error) ? '<br />' : '') . $user->lang['MISSING_USERNAME'];
+posting.php:							$error .= (($error) ? '<br />' : '') . $user->lang['INVALID_USERNAME'];
+posting.php:						$error .= (($error) ? '<br />' : '') . $user->lang['MISSING_COMMENT'];
+posting.php:						$error .= (($error) ? '<br />' : '') . $user->lang['COMMENT_TOO_LONG'];
+posting.php:					$message_parser->message	= utf8_normalize_nfc($comment_text);
+posting.php:					if ($message_parser->message)
+posting.php:						$message_parser->parse(true, true, true, true, false, true, true, true);
+posting.php:						'comment'				=> $message_parser->message,
+posting.php:						'comment_uid'			=> $message_parser->bbcode_uid,
+posting.php:						'comment_bitfield'		=> $message_parser->bbcode_bitfield,
+posting.php:						'comment_edit_user_id'	=> $user->data['user_id'],
+posting.php:						$db->sql_query('UPDATE ' . GALLERY_COMMENTS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_ary) . ' WHERE comment_id = ' . (int) $comment_id);
+posting.php:						$message .= $user->lang['COMMENT_STORED'] . '<br />';
+posting.php:						if ($user->data['user_id'] != $comment_data['comment_user_id'])
+posting.php:				$page_title = $user->lang['EDIT_COMMENT'];
+posting.php:					$db->sql_query($sql);
+posting.php:					set_gallery_config_count('num_comments', -1);
+posting.php:					$result = $db->sql_query_limit($sql, 1);
+posting.php:					$last_comment_id = (int) $db->sql_fetchfield('last_comment');
+posting.php:					$db->sql_freeresult($result);
+posting.php:						SET image_comments = image_comments - 1,
+posting.php:						WHERE " . $db->sql_in_set('image_id', $image_id);
+posting.php:					$db->sql_query($sql);
+posting.php:					if ($user->data['user_id'] != $comment_data['comment_user_id'])
+posting.php:					$message = $user->lang['DELETED_COMMENT'] . '<br />';
+posting.php:						$message = $user->lang['DELETED_COMMENT_NOT'] . '<br />';
+posting.php:		$template->assign_vars(array(
+posting.php:			'L_COMMENT_LENGTH'		=> sprintf($user->lang['COMMENT_LENGTH'], $gallery_config['comment_length']),
+posting.php:		$message .= '<br />' . sprintf($user->lang['CLICK_RETURN_IMAGE'], '<a href="' . $image_backlink . '">', '</a>');
+posting.php:		$message .= '<br />' . sprintf($user->lang['CLICK_RETURN_ALBUM'], '<a href="' . $album_backlink . '">', '</a>');
+posting.php:$template->set_filenames(array(
+search.php:* @copyright (c) 2007 nickvergessen nickvergessen@gmx.de http://www.flying-bits.org
+search.php:* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+search.php:$user->session_begin();
+search.php:$auth->acl($user->data);
+search.php:$user->setup(array('mods/gallery', 'search'));
+search.php:if (!$auth->acl_get('u_search') || !$config['load_search'])
+search.php:	$template->assign_var('S_NO_SEARCH', true);
+search.php:$template->assign_block_vars('navlinks', array(
+search.php:	'FORUM_NAME'	=> $user->lang['SEARCH'],
+search.php:$limit_days = array(0 => $user->lang['ALL_IMAGES'], 1 => $user->lang['1_DAY'], 7 => $user->lang['7_DAYS'], 14 => $user->lang['2_WEEKS'], 30 => $user->lang['1_MONTH'], 90 => $user->lang['3_MONTHS'], 180 => $user->lang['6_MONTHS'], 365 => $user->lang['1_YEAR']);
+search.php:$sort_by_text = array('t' => $user->lang['TIME'], 'n' => $user->lang['IMAGE_NAME'], 'u' => $user->lang['SORT_USERNAME'], 'vc' => $user->lang['VIEWS']);
+search.php:	$sort_by_text['ra'] = $user->lang['RATING'];
+search.php:	$sort_by_text['r'] = $user->lang['RATES_COUNT'];
+search.php:	$sort_by_text['c'] = $user->lang['COMMENTS'];
+search.php:	$sort_by_text['lc'] = $user->lang['NEW_COMMENT'];
+search.php:		$user_id = $user->data['user_id'];
+search.php:		if ($user->data['user_id'] == ANONYMOUS)
+search.php:			login_box('', $user->lang['LOGIN_EXPLAIN_EGOSEARCH']);
+search.php:			trigger_error(sprintf($user->lang['TOO_FEW_AUTHOR_CHARS'], $config['min_search_author_chars']));
+search.php:		$sql_where = (strpos($username, '*') !== false) ? ' username_clean ' . $db->sql_like_expression(str_replace('*', $db->any_char, utf8_clean_string($username))) : " username_clean = '" . $db->sql_escape(utf8_clean_string($username)) . "'";
+search.php:		$result = $db->sql_query_limit($sql, 100);
+search.php:		while ($row = $db->sql_fetchrow($result))
+search.php:		$db->sql_freeresult($result);
+search.php:	// if we search in an existing search result just add the additional keywords. But we need to use "all search terms"-mode
+search.php:	// pre-made searches
+search.php:				$template->assign_block_vars('navlinks', array(
+search.php:					'FORUM_NAME'	=> $user->lang['SEARCH_RECENT'],
+search.php:				$l_search_title = $user->lang['SEARCH_RECENT'];
+search.php:					WHERE ((' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('i_view'), false, true) . ' AND image_status <> ' . IMAGE_UNAPPROVED . ')
+search.php:							OR ' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('m_status'), false, true) . ')
+search.php:				$template->assign_block_vars('navlinks', array(
+search.php:					'FORUM_NAME'	=> $user->lang['SEARCH_RANDOM'],
+search.php:				$l_search_title = $user->lang['SEARCH_RANDOM'];
+search.php:				switch ($db->sql_layer)
+search.php:					WHERE ((' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('i_view'), false, true) . ' AND image_status <> ' . IMAGE_UNAPPROVED . ')
+search.php:							OR ' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('m_status'), false, true) . ')
+search.php:				$template->assign_block_vars('navlinks', array(
+search.php:					'FORUM_NAME'	=> $user->lang['SEARCH_RECENT_COMMENTS'],
+search.php:				$l_search_title = $user->lang['SEARCH_RECENT_COMMENTS'];
+search.php:					'WHERE'			=> '((' . $db->sql_in_set('i.image_album_id', gallery_acl_album_ids('i_view'), false, true) . ' AND i.image_status <> ' . IMAGE_UNAPPROVED . ')
+search.php:						OR ' . $db->sql_in_set('i.image_album_id', gallery_acl_album_ids('m_status'), false, true) . ')
+search.php:						AND ' . $db->sql_in_set('i.image_album_id', gallery_acl_album_ids('c_read'), false, true),
+search.php:				$sql = $db->sql_build_query('SELECT', $sql_array);
+search.php:				$template->assign_block_vars('navlinks', array(
+search.php:					'FORUM_NAME'	=> $user->lang['SEARCH_TOPRATED'],
+search.php:				$l_search_title = $user->lang['SEARCH_TOPRATED'];
+search.php:				// We need to hide contest-images on this search_id, if the contest is still running!
+search.php:						AND ((' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('i_view'), false, true) . ' AND image_status <> ' . IMAGE_UNAPPROVED . ' AND image_contest = ' . IMAGE_NO_CONTEST . ')
+search.php:							OR ' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('m_status'), false, true) . ')
+search.php:				$template->assign_block_vars('navlinks', array(
+search.php:					'FORUM_NAME'	=> $user->lang['SEARCH_CONTEST'],
+search.php:				$l_search_title = $user->lang['SEARCH_CONTEST'];
+search.php:					'WHERE'			=> $db->sql_in_set('c.contest_album_id', array_unique(array_merge(gallery_acl_album_ids('i_view'), gallery_acl_album_ids('m_status'))), false, true) . ' AND c.contest_marked = ' . IMAGE_NO_CONTEST,
+search.php:				$sql = $db->sql_build_query('SELECT', $sql_array);
+search.php:				$result = $db->sql_query_limit($sql, $gallery_config['rows_per_page'] * SEARCH_PAGES_NUMBER);
+search.php:				while ($row = $db->sql_fetchrow($result))
+search.php:				$db->sql_freeresult($result);
+search.php:				$user_id = $user->data['user_id'];
+search.php:				// Get username for the search-title "Images of %s"
+search.php:				$result = $db->sql_query($sql);
+search.php:				$username = $db->sql_fetchfield('username');
+search.php:				$db->sql_freeresult($result);
+search.php:				$l_search_title = sprintf($user->lang['SEARCH_USER_IMAGES_OF'], $username);
+search.php:				// We need to hide contest-images on this search_id, if the contest is still running!
+search.php:						AND ((' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('i_view'), false, true) . ' AND image_status <> ' . IMAGE_UNAPPROVED . ' AND image_contest = ' . IMAGE_NO_CONTEST . ')
+search.php:							OR ' . $db->sql_in_set('image_album_id', gallery_acl_album_ids('m_status'), false, true) . ')
+search.php:				$match_search_query .= $db->sql_like_expression(str_replace('*', $db->any_char, $db->any_char . strtolower($word) . $db->any_char));
+search.php:			WHERE ((' . $db->sql_in_set('i.image_album_id', gallery_acl_album_ids('i_view'), false, true) . ' AND i.image_status <> ' . IMAGE_UNAPPROVED . ')
+search.php:					OR ' . $db->sql_in_set('i.image_album_id', gallery_acl_album_ids('m_status'), false, true) . ')
+search.php:				' . (($user_id_ary) ? ' AND ' . $db->sql_in_set('i.image_user_id', $user_id_ary) : '') . '
+search.php:				' . (($search_album) ? ' AND ' . $db->sql_in_set('i.image_album_id', $search_album) : '') . '
+search.php:			$result = $db->sql_query($sql);
+search.php:			$result = $db->sql_query_limit($sql, $sql_limit);
+search.php:		while ($row = $db->sql_fetchrow($result))
+search.php:		$db->sql_freeresult($result);
+search.php:	$l_search_matches = ($total_match_count == 1) ? sprintf($user->lang['FOUND_SEARCH_MATCH'], $total_match_count) : sprintf($user->lang['FOUND_SEARCH_MATCHES'], $total_match_count);
+search.php:	// For some searches we need to print out the "no results" page directly to allow re-sorting/refining the search options.
+search.php:		$sql_where .= ($search_results == 'image') ? $db->sql_in_set('i.image_id', $id_ary) : $db->sql_in_set('c.comment_id', $id_ary);
+search.php:	$hilit = explode(' ', preg_replace('#\s+#u', ' ', str_replace(array('+', '-', '|', '(', ')', '&quot;'), ' ', $keywords)));
+search.php:	$template->assign_vars(array(
+search.php:		//@todo: 'IGNORED_WORDS'		=> (sizeof($search->common_words)) ? implode(' ', $search->common_words) : '',
+search.php:			$sql = $db->sql_build_query('SELECT', $sql_array);
+search.php:			$result = $db->sql_query($sql);
+search.php:			while ($row = $db->sql_fetchrow($result))
+search.php:			$db->sql_freeresult($result);
+search.php:					$template->assign_block_vars('imageblock', array(
+search.php:						'BLOCK_NAME'		=> sprintf($user->lang['CONTEST_WINNERS_OF'], $contest_data['album_name']),
+search.php:							$template->assign_block_vars('imageblock.imagerow', array());
+search.php:						$template->assign_block_vars('imageblock.imagerow.no_image', array());
+search.php:						$template->assign_block_vars('imageblock', array(
+search.php:					$template->assign_block_vars('imageblock.imagerow', array());
+search.php:							$template->assign_block_vars('imageblock.imagerow.noimage', array());
+search.php:						// Assign the image to the template-block
+search.php:			$sql = $db->sql_build_query('SELECT', $sql_array);
+search.php:			$result = $db->sql_query($sql);
+search.php:			while ($commentrow = $db->sql_fetchrow($result))
+search.php:				$template->assign_block_vars('commentrow', array(
+search.php:					'TIME'			=> $user->format_date($commentrow['comment_time']),
+search.php:					'U_DELETE'		=> (gallery_acl_check('m_comments', $album_id) || (gallery_acl_check('c_delete', $album_id) && ($commentrow['comment_user_id'] == $user->data['user_id']) && $user->data['is_registered'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=delete&amp;comment_id=" . $commentrow['comment_id']) : '',
+search.php:					'U_EDIT'		=> (gallery_acl_check('m_comments', $album_id) || (gallery_acl_check('c_edit', $album_id) && ($commentrow['comment_user_id'] == $user->data['user_id']) && $user->data['is_registered'])) ? append_sid("{$phpbb_root_path}{$gallery_root_path}posting.$phpEx", "album_id=$album_id&amp;image_id=$image_id&amp;mode=comment&amp;submode=edit&amp;comment_id=" . $commentrow['comment_id']) : '',
+search.php:					'U_INFO'		=> ($auth->acl_get('a_')) ? append_sid("{$phpbb_root_path}{$gallery_root_path}mcp.$phpEx", 'mode=whois&amp;ip=' . $commentrow['comment_user_ip']) : '',
+search.php:					'IMAGE_TIME'			=> $user->format_date($commentrow['image_time']),
+search.php:			$db->sql_freeresult($result);
+search.php:			$template->assign_vars(array(
+search.php:				'DELETE_IMG'		=> $user->img('icon_post_delete', 'DELETE_COMMENT'),
+search.php:				'EDIT_IMG'			=> $user->img('icon_post_edit', 'EDIT_COMMENT'),
+search.php:				'INFO_IMG'			=> $user->img('icon_post_info', 'IP'),
+search.php:				'MINI_POST_IMG'		=> $user->img('icon_post_target_unread', 'COMMENT'),
+search.php:				'PROFILE_IMG'		=> $user->img('icon_user_profile', 'READ_PROFILE'),
+search.php:	page_header(($l_search_title) ? $l_search_title : $user->lang['SEARCH']);
+search.php:	$template->set_filenames(array(
+search.php:$template->assign_vars(array(
+search.php:page_header($user->lang['GALLERY'] . ' &bull; ' . $user->lang['SEARCH'], false);
+search.php:$template->set_filenames(array(

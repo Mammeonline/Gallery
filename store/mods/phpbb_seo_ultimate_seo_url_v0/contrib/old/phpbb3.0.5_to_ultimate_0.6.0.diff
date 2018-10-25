@@ -1,0 +1,1304 @@
+Index: viewtopic.php
+===================================================================
+--- viewtopic.php	(phpBB 3.0.5)
++++ viewtopic.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -17,7 +17,20 @@
+ include($phpbb_root_path . 'common.' . $phpEx);
+ include($phpbb_root_path . 'includes/functions_display.' . $phpEx);
+ include($phpbb_root_path . 'includes/bbcode.' . $phpEx);
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++if (empty($_REQUEST['f'])) {
++	$phpbb_seo->get_forum_id($session_forum_id);
++	if ($session_forum_id > 0) {
++		$_REQUEST['f'] = (int) $session_forum_id;
++	}
++}
++if (!empty($_REQUEST['hilit'])) {
++	$_REQUEST['hilit'] = rawurldecode($_REQUEST['hilit']);
++	if (!$phpbb_seo->is_utf8($_REQUEST['hilit'])) {
++		$_REQUEST['hilit'] = utf8_normalize_nfc(utf8_recode($_REQUEST['hilit'], 'iso-8859-1'));
++	}
++}
++// www.phpBB-SEO.com SEO TOOLKIT END
+ // Start session management
+ $user->session_begin();
+ $auth->acl($user->data);
+@@ -305,7 +318,40 @@
+ 
+ $forum_id = (int) $topic_data['forum_id'];
+ $topic_id = (int) $topic_data['topic_id'];
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++$phpbb_seo->set_url($topic_data['forum_name'], $forum_id, $phpbb_seo->seo_static['forum']);
++if ($topic_data['topic_type'] == POST_GLOBAL) {
++	// Let's make sure user will see global annoucements
++	$auth->cache[$forum_id]['f_read'] = 1;
++	$_parent = $phpbb_seo->seo_static['global_announce'];
++} else {
++	$_parent = $phpbb_seo->seo_url['forum'][$forum_id];
++}
++if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
++	if ( !$phpbb_seo->check_url('topic', $topic_data['topic_url'], $_parent)) {
++		if (!empty($topic_data['topic_url'])) {
++			// Here we get rid of the seo delim (-t) and put it back even in simple mod 
++			// to be able to handle all cases at once
++			$_url = preg_replace('`' . $phpbb_seo->seo_delim['topic'] . '$`i', '', $topic_data['topic_url']);
++			$_title = $phpbb_seo->get_url_info('topic', $_url . $phpbb_seo->seo_delim['topic'] . $topic_id, 'title');
++		} else {
++			$_title = $phpbb_seo->modrtype > 2 ? censor_text($topic_data['topic_title']) : '';
++		}
++		unset($phpbb_seo->seo_url['topic'][$topic_id]);
++		$topic_data['topic_url'] = $phpbb_seo->get_url_info('topic', $phpbb_seo->prepare_url( 'topic', $_title, $topic_id, $_parent, (( empty($_title) || ($_title == $phpbb_seo->seo_static['topic']) ) ? true : false) ), 'url');
++		unset($phpbb_seo->seo_url['topic'][$topic_id]);
++		if ($topic_data['topic_url']) {
++			// Update the topic_url field for later re-use
++			$sql = "UPDATE " . TOPICS_TABLE . " SET topic_url = '" . $db->sql_escape($topic_data['topic_url']) . "'
++				WHERE topic_id = $topic_id";
++			$db->sql_query($sql);
++		}
++	}
++} else {
++	$topic_data['topic_url'] = '';
++}
++$phpbb_seo->prepare_iurl($topic_data, 'topic', $_parent);
++// www.phpBB-SEO.com SEO TOOLKIT END
+ //
+ $topic_replies = ($auth->acl_get('m_approve', $forum_id)) ? $topic_data['topic_replies_real'] : $topic_data['topic_replies'];
+ 
+@@ -352,17 +398,23 @@
+ {
+ 	$jump_to = request_var('e', 0);
+ 
+-	$redirect_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id");
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	//$redirect_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id");
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+ 	if ($user->data['user_id'] == ANONYMOUS)
+ 	{
+-		login_box($redirect_url . "&amp;p=$post_id&amp;e=$jump_to", $user->lang['LOGIN_NOTIFY_TOPIC']);
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		login_box(append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;p=$post_id&amp;e=$jump_to"), $user->lang['LOGIN_NOTIFY_TOPIC']);
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	}
+ 
+ 	if ($jump_to > 0)
+ 	{
+ 		// We direct the already logged in user to the correct post...
+-		redirect($redirect_url . ((!$post_id) ? "&amp;p=$jump_to" : "&amp;p=$post_id") . "#p$jump_to");
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		redirect(append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id" . ((!$post_id) ? "&amp;p=$jump_to" : "&amp;p=$post_id")) . "#p$jump_to");
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	}
+ }
+ 
+@@ -613,20 +665,26 @@
+ 	'S_DISPLAY_POST_INFO'	=> ($topic_data['forum_type'] == FORUM_POST && ($auth->acl_get('f_post', $forum_id) || $user->data['user_id'] == ANONYMOUS)) ? true : false,
+ 	'S_DISPLAY_REPLY_INFO'	=> ($topic_data['forum_type'] == FORUM_POST && ($auth->acl_get('f_reply', $forum_id) || $user->data['user_id'] == ANONYMOUS)) ? true : false,
+ 
+-	'U_TOPIC'				=> "{$server_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id",
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	'U_TOPIC'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid($viewtopic_url) : "{$server_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id",
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	'U_FORUM'				=> $server_path,
+ 	'U_VIEW_TOPIC' 			=> $viewtopic_url,
+ 	'U_VIEW_FORUM' 			=> append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $forum_id),
+ 	'U_VIEW_OLDER_TOPIC'	=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;view=previous"),
+ 	'U_VIEW_NEWER_TOPIC'	=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;view=next"),
+-	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? $viewtopic_url . '&amp;view=print' : '',
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start&amp;" . ((strlen($u_sort_param)) ? "&amp;$u_sort_param" : '') . (($highlight_match) ? "&amp;hilit=$highlight" : '') . "&amp;view=print") : '',
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	'U_EMAIL_TOPIC'			=> ($auth->acl_get('f_email', $forum_id) && $config['email_enable']) ? append_sid("{$phpbb_root_path}memberlist.$phpEx", "mode=email&amp;t=$topic_id") : '',
+ 
+ 	'U_WATCH_TOPIC' 		=> $s_watching_topic['link'],
+ 	'L_WATCH_TOPIC' 		=> $s_watching_topic['title'],
+ 	'S_WATCHING_TOPIC'		=> $s_watching_topic['is_watching'],
+ 
+-	'U_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks']) ? $viewtopic_url . '&amp;bookmark=1&amp;hash=' . generate_link_hash("topic_$topic_id") : '',
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	'U_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks']) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;bookmark=1&amp;hash=" . generate_link_hash("topic_$topic_id")) : '',
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	'L_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks'] && $topic_data['bookmarked']) ? $user->lang['BOOKMARK_TOPIC_REMOVE'] : $user->lang['BOOKMARK_TOPIC'],
+ 
+ 	'U_POST_NEW_TOPIC' 		=> ($auth->acl_get('f_post', $forum_id) || $user->data['user_id'] == ANONYMOUS) ? append_sid("{$phpbb_root_path}posting.$phpEx", "mode=post&amp;f=$forum_id") : '',
+@@ -849,7 +907,9 @@
+ 		'S_IS_MULTI_CHOICE'	=> ($topic_data['poll_max_options'] > 1) ? true : false,
+ 		'S_POLL_ACTION'		=> $viewtopic_url,
+ 
+-		'U_VIEW_RESULTS'	=> $viewtopic_url . '&amp;view=viewpoll')
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		'U_VIEW_RESULTS'	=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;view=viewpoll") )
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	);
+ 
+ 	unset($poll_end, $poll_info, $voted_id);
+@@ -953,7 +1013,9 @@
+ 	}
+ 
+ 	$poster_id = (int) $row['poster_id'];
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	$phpbb_seo->set_user_url( $row['username'], $poster_id );
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Does post have an attachment? If so, add it to the list
+ 	if ($row['post_attachment'] && $config['allow_attachments'])
+ 	{
+@@ -1479,7 +1541,9 @@
+ 		'S_TOPIC_POSTER'	=> ($topic_data['topic_poster'] == $poster_id) ? true : false,
+ 
+ 		'S_IGNORE_POST'		=> ($row['hide_post']) ? true : false,
+-		'L_IGNORE_POST'		=> ($row['hide_post']) ? sprintf($user->lang['POST_BY_FOE'], get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']), '<a href="' . $viewtopic_url . "&amp;p={$row['post_id']}&amp;view=show#p{$row['post_id']}" . '">', '</a>') : '',
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		'L_IGNORE_POST'		=> ($row['hide_post']) ? sprintf($user->lang['POST_BY_FOE'], get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']), '<a href="' . append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;p={$row['post_id']}&amp;view=show") . '#p' . $row['post_id'] . '">', '</a>') : '',
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	);
+ 
+ 	if (isset($cp_row['row']) && sizeof($cp_row['row']))
+@@ -1553,7 +1617,9 @@
+ 	if ($post_unread)
+ 	{
+ 		$template->assign_vars(array(
+-			'U_VIEW_UNREAD_POST'	=> '#unread',
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			'U_VIEW_UNREAD_POST'	=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start") . '#unread',
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 		));
+ 	}
+ 	else if (isset($topic_tracking_info[$topic_id]) && $topic_data['topic_last_post_time'] > $topic_tracking_info[$topic_id])
+@@ -1571,7 +1637,9 @@
+ 	if ($last_page && $post_unread)
+ 	{
+ 		$template->assign_vars(array(
+-			'U_VIEW_UNREAD_POST'	=> '#unread',
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			'U_VIEW_UNREAD_POST'	=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start") . '#unread',
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 		));
+ 	}
+ 	else if (!$last_page)
+Index: styles/subsilver2/template/overall_header.html
+===================================================================
+--- styles/subsilver2/template/overall_header.html	(phpBB 3.0.5)
++++ styles/subsilver2/template/overall_header.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -1,7 +1,7 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
+ <head>
+-
++{SEO_BASE_HREF}
+ <meta http-equiv="content-type" content="text/html; charset={S_CONTENT_ENCODING}" />
+ <meta http-equiv="content-language" content="{S_USER_LANG}" />
+ <meta http-equiv="content-style-type" content="text/css" />
+@@ -37,24 +37,33 @@
+ 	return false;
+ }
+ 
+-function jumpto()
+-{
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++function jumpto() {
+ 	var page = prompt('{LA_JUMP_PAGE}:', '{ON_PAGE}');
+-	var per_page = '{PER_PAGE}';
++	var perpage = '{PER_PAGE}';
+ 	var base_url = '{A_BASE_URL}';
+-
+-	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0)
+-	{
+-		if (base_url.indexOf('?') == -1)
+-		{
+-			document.location.href = base_url + '?start=' + ((page - 1) * per_page);
++	var seo_delim_start = '{SEO_START_DELIM}';
++	var seo_static_pagination = '{SEO_SATIC_PAGE}';
++	var seo_ext_pagination = '{SEO_EXT_PAGE}';
++	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0) {
++		var seo_page = (page - 1) * perpage;
++		if ( base_url.indexOf('?') >= 0 ) {
++			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page;
++		} else if ( seo_page > 0 ) {
++			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
++			if (seo_type1 !== null) {
++				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1;
++			}
++			var seo_type2 = base_url.match(/\/$/);
++			if (seo_type2 !== null) {
++				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination;
++			}
++		} else {
++			document.location.href = base_url;
+ 		}
+-		else
+-		{
+-			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * per_page);
+-		}
+ 	}
+ }
++// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+ /**
+ * Find a member
+Index: styles/subsilver2/template/posting_body.html
+===================================================================
+--- styles/subsilver2/template/posting_body.html	(phpBB 3.0.5)
++++ styles/subsilver2/template/posting_body.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -175,7 +175,13 @@
+ 	<td class="row1" width="22%"><b class="genmed">{L_SUBJECT}:</b></td>
+ 	<td class="row2" width="78%"><input class="post" style="width:450px" type="text" name="subject" size="45" maxlength="<!-- IF S_NEW_MESSAGE -->60<!-- ELSE -->64<!-- ENDIF -->" tabindex="2" value="{SUBJECT}" /></td>
+ </tr>
++<!-- IF S_URL -->
+ <tr>
++	<td class="row1" width="22%"><b class="genmed">URL:</b></td>
++	<td class="row2" width="78%"><input class="post" style="width:450px" type="text" name="url" size="45" maxlength="250" tabindex="2" value="{TOPIC_URL}" /></td>
++</tr>
++<!-- ENDIF -->
++<tr>
+ 	<td class="row1" valign="top"><b class="genmed">{L_MESSAGE_BODY}:</b><br /><span class="gensmall">{L_MESSAGE_BODY_EXPLAIN}&nbsp;</span><br /><br />
+ 	<!-- IF S_SMILIES_ALLOWED -->
+ 		<table width="100%" cellspacing="5" cellpadding="0" border="0" align="center">
+@@ -424,4 +430,4 @@
+ 	</table>
+ 
+ 	<!-- INCLUDE overall_footer.html -->
+-<!-- ENDIF -->
+\ No newline at end of file
++<!-- ENDIF -->
+Index: styles/subsilver2/template/simple_header.html
+===================================================================
+--- styles/subsilver2/template/simple_header.html	(phpBB 3.0.5)
++++ styles/subsilver2/template/simple_header.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -1,7 +1,7 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
+ <head>
+-
++{SEO_BASE_HREF}
+ <meta http-equiv="content-type" content="text/html; charset={S_CONTENT_ENCODING}" />
+ <meta http-equiv="content-language" content="{S_USER_LANG}" />
+ <meta http-equiv="content-style-type" content="text/css" />
+Index: styles/subsilver2/template/viewtopic_body.html
+===================================================================
+--- styles/subsilver2/template/viewtopic_body.html	(phpBB 3.0.5)
++++ styles/subsilver2/template/viewtopic_body.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -279,7 +279,7 @@
+ 
+ 		<!-- IF postrow.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+ 
+-			<td class="profile"><strong><a href="#wrapheader">{L_BACK_TO_TOP}</a></strong></td>
++			<td class="profile"><strong><a href="{U_VIEW_TOPIC}#wrapheader">{L_BACK_TO_TOP}</a></strong></td>
+ 			<td><div class="gensmall" style="float: {S_CONTENT_FLOW_BEGIN};">&nbsp;<!-- IF postrow.U_PROFILE --><a href="{postrow.U_PROFILE}">{PROFILE_IMG}</a> <!-- ENDIF --> <!-- IF postrow.U_PM --><a href="{postrow.U_PM}">{PM_IMG}</a> <!-- ENDIF --> <!-- IF postrow.U_EMAIL --><a href="{postrow.U_EMAIL}">{EMAIL_IMG}</a> <!-- ENDIF -->&nbsp;</div> <div class="gensmall" style="float: {S_CONTENT_FLOW_END};"><!-- IF not S_IS_BOT --><!-- IF postrow.U_EDIT --><a href="{postrow.U_EDIT}">{EDIT_IMG}</a> <!-- ENDIF --> <!-- IF postrow.U_QUOTE --><a href="{postrow.U_QUOTE}">{QUOTE_IMG}</a> <!-- ENDIF --> <!-- ENDIF -->&nbsp;</div></td>
+ 	<!-- ENDIF -->
+ 		</tr>
+Index: styles/subsilver2/template/attachment.html
+===================================================================
+--- styles/subsilver2/template/attachment.html	(phpBB 3.0.5)
++++ styles/subsilver2/template/attachment.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -10,19 +10,19 @@
+ 		<!-- ENDIF -->
+ 
+ 		<!-- IF _file.S_THUMBNAIL -->
+-			<a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" /></a><br />
++			<a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / {_file.DOWNLOAD_NAME}<!-- ELSE -->{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}<!-- ENDIF -->"/></a><br />
+ 			<span class="gensmall">{_file.DOWNLOAD_NAME} [ {_file.FILESIZE} {_file.SIZE_LANG} | {_file.L_DOWNLOAD_COUNT} ]</span>
+ 		<!-- ENDIF -->
+ 
+ 		<!-- IF _file.S_IMAGE -->
+-			<img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" /><br />
++			<img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}"/><br />
+ 			<span class="gensmall">{_file.DOWNLOAD_NAME} [ {_file.FILESIZE} {_file.SIZE_LANG} | {_file.L_DOWNLOAD_COUNT} ]</span>
+ 		<!-- ENDIF -->
+ 
+ 		<!-- IF _file.S_FILE -->
+ 			<span class="genmed">
+ 				<!-- IF _file.UPLOAD_ICON -->{_file.UPLOAD_ICON} <!-- ENDIF -->
+-				<a href="{_file.U_DOWNLOAD_LINK}">{_file.DOWNLOAD_NAME}</a> [{_file.FILESIZE} {_file.SIZE_LANG}]
++				<a href="{_file.U_DOWNLOAD_LINK}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}">{_file.DOWNLOAD_NAME}</a> [{_file.FILESIZE} {_file.SIZE_LANG}]
+ 			</span><br />
+ 			<span class="gensmall">{_file.L_DOWNLOAD_COUNT}</span>
+ 		<!-- ENDIF -->
+Index: styles/prosilver/template/overall_header.html
+===================================================================
+--- styles/prosilver/template/overall_header.html	(phpBB 3.0.5)
++++ styles/prosilver/template/overall_header.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -1,7 +1,7 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
+ <head>
+-
++{SEO_BASE_HREF}
+ <meta http-equiv="content-type" content="text/html; charset={S_CONTENT_ENCODING}" />
+ <meta http-equiv="content-style-type" content="text/css" />
+ <meta http-equiv="content-language" content="{S_USER_LANG}" />
+@@ -36,6 +36,11 @@
+ 	var style_cookie_settings = '{A_COOKIE_SETTINGS}';
+ 	var onload_functions = new Array();
+ 	var onunload_functions = new Array();
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	var seo_delim_start = '{SEO_START_DELIM}';
++	var seo_static_pagination = '{SEO_SATIC_PAGE}';
++	var seo_ext_pagination = '{SEO_EXT_PAGE}';
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+ 	<!-- IF S_USER_PM_POPUP -->
+ 		if ({S_NEW_PM})
+@@ -171,4 +176,4 @@
+ 				<strong>{L_INFORMATION}:</strong> {L_BOARD_DISABLED}
+ 			<span class="corners-bottom"><span></span></span></div>
+ 		</div>
+-		<!-- ENDIF -->
+\ No newline at end of file
++		<!-- ENDIF -->
+Index: styles/prosilver/template/simple_header.html
+===================================================================
+--- styles/prosilver/template/simple_header.html	(phpBB 3.0.5)
++++ styles/prosilver/template/simple_header.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -1,7 +1,7 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml" dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}" xml:lang="{S_USER_LANG}">
+ <head>
+-
++{SEO_BASE_HREF}
+ <meta http-equiv="content-type" content="text/html; charset={S_CONTENT_ENCODING}" />
+ <meta http-equiv="content-style-type" content="text/css" />
+ <meta http-equiv="content-language" content="{S_USER_LANG}" />
+@@ -69,4 +69,4 @@
+ 
+ <div id="simple-wrap">
+ 	<a id="top" name="top" accesskey="t"></a>
+-	<div id="page-body">
+\ No newline at end of file
++	<div id="page-body">
+Index: styles/prosilver/template/forum_fn.js
+===================================================================
+--- styles/prosilver/template/forum_fn.js	(phpBB 3.0.5)
++++ styles/prosilver/template/forum_fn.js	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -19,22 +19,29 @@
+ /**
+ * Jump to page
+ */
+-function jumpto()
+-{
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++function jumpto() {
+ 	var page = prompt(jump_page, on_page);
+ 
+-	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0)
+-	{
+-		if (base_url.indexOf('?') == -1)
+-		{
+-			document.location.href = base_url + '?start=' + ((page - 1) * per_page);
++	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0) {
++		var seo_page = (page - 1) * per_page;
++		if ( base_url.indexOf('?') >= 0 ) {
++			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page;
++		} else if ( seo_page > 0 ) {
++			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
++			if (seo_type1 !== null) {
++				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1;
++			}
++			var seo_type2 = base_url.match(/\/$/);
++			if (seo_type2 !== null) {
++				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination;
++			}
++		} else {
++			document.location.href = base_url;
+ 		}
+-		else
+-		{
+-			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * per_page);
+-		}
+ 	}
+ }
++// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+ /**
+ * Mark/unmark checklist
+Index: styles/prosilver/template/viewtopic_body.html
+===================================================================
+--- styles/prosilver/template/viewtopic_body.html	(phpBB 3.0.5)
++++ styles/prosilver/template/viewtopic_body.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -135,7 +135,7 @@
+ 			<!-- ENDIF -->
+ 		<!-- ENDIF -->
+ 
+-			<h3 <!-- IF postrow.S_FIRST_ROW -->class="first"<!-- ENDIF -->><!-- IF postrow.POST_ICON_IMG --><img src="{T_ICONS_PATH}{postrow.POST_ICON_IMG}" width="{postrow.POST_ICON_IMG_WIDTH}" height="{postrow.POST_ICON_IMG_HEIGHT}" alt="" /> <!-- ENDIF --><a href="#p{postrow.POST_ID}">{postrow.POST_SUBJECT}</a></h3>
++			<h3 <!-- IF postrow.S_FIRST_ROW -->class="first"<!-- ENDIF -->><!-- IF postrow.POST_ICON_IMG --><img src="{T_ICONS_PATH}{postrow.POST_ICON_IMG}" width="{postrow.POST_ICON_IMG_WIDTH}" height="{postrow.POST_ICON_IMG_HEIGHT}" alt="" /> <!-- ENDIF --><a href="{U_VIEW_TOPIC}#p{postrow.POST_ID}">{postrow.POST_SUBJECT}</a></h3>
+ 			<p class="author"><!-- IF S_IS_BOT -->{postrow.MINI_POST_IMG}<!-- ELSE --><a href="{postrow.U_MINI_POST}">{postrow.MINI_POST_IMG}</a><!-- ENDIF -->{L_POST_BY_AUTHOR} <strong>{postrow.POST_AUTHOR_FULL}</strong> &raquo; {postrow.POST_DATE} </p>
+ 
+ 			<!-- IF postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED -->
+@@ -215,7 +215,7 @@
+ 		</dl>
+ 	<!-- ENDIF -->
+ 
+-		<div class="back2top"><a href="#wrap" class="top" title="{L_BACK_TO_TOP}">{L_BACK_TO_TOP}</a></div>
++		<div class="back2top"><a href="{U_VIEW_TOPIC}#wrap" class="top" title="{L_BACK_TO_TOP}">{L_BACK_TO_TOP}</a></div>
+ 
+ 		<span class="corners-bottom"><span></span></span></div>
+ 	</div>
+@@ -270,4 +270,4 @@
+ 	<p>{LOGGED_IN_USER_LIST}</p>
+ <!-- ENDIF -->
+ 
+-<!-- INCLUDE overall_footer.html -->
+\ No newline at end of file
++<!-- INCLUDE overall_footer.html -->
+Index: styles/prosilver/template/attachment.html
+===================================================================
+--- styles/prosilver/template/attachment.html	(phpBB 3.0.5)
++++ styles/prosilver/template/attachment.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -6,7 +6,7 @@
+ 
+ 		<!-- IF _file.S_THUMBNAIL -->
+ 		<dl class="thumbnail">
+-			<dt><a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" title="{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}" /></a></dt>
++			<dt><a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / {_file.DOWNLOAD_NAME}<!-- ELSE -->{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}<!-- ENDIF -->" /></a></dt>
+ 			<!-- IF _file.COMMENT --><dd> {_file.COMMENT}</dd><!-- ENDIF -->
+ 		</dl>
+ 		<!-- ENDIF -->
+@@ -14,7 +14,7 @@
+ 
+ 		<!-- IF _file.S_IMAGE -->
+ 		<dl class="file">
+-			<dt class="attach-image"><img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" onclick="viewableArea(this);" /></dt>
++			<dt class="attach-image"><img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}" onclick="viewableArea(this);" /></dt>
+ 			<!-- IF _file.COMMENT --><dd><em>{_file.COMMENT}</em></dd><!-- ENDIF -->
+ 			<dd>{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}</dd>
+ 		</dl>
+@@ -22,7 +22,7 @@
+ 
+ 		<!-- IF _file.S_FILE -->
+ 		<dl class="file">
+-			<dt><!-- IF _file.UPLOAD_ICON -->{_file.UPLOAD_ICON} <!-- ENDIF --><a class="postlink" href="{_file.U_DOWNLOAD_LINK}">{_file.DOWNLOAD_NAME}</a></dt>
++			<dt><!-- IF _file.UPLOAD_ICON -->{_file.UPLOAD_ICON} <!-- ENDIF --><a class="postlink" href="{_file.U_DOWNLOAD_LINK}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}">{_file.DOWNLOAD_NAME}</a></dt>
+ 			<!-- IF _file.COMMENT --><dd><em>{_file.COMMENT}</em></dd><!-- ENDIF -->
+ 			<dd>({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}</dd>
+ 		</dl>
+Index: styles/prosilver/template/posting_editor.html
+===================================================================
+--- styles/prosilver/template/posting_editor.html	(phpBB 3.0.5)
++++ styles/prosilver/template/posting_editor.html	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -99,6 +99,12 @@
+ 		<dt><label for="subject">{L_SUBJECT}:</label></dt>
+ 		<dd><input type="text" name="subject" id="subject" size="45" maxlength="<!-- IF S_NEW_MESSAGE -->60<!-- ELSE -->64<!-- ENDIF -->" tabindex="2" value="{SUBJECT}{DRAFT_SUBJECT}" class="inputbox autowidth" /></dd>
+ 	</dl>
++		<!-- IF S_URL -->
++		<dl style="clear: left;">
++			<dt><label for="url">URL:</label></dt>
++				<dd><input type="text" name="url" id="url" size="45" maxlength="250" tabindex="2" value="{TOPIC_URL}" class="inputbox autowidth" /></dd>
++		</dl>
++		<!-- ENDIF -->
+ 		<!-- IF S_CONFIRM_CODE -->
+ 		<dl>
+ 			<dt><label for="confirm_code">{L_CONFIRM_CODE}:</label><br /><span>{L_CONFIRM_CODE_EXPLAIN}</span></dt>
+@@ -260,4 +266,4 @@
+ 		</fieldset>
+ 		<!-- ENDIF -->
+ 
+-<!-- ENDIF -->
+\ No newline at end of file
++<!-- ENDIF -->
+Index: language/en/acp/common.php
+===================================================================
+--- language/en/acp/common.php	(phpBB 3.0.5)
++++ language/en/acp/common.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -687,5 +687,23 @@
+ 	'LOG_WORD_DELETE'		=> '<strong>Deleted word censor</strong><br />Â» %s',
+ 	'LOG_WORD_EDIT'			=> '<strong>Edited word censor</strong><br />Â» %s',
+ ));
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++$lang = array_merge($lang, array(
++	'ACP_CAT_PHPBB_SEO' => 'phpBB SEO',
++	'ACP_MOD_REWRITE' => 'URL Rewriting settings',
++	'ACP_PHPBB_SEO_CLASS' => 'phpBB SEO Class settings',
++	'ACP_FORUM_URL' => 'Forum URL Management',
++	'ACP_HTACCESS' => '.htaccess',
++	'ACP_PREMOD_UPDATE' => '<h1>Release announcement</h1>
++	<p>This update does only concern the premod, not the phpBB core.</p>
++	<p>A new version of the phpBB SEO premod is thus available : %1$s<br/>Make sure you visit<a href="%2$s" title="The release thread"><b>the release thread</b></a> and update your installation.</p>',
++	'SEO_LOG_INSTALL_PHPBB_SEO' => '<strong>phpBB SEO mod rewrite installed (v%s)</strong>',
++	'SEO_LOG_INSTALL_PHPBB_SEO_FAIL' => '<strong>phpBB SEO mod rewrite install attempt failed</strong><br/>%s',
++	'SEO_LOG_UNINSTALL_PHPBB_SEO' => '<strong>phpBB SEO mod rewrite uninstalled (v%s)</strong>',
++	'SEO_LOG_UNINSTALL_PHPBB_SEO_FAIL' => '<strong>phpBB SEO mod rewrite uninstall attempts failed</strong><br/>%s',
++	'SEO_LOG_CONFIG_SETTINGS' => '<strong>Altered phpBB SEO Class settings</strong>',
++	'SEO_LOG_CONFIG_FORUM_URL' => '<strong>Altered Forum URLs</strong>',
++	'SEO_LOG_CONFIG_HTACCESS' => '<strong>Generated new .htaccess</strong>',
++));
++// www.phpBB-SEO.com SEO TOOLKIT END
+ ?>
+\ No newline at end of file
+Index: includes/functions_posting.php
+===================================================================
+--- includes/functions_posting.php	(phpBB 3.0.5)
++++ includes/functions_posting.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -1276,13 +1276,18 @@
+ 				$messenger->to($addr['email'], $addr['name']);
+ 				$messenger->im($addr['jabber'], $addr['name']);
+ 
++				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++				global $phpbb_seo;
++				$phpbb_seo->set_url(htmlspecialchars_decode($forum_name), $forum_id, $phpbb_seo->seo_static['forum']);
++				$phpbb_seo->prepare_iurl(array('topic_id' => $topic_id, 'topic_title' => htmlspecialchars_decode($topic_title)), 'topic', $phpbb_seo->seo_url['forum'][$forum_id]);
+ 				$messenger->assign_vars(array(
+ 					'USERNAME'		=> htmlspecialchars_decode($addr['name']),
+ 					'TOPIC_TITLE'	=> htmlspecialchars_decode($topic_title),
+ 					'FORUM_NAME'	=> htmlspecialchars_decode($forum_name),
+ 
+-					'U_FORUM'				=> generate_board_url() . "/viewforum.$phpEx?f=$forum_id",
+-					'U_TOPIC'				=> generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id",
++					'U_FORUM'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid(append_sid("{$phpbb_root_path}viewforum.$phpEx?f=$forum_id")) : generate_board_url() . "/viewforum.$phpEx?f=$forum_id",
++					'U_TOPIC'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid(append_sid("{$phpbb_root_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id")) : generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id",
++				// www.phpBB-SEO.com SEO TOOLKIT END
+ 					'U_NEWEST_POST'			=> generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id&p=$post_id&e=$post_id",
+ 					'U_STOP_WATCHING_TOPIC'	=> generate_board_url() . "/viewtopic.$phpEx?uid={$addr['user_id']}&f=$forum_id&t=$topic_id&unwatch=topic",
+ 					'U_STOP_WATCHING_FORUM'	=> generate_board_url() . "/viewforum.$phpEx?uid={$addr['user_id']}&f=$forum_id&unwatch=forum",
+@@ -1569,7 +1574,9 @@
+ function submit_post($mode, $subject, $username, $topic_type, &$poll, &$data, $update_message = true)
+ {
+ 	global $db, $auth, $user, $config, $phpEx, $template, $phpbb_root_path;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// We do not handle erasing posts here
+ 	if ($mode == 'delete')
+ 	{
+@@ -1743,6 +1750,9 @@
+ 				'icon_id'					=> $data['icon_id'],
+ 				'topic_approved'			=> $post_approval,
+ 				'topic_title'				=> $subject,
++				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++				'topic_url' => isset($data['topic_url']) ? $data['topic_url'] : '',
++				// www.phpBB-SEO.com SEO TOOLKIT END
+ 				'topic_first_poster_name'	=> (!$user->data['is_registered'] && $username) ? $username : (($user->data['user_id'] != ANONYMOUS) ? $user->data['username'] : ''),
+ 				'topic_first_poster_colour'	=> $user->data['user_colour'],
+ 				'topic_type'				=> $topic_type,
+@@ -1823,6 +1833,9 @@
+ 				'icon_id'					=> $data['icon_id'],
+ 				'topic_approved'			=> (!$post_approval) ? 0 : $data['topic_approved'],
+ 				'topic_title'				=> $subject,
++				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++				'topic_url' => isset($data['topic_url']) ? $data['topic_url'] : '',
++				// www.phpBB-SEO.com SEO TOOLKIT END
+ 				'topic_first_poster_name'	=> $username,
+ 				'topic_type'				=> $topic_type,
+ 				'topic_time_limit'			=> ($topic_type == POST_STICKY || $topic_type == POST_ANNOUNCE) ? ($data['topic_time_limit'] * 86400) : 0,
+@@ -2528,7 +2541,12 @@
+ 	{
+ 		$params .= '&amp;t=' . $data['topic_id'];
+ 	}
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	$phpbb_seo->set_url($data['forum_name'], $data['forum_id'], $phpbb_seo->seo_static['forum']);
++	if ( $params ) {
++		$phpbb_seo->prepare_iurl($data, 'topic', $topic_type == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$data['forum_id']]);
++	}
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	$url = (!$params) ? "{$phpbb_root_path}viewforum.$phpEx" : "{$phpbb_root_path}viewtopic.$phpEx";
+ 	$url = append_sid($url, 'f=' . $data['forum_id'] . $params) . $add_anchor;
+ 
+Index: includes/functions_display.php
+===================================================================
+--- includes/functions_display.php	(phpBB 3.0.5)
++++ includes/functions_display.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -23,7 +23,9 @@
+ {
+ 	global $db, $auth, $user, $template;
+ 	global $phpbb_root_path, $phpEx, $config;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	$forum_rows = $subforums = $forum_ids = $forum_ids_moderator = $forum_moderators = $active_forum_ary = array();
+ 	$parent_id = $visible_forums = 0;
+ 	$sql_from = '';
+@@ -105,7 +107,9 @@
+ 	while ($row = $db->sql_fetchrow($result))
+ 	{
+ 		$forum_id = $row['forum_id'];
+-
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$phpbb_seo->set_url($row['forum_name'], $forum_id, $phpbb_seo->seo_static['forum']);
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 		// Mark forums read?
+ 		if ($mark_read == 'forums' || $mark_read == 'all')
+ 		{
+@@ -516,7 +520,9 @@
+ {
+ 	global $db, $user, $template, $auth;
+ 	global $phpEx, $phpbb_root_path;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	if (!$auth->acl_get('f_list', $forum_data['forum_id']))
+ 	{
+ 		return;
+@@ -531,7 +537,9 @@
+ 		foreach ($forum_parents as $parent_forum_id => $parent_data)
+ 		{
+ 			list($parent_name, $parent_type) = array_values($parent_data);
+-
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			$phpbb_seo->set_url($parent_name, $parent_forum_id, $phpbb_seo->seo_static['forum']);
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 			// Skip this parent if the user does not have the permission to view it
+ 			if (!$auth->acl_get('f_list', $parent_forum_id))
+ 			{
+@@ -615,7 +623,9 @@
+ function topic_generate_pagination($replies, $url)
+ {
+ 	global $config, $user;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo, $phpEx;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Make sure $per_page is a valid value
+ 	$per_page = ($config['posts_per_page'] <= 0) ? 1 : $config['posts_per_page'];
+ 
+@@ -642,6 +652,18 @@
+ 			}
+ 			$times++;
+ 		}
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
++			static $pagin_find = array();
++			static $pagin_replace = array();
++			if (empty($pagin_find)) {
++				$pagin_find = array( '`(\.(?!' . $phpEx . ')[a-z0-9]+)([\w\#$%&~\-;:=,?@+]*)&amp;start=([0-9]+)`i', '`/([\w\#$%&~\-;:=,?@+]*)&amp;start=([0-9]+)`i' );
++				$pagin_replace = array( $phpbb_seo->seo_delim['start'] . '\\3\\1\\2', '/' . $phpbb_seo->seo_static['pagination'] . '\\2' . $phpbb_seo->seo_ext['pagination'] .'\\1' );
++			}
++			$pagination = str_replace( '&amp;start=0', '', $pagination );
++			$pagination = preg_replace( $pagin_find, $pagin_replace, $pagination );
++		}
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	}
+ 	else
+ 	{
+@@ -657,7 +679,9 @@
+ function get_moderators(&$forum_moderators, $forum_id = false)
+ {
+ 	global $config, $template, $db, $phpbb_root_path, $phpEx, $user, $auth;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Have we disabled the display of moderators? If so, then return
+ 	// from whence we came ...
+ 	if (!$config['load_moderators'])
+@@ -715,6 +739,9 @@
+ 		}
+ 		else
+ 		{
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			$phpbb_seo->prepare_url('group', $row['group_name'], $row['group_id']);
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 			$group_name = (($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name']);
+ 
+ 			if ($user->data['user_id'] != ANONYMOUS && !$auth->acl_get('u_viewprofile'))
+@@ -917,7 +944,9 @@
+ {
+ 	global $auth, $template, $db, $user;
+ 	global $phpbb_root_path, $phpEx;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Do not display user activity for users having more than 5000 posts...
+ 	if ($userdata['user_posts'] > 5000)
+ 	{
+@@ -976,11 +1005,17 @@
+ 
+ 	if (!empty($active_t_row))
+ 	{
+-		$sql = 'SELECT topic_title
+-			FROM ' . TOPICS_TABLE . '
+-			WHERE topic_id = ' . $active_t_row['topic_id'];
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$sql = 'SELECT t.topic_title, t.topic_type ' . (!empty($phpbb_seo->seo_opt['sql_rewrite']) ? ', t.topic_url' : '') . ', f.forum_id, f.forum_name
++			FROM ' . TOPICS_TABLE . ' AS t, ' . FORUMS_TABLE . ' AS f
++			WHERE t.topic_id = ' . $active_t_row['topic_id'] . '
++			AND f.forum_id = t.forum_id';
+ 		$result = $db->sql_query($sql);
+-		$active_t_row['topic_title'] = (string) $db->sql_fetchfield('topic_title');
++		$seo_active_t_row = $db->sql_fetchrow($result);
++		if ($seo_active_t_row) {
++			$active_t_row = array_merge($active_t_row, $seo_active_t_row);
++		}
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 		$db->sql_freeresult($result);
+ 	}
+ 
+@@ -994,6 +1029,9 @@
+ 		$active_f_id = $active_f_row['forum_id'];
+ 		$active_f_count = $active_f_row['num_posts'];
+ 		$active_f_pct = ($userdata['user_posts']) ? ($active_f_count / $userdata['user_posts']) * 100 : 0;
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$phpbb_seo->set_url($active_f_name, $active_f_id, $phpbb_seo->seo_static['forum']);
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	}
+ 
+ 	$active_t_name = $active_t_id = $active_t_count = $active_t_pct = '';
+@@ -1003,6 +1041,13 @@
+ 		$active_t_id = $active_t_row['topic_id'];
+ 		$active_t_count = $active_t_row['num_posts'];
+ 		$active_t_pct = ($userdata['user_posts']) ? ($active_t_count / $userdata['user_posts']) * 100 : 0;
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		if (!empty($seo_active_t_row)) {
++			$active_t_forum_id = (int) $active_t_row['forum_id'];
++			$phpbb_seo->set_url($active_t_row['forum_name'], $active_t_forum_id, $phpbb_seo->seo_static['forum']);
++			$phpbb_seo->prepare_iurl($active_t_row, 'topic', $active_t_row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$active_t_forum_id]);
++		}
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 	}
+ 
+ 	$l_active_pct = ($userdata['user_id'] != ANONYMOUS && $userdata['user_id'] == $user->data['user_id']) ? $user->lang['POST_PCT_ACTIVE_OWN'] : $user->lang['POST_PCT_ACTIVE'];
+Index: includes/db/dbal.php
+===================================================================
+--- includes/db/dbal.php	(phpBB 3.0.5)
++++ includes/db/dbal.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -671,7 +671,9 @@
+ 	function sql_report($mode, $query = '')
+ 	{
+ 		global $cache, $starttime, $phpbb_root_path, $user;
+-
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		global $phpbb_seo;
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 		if (empty($_REQUEST['explain']))
+ 		{
+ 			return false;
+@@ -701,7 +703,7 @@
+ 						<meta http-equiv="Content-Style-Type" content="text/css" />
+ 						<meta http-equiv="imagetoolbar" content="no" />
+ 						<title>SQL Report</title>
+-						<link href="' . $phpbb_root_path . 'adm/style/admin.css" rel="stylesheet" type="text/css" media="screen" />
++						<link href="' . $phpbb_seo->seo_path['phpbb_url'] . 'adm/style/admin.css" rel="stylesheet" type="text/css" media="screen" />
+ 					</head>
+ 					<body id="errorpage">
+ 					<div id="wrap">
+Index: includes/functions_content.php
+===================================================================
+--- includes/functions_content.php	(phpBB 3.0.5)
++++ includes/functions_content.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -750,7 +750,9 @@
+ 
+ 	global $template, $cache, $user;
+ 	global $extensions, $config, $phpbb_root_path, $phpEx;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	//
+ 	$compiled_attachments = array();
+ 
+@@ -926,9 +928,26 @@
+ 			{
+ 				$display_cat = ATTACHMENT_CATEGORY_NONE;
+ 			}
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			//$download_link = append_sid("{$phpbb_root_path}download/file.$phpEx", 'id=' . $attachment['attach_id']);
++			$download_link = "{$phpbb_root_path}download/file.$phpEx?id=" . $attachment['attach_id'];
++			$comment_clean = preg_replace('`<[^>]*>`Ui', ' ', $comment);
++			$block_array += array(
++				'COMMENT_CLEAN'		=> $comment_clean,
++			);
++			if (!empty($phpbb_seo->seo_opt['rewrite_files'])) {
++				if (empty($phpbb_seo->seo_url['file'][$attachment['attach_id']])) {
++					if (($_pos = utf8_strpos($comment, '<br')) !== false) {
++						$comment_url = strip_tags(utf8_substr($comment, 0, $_pos));
++					} else {
++						$comment_url = $comment_clean;
++					}
++					$comment_url = utf8_strlen($comment_url) > 60 ? utf8_substr($comment_url, 0, 60) : $comment_url; 
++					$phpbb_seo->seo_url['file'][$attachment['attach_id']] = $phpbb_seo->format_url($comment_url, $phpbb_seo->seo_static['file'][$display_cat]);
++				}
++			}
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+-			$download_link = append_sid("{$phpbb_root_path}download/file.$phpEx", 'id=' . $attachment['attach_id']);
+-
+ 			switch ($display_cat)
+ 			{
+ 				// Images
+@@ -1003,7 +1022,9 @@
+ 						'S_FLASH_FILE'	=> true,
+ 						'WIDTH'			=> $width,
+ 						'HEIGHT'		=> $height,
+-						'U_VIEW_LINK'	=> $download_link . '&amp;view=1',
++						// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++						'U_VIEW_LINK'	=> append_sid($download_link . '&amp;view=1'),
++						// www.phpBB-SEO.com SEO TOOLKIT END
+ 					);
+ 
+ 					// Viewed/Heared File ... update the download count
+@@ -1018,7 +1039,9 @@
+ 					);
+ 				break;
+ 			}
+-
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			$download_link = append_sid($download_link);
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 			$l_download_count = (!isset($attachment['download_count']) || $attachment['download_count'] == 0) ? $user->lang[$l_downloaded_viewed . '_NONE'] : (($attachment['download_count'] == 1) ? sprintf($user->lang[$l_downloaded_viewed], $attachment['download_count']) : sprintf($user->lang[$l_downloaded_viewed . 'S'], $attachment['download_count']));
+ 
+ 			$block_array += array(
+@@ -1226,7 +1249,12 @@
+ 			// For anonymous the link leads to a login page.
+ 			if ($user_id && $user_id != ANONYMOUS && ($user->data['user_id'] == ANONYMOUS || $auth->acl_get('u_viewprofile')))
+ 			{
+-				$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace(array('={USER_ID}', '=%7BUSER_ID%7D'), '=' . (int) $user_id, $_profile_cache['base_url']);
++				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++				// $profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace(array('={USER_ID}', '=%7BUSER_ID%7D'), '=' . (int) $user_id, $_profile_cache['base_url']);
++				global $phpbb_seo, $phpbb_root_path, $phpEx;
++				$phpbb_seo->set_user_url( $username, $user_id );
++				$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile&amp;u=' . (int) $user_id);
++				// www.phpBB-SEO.com SEO TOOLKIT END
+ 			}
+ 			else
+ 			{
+Index: includes/functions.php
+===================================================================
+--- includes/functions.php	(phpBB 3.0.5)
++++ includes/functions.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -1764,7 +1764,9 @@
+ function generate_pagination($base_url, $num_items, $per_page, $start_item, $add_prevnext_text = false, $tpl_prefix = '')
+ {
+ 	global $template, $user;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo, $phpEx;
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Make sure $per_page is a valid value
+ 	$per_page = ($per_page <= 0) ? 1 : $per_page;
+ 
+@@ -1828,16 +1830,34 @@
+ 		}
+ 	}
+ 
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	$prev =  ($on_page == 1) ? '' : $base_url . "{$url_delim}start=" . (($on_page - 2) * $per_page);
++	$next = ($on_page == $total_pages) ? '' : $base_url . "{$url_delim}start=" . ($on_page * $per_page);
++	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
++		static $pagin_find = array();
++		static $pagin_replace = array();
++		static $prev_find = array();
++		if (empty($pagin_replace)) {
++			$pagin_find = array('`(\.(?!' . $phpEx . ')[a-z0-9]+)([\w\#$%&~\-;:=,?@+]*)(&amp;|\?)start=([0-9]+)`i', '`/([\w\#$%&~\-;:=,?@+]*)(&amp;|\?)start=([0-9]+)`i' );
++			$pagin_replace = array( $phpbb_seo->seo_delim['start'] . '\\4\\1\\2', '/' . $phpbb_seo->seo_static['pagination'] . '\\3' . $phpbb_seo->seo_ext['pagination'] . '\\1' );
++			$prev_find = array($phpbb_seo->seo_delim['start'] . '0', $phpbb_seo->seo_static['pagination'] . '0' . $phpbb_seo->seo_ext['pagination']);
++		}
++		$page_string = str_replace($url_delim . 'start=0', '', $page_string);
++		$page_string = preg_replace($pagin_find, $pagin_replace, $page_string);
++		$prev = preg_replace($pagin_find, $pagin_replace, $prev);
++		$prev = str_replace($prev_find, '', $prev);
++		$next = preg_replace( $pagin_find, $pagin_replace, $next);
++	}
+ 	$template->assign_vars(array(
+-		$tpl_prefix . 'BASE_URL'		=> $base_url,
++		$tpl_prefix . 'BASE_URL'	=> $base_url,
+ 		'A_' . $tpl_prefix . 'BASE_URL'	=> addslashes($base_url),
+-		$tpl_prefix . 'PER_PAGE'		=> $per_page,
++		$tpl_prefix . 'PER_PAGE'	=> $per_page,
++		$tpl_prefix . 'PREVIOUS_PAGE'	=> $prev,
++		$tpl_prefix . 'NEXT_PAGE'	=> $next,
++		$tpl_prefix . 'TOTAL_PAGES'	=> $total_pages)
++	);
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+-		$tpl_prefix . 'PREVIOUS_PAGE'	=> ($on_page == 1) ? '' : $base_url . "{$url_delim}start=" . (($on_page - 2) * $per_page),
+-		$tpl_prefix . 'NEXT_PAGE'		=> ($on_page == $total_pages) ? '' : $base_url . "{$url_delim}start=" . ($on_page * $per_page),
+-		$tpl_prefix . 'TOTAL_PAGES'		=> $total_pages,
+-	));
+-
+ 	return $page_string;
+ }
+ 
+@@ -1883,7 +1903,13 @@
+ function append_sid($url, $params = false, $is_amp = true, $session_id = false)
+ {
+ 	global $_SID, $_EXTRA_URL, $phpbb_hook;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	// We bypass the hook function here, the same effect as a standalone hook, which we want, but faster ;-)
++	global $phpbb_seo;
++	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
++		return $phpbb_seo->url_rewrite($url, $params, $is_amp, $session_id);
++	} else
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Developers using the hook function need to globalise the $_SID and $_EXTRA_URL on their own and also handle it appropiatly.
+ 	// They could mimick most of what is within this function
+ 	if (!empty($phpbb_hook) && $phpbb_hook->call_hook(__FUNCTION__, $url, $params, $is_amp, $session_id))
+@@ -2274,7 +2300,10 @@
+ 		$redirect .= ($query) ? '?' . $query : '';
+ 	}
+ 
+-	return $phpbb_root_path . str_replace('&', '&amp;', $redirect);
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	$redirect = (preg_match('`^https?://`i', $redirect) ? '' : $phpbb_root_path) . trim(str_replace('&', '&amp;', $redirect), '? ');
++	return reapply_sid($redirect);
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ }
+ 
+ /**
+@@ -3624,7 +3653,15 @@
+ 	{
+ 		return;
+ 	}
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	$template->assign_vars( array( 'PHPBB_FULL_URL' => $phpbb_seo->seo_path['phpbb_url'], 
++			'SEO_BASE_HREF' => $phpbb_seo->seo_opt['seo_base_href'], 
++			'SEO_START_DELIM' => $phpbb_seo->seo_delim['start'], 
++			'SEO_SATIC_PAGE' => $phpbb_seo->seo_static['pagination'], 
++			'SEO_EXT_PAGE' => $phpbb_seo->seo_ext['pagination'])
++	);
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	define('HEADER_INC', true);
+ 
+ 	// gzip_compression
+@@ -3836,7 +3873,12 @@
+ function page_footer($run_cron = true)
+ {
+ 	global $db, $config, $template, $user, $auth, $cache, $starttime, $phpbb_root_path, $phpEx;
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	global $phpbb_seo;
++	if (!empty($phpbb_seo)) {
++		$phpbb_seo->seo_end();
++	}
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	// Output page creation time
+ 	if (defined('DEBUG'))
+ 	{
+@@ -3864,7 +3906,10 @@
+ 				}
+ 			}
+ 
+-			$debug_output .= ' | <a href="' . build_url() . '&amp;explain=1">Explain</a>';
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			$url_prefix = build_url();
++			$debug_output .= ' | <a href="' . $url_prefix . ((strpos($url_prefix, '?') === false) ? '?' : '&amp;') . 'explain=1">Explain</a>';
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 		}
+ 	}
+ 
+Index: memberlist.php
+===================================================================
+--- memberlist.php	(phpBB 3.0.5)
++++ memberlist.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -21,7 +21,14 @@
+ $user->session_begin();
+ $auth->acl($user->data);
+ $user->setup(array('memberlist', 'groups'));
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++if (!empty($_REQUEST['un'])) {
++	$_REQUEST['un'] = rawurldecode($_REQUEST['un']);
++	if (!$phpbb_seo->is_utf8($_REQUEST['un'])) {
++		$_REQUEST['un'] = utf8_normalize_nfc(utf8_recode($_REQUEST['un'], 'ISO-8859-1'));
++	}
++}
++// www.phpBB-SEO.com SEO TOOLKIT END
+ // Grab data
+ $mode		= request_var('mode', '');
+ $action		= request_var('action', '');
+@@ -234,6 +241,9 @@
+ 			else
+ 			{
+ 				$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
++				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++				$phpbb_seo->prepare_url('group', $row['group_name'], $row['group_id']);
++				// www.phpBB-SEO.com SEO TOOLKIT END
+ 				$u_group = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']);
+ 			}
+ 
+@@ -429,7 +439,9 @@
+ 		}
+ 
+ 		$user_id = (int) $member['user_id'];
+-
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$phpbb_seo->set_user_url( $member['username'], $user_id );
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 		// Do the SQL thang
+ 		$sql = 'SELECT g.group_id, g.group_name, g.group_type
+ 			FROM ' . GROUPS_TABLE . ' g, ' . USER_GROUP_TABLE . " ug
+@@ -1476,7 +1488,9 @@
+ 				unset($id_cache[$user_id]);
+ 			}
+ 		}
+-
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$seo_sep = strpos($sort_url, '?') === false ? '?' : '&amp;';
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 		// Generate page
+ 		$template->assign_vars(array(
+ 			'PAGINATION'	=> generate_pagination($pagination_url, $total_users, $config['topics_per_page'], $start),
+@@ -1496,20 +1510,22 @@
+ 
+ 			'U_FIND_MEMBER'			=> ($config['load_search'] || $auth->acl_get('a_')) ? append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=searchuser' . (($start) ? "&amp;start=$start" : '') . (!empty($params) ? '&amp;' . implode('&amp;', $params) : '')) : '',
+ 			'U_HIDE_FIND_MEMBER'	=> ($mode == 'searchuser') ? $u_hide_find_member : '',
+-			'U_SORT_USERNAME'		=> $sort_url . '&amp;sk=a&amp;sd=' . (($sort_key == 'a' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_FROM'			=> $sort_url . '&amp;sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_JOINED'			=> $sort_url . '&amp;sk=c&amp;sd=' . (($sort_key == 'c' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_POSTS'			=> $sort_url . '&amp;sk=d&amp;sd=' . (($sort_key == 'd' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_EMAIL'			=> $sort_url . '&amp;sk=e&amp;sd=' . (($sort_key == 'e' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_WEBSITE'		=> $sort_url . '&amp;sk=f&amp;sd=' . (($sort_key == 'f' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_LOCATION'		=> $sort_url . '&amp;sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_ICQ'			=> $sort_url . '&amp;sk=g&amp;sd=' . (($sort_key == 'g' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_AIM'			=> $sort_url . '&amp;sk=h&amp;sd=' . (($sort_key == 'h' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_MSN'			=> $sort_url . '&amp;sk=i&amp;sd=' . (($sort_key == 'i' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_YIM'			=> $sort_url . '&amp;sk=j&amp;sd=' . (($sort_key == 'j' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_SORT_ACTIVE'			=> ($auth->acl_get('u_viewonline')) ? $sort_url . '&amp;sk=l&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a') : '',
+-			'U_SORT_RANK'			=> $sort_url . '&amp;sk=m&amp;sd=' . (($sort_key == 'm' && $sort_dir == 'a') ? 'd' : 'a'),
+-			'U_LIST_CHAR'			=> $sort_url . '&amp;sk=a&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a'),
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			'U_SORT_USERNAME'		=> $sort_url . $seo_sep . 'sk=a&amp;sd=' . (($sort_key == 'a' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_FROM'			=> $sort_url . $seo_sep . 'sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_JOINED'			=> $sort_url . $seo_sep . 'sk=c&amp;sd=' . (($sort_key == 'c' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_POSTS'			=> $sort_url . $seo_sep . 'sk=d&amp;sd=' . (($sort_key == 'd' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_EMAIL'			=> $sort_url . $seo_sep . 'sk=e&amp;sd=' . (($sort_key == 'e' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_WEBSITE'		=> $sort_url . $seo_sep . 'sk=f&amp;sd=' . (($sort_key == 'f' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_LOCATION'		=> $sort_url . $seo_sep . 'sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_ICQ'			=> $sort_url . $seo_sep . 'sk=g&amp;sd=' . (($sort_key == 'g' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_AIM'			=> $sort_url . $seo_sep . 'sk=h&amp;sd=' . (($sort_key == 'h' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_MSN'			=> $sort_url . $seo_sep . 'sk=i&amp;sd=' . (($sort_key == 'i' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_YIM'			=> $sort_url . $seo_sep . 'sk=j&amp;sd=' . (($sort_key == 'j' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_SORT_ACTIVE'			=> ($auth->acl_get('u_viewonline')) ? $sort_url . $seo_sep . 'sk=l&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a') : '',
++			'U_SORT_RANK'			=> $sort_url . $seo_sep . 'sk=m&amp;sd=' . (($sort_key == 'm' && $sort_dir == 'a') ? 'd' : 'a'),
++			'U_LIST_CHAR'			=> $sort_url . $seo_sep . 'sk=a&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a'),
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+ 			'S_SHOW_GROUP'		=> ($mode == 'group') ? true : false,
+ 			'S_VIEWONLINE'		=> $auth->acl_get('u_viewonline'),
+@@ -1517,7 +1533,11 @@
+ 			'S_MODE_SELECT'		=> $s_sort_key,
+ 			'S_ORDER_SELECT'	=> $s_sort_dir,
+ 			'S_CHAR_OPTIONS'	=> $s_char_options,
+-			'S_MODE_ACTION'		=> $pagination_url)
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			// Here we circumvent because our append_sid does not allow 
++			// an url to end with an ?, as it should.
++			'S_MODE_ACTION'		=> $pagination_url . (strpos($pagination_url, '?') !== false ? '' : '?') )
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 		);
+ }
+ 
+Index: viewforum.php
+===================================================================
+--- viewforum.php	(phpBB 3.0.5)
++++ viewforum.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -16,7 +16,16 @@
+ $phpEx = substr(strrchr(__FILE__, '.'), 1);
+ include($phpbb_root_path . 'common.' . $phpEx);
+ include($phpbb_root_path . 'includes/functions_display.' . $phpEx);
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++if (empty($_REQUEST['f'])) {
++	$phpbb_seo->get_forum_id($session_forum_id);
++	if ($session_forum_id == 0) {
++		header('HTTP/1.1 404 Not Found');
++	} else {
++		$_REQUEST['f'] = (int) $session_forum_id;
++	}
++}
++// www.phpBB-SEO.com SEO TOOLKIT END
+ // Start session
+ $user->session_begin();
+ $auth->acl($user->data);
+@@ -69,8 +78,10 @@
+ {
+ 	trigger_error('NO_FORUM');
+ }
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++$phpbb_seo->set_url($forum_data['forum_name'], $forum_data['forum_id'], $phpbb_seo->seo_static['forum']);
++// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+-
+ // Configure style, language, etc.
+ $user->setup('viewforum', $forum_data['forum_style']);
+ 
+@@ -589,7 +600,10 @@
+ 	foreach ($topic_list as $topic_id)
+ 	{
+ 		$row = &$rowset[$topic_id];
+-
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$cur_forum_id = ($row['forum_id']) ? (int) $row['forum_id'] : $forum_id;
++		$phpbb_seo->prepare_iurl($row, 'topic', $row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$cur_forum_id]);
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+ 		// This will allow the style designer to output a different header
+ 		// or even separate the list of announcements from sticky and normal topics
+ 		$s_type_switch_test = ($row['topic_type'] == POST_ANNOUNCE || $row['topic_type'] == POST_GLOBAL) ? 1 : 0;
+Index: posting.php
+===================================================================
+--- posting.php	(phpBB 3.0.5)
++++ posting.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -606,7 +606,30 @@
+ 	$post_data['enable_smilies']	= (!$smilies_status || isset($_POST['disable_smilies'])) ? false : true;
+ 	$post_data['enable_urls']		= (isset($_POST['disable_magic_url'])) ? 0 : 1;
+ 	$post_data['enable_sig']		= (!$config['allow_sig'] || !$auth->acl_get('f_sigs', $forum_id) || !$auth->acl_get('u_sig')) ? false : ((isset($_POST['attach_sig']) && $user->data['is_registered']) ? true : false);
+-
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
++		if ($mode == 'post' || ($mode == 'edit' && $post_data['topic_first_post_id'] == $post_id)) {
++			$phpbb_seo->set_url($post_data['forum_name'], $forum_id, $phpbb_seo->seo_static['forum']);
++			$_parent = $post_data['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$forum_id];
++			$_t = !empty($post_data['topic_id']) ? max(0, (int) $post_data['topic_id'] ) : 0;		
++			$_url = $phpbb_seo->url_can_edit($forum_id) ? utf8_normalize_nfc(request_var('url', '', true)) : ( isset($post_data['topic_url']) ? $post_data['topic_url'] : '' );
++			if (!$phpbb_seo->check_url('topic', $_url, $_parent)) {
++				if (!empty($_url)) {
++					// Here we get rid of the seo delim (-t) and put it back even in simple mod 
++					// to be able to handle all cases at once
++					$_url = preg_replace('`' . $phpbb_seo->seo_delim['topic'] . '$`i', '', $_url);
++					$_title = $phpbb_seo->get_url_info('topic', $_url . $phpbb_seo->seo_delim['topic'] . $_t);
++				} else {
++					$_title = $phpbb_seo->modrtype > 2 ? censor_text($post_data['post_subject']) : '';
++				}
++				unset($phpbb_seo->seo_url['topic'][$_t]);
++				$_url = $phpbb_seo->get_url_info('topic', $phpbb_seo->prepare_url( 'topic', $_title, $_t, $_parent ,  (( empty($_title) || ($_title == $phpbb_seo->seo_static['topic']) ) ? true : false)), 'url');
++				unset($phpbb_seo->seo_url['topic'][$_t]);
++			}
++			$post_data['topic_url'] = $_url;
++		}
++	}
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	if ($config['allow_topic_notify'] && $user->data['is_registered'])
+ 	{
+ 		$notify = (isset($_POST['notify'])) ? true : false;
+@@ -979,6 +1002,9 @@
+ 
+ 			$data = array(
+ 				'topic_title'			=> (empty($post_data['topic_title'])) ? $post_data['post_subject'] : $post_data['topic_title'],
++				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++				'topic_url' => isset($post_data['topic_url']) ? $post_data['topic_url'] : '',
++				// www.phpBB-SEO.com SEO TOOLKIT END
+ 				'topic_first_post_id'	=> (isset($post_data['topic_first_post_id'])) ? (int) $post_data['topic_first_post_id'] : 0,
+ 				'topic_last_post_id'	=> (isset($post_data['topic_last_post_id'])) ? (int) $post_data['topic_last_post_id'] : 0,
+ 				'topic_time_limit'		=> (int) $post_data['topic_time_limit'],
+@@ -1299,6 +1325,10 @@
+ 	'FORUM_NAME'			=> $post_data['forum_name'],
+ 	'FORUM_DESC'			=> ($post_data['forum_desc']) ? generate_text_for_display($post_data['forum_desc'], $post_data['forum_desc_uid'], $post_data['forum_desc_bitfield'], $post_data['forum_desc_options']) : '',
+ 	'TOPIC_TITLE'			=> censor_text($post_data['topic_title']),
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	'TOPIC_URL'		=> isset($post_data['topic_url']) ? preg_replace('`' . $phpbb_seo->seo_delim['topic'] . '$`i', '', $post_data['topic_url']) : '',
++	'S_URL'			=> ($mode == 'post' || ($mode == 'edit' && $post_id == $post_data['topic_first_post_id'])) ? $phpbb_seo->url_can_edit($forum_id) : false,
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 	'MODERATORS'			=> (sizeof($moderators)) ? implode(', ', $moderators[$forum_id]) : '',
+ 	'USERNAME'				=> ((!$preview && $mode != 'quote') || $preview) ? $post_data['username'] : '',
+ 	'SUBJECT'				=> $post_data['post_subject'],
+Index: search.php
+===================================================================
+--- search.php	(phpBB 3.0.5)
++++ search.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -20,7 +20,17 @@
+ $user->session_begin();
+ $auth->acl($user->data);
+ $user->setup('search');
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++$clean_request = array('keywords', 'author', 'add_keywords');
++foreach ($clean_request as $request) {
++	if (!empty($_REQUEST[$request])) {
++		$_REQUEST[$request] = rawurldecode($_REQUEST[$request]);
++		if (!$phpbb_seo->is_utf8($_REQUEST[$request])) {
++			$_REQUEST[$request] = utf8_normalize_nfc(utf8_recode($_REQUEST[$request], 'iso-8859-1'));
++		}
++	}
++}
++// www.phpBB-SEO.com SEO TOOLKIT END
+ // Define initial vars
+ $mode			= request_var('mode', '');
+ $search_id		= request_var('search_id', '');
+@@ -487,7 +497,9 @@
+ 	$u_show_results = ($show_results != 'posts') ? '&amp;sr=' . $show_results : '';
+ 	$u_search_forum = implode('&amp;fid%5B%5D=', $search_forum);
+ 
+-	$u_search = append_sid("{$phpbb_root_path}search.$phpEx", $u_sort_param . $u_show_results);
++	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++	//$u_search = append_sid("{$phpbb_root_path}search.$phpEx", $u_sort_param . $u_show_results);
++	$u_search = $u_sort_param . $u_show_results;
+ 	$u_search .= ($search_id) ? '&amp;search_id=' . $search_id : '';
+ 	$u_search .= ($u_hilit) ? '&amp;keywords=' . urlencode(htmlspecialchars_decode($search->search_query)) : '';
+ 	$u_search .= ($search_terms != 'all') ? '&amp;terms=' . $search_terms : '';
+@@ -498,6 +510,34 @@
+ 	$u_search .= (!$search_child) ? '&amp;sc=0' : '';
+ 	$u_search .= ($search_fields != 'all') ? '&amp;sf=' . $search_fields : '';
+ 	$u_search .= ($return_chars != 300) ? '&amp;ch=' . $return_chars : '';
++	$u_search = preg_replace('`(^&amp;|&amp;$)`i', '', $u_search);	
++	if ( $phpbb_seo->seo_opt['rewrite_usermsg'] && (!empty($author) || !empty($author_id)) ) {
++		$author_name = '';
++		if (!empty($author_id)) {
++			$sql = $sql = 'SELECT username
++				FROM ' . USERS_TABLE . "
++				WHERE user_id = $author_id
++				AND user_type IN (" . USER_NORMAL . ', ' . USER_FOUNDER . ')';
++			$result = $db->sql_query($sql);
++			if ($row = $db->sql_fetchrow($result)) {
++				$author_name = $row['username'];
++				$phpbb_seo->set_user_url( $author_name, $author_id );
++			}
++		}
++		if (!empty($author) && (strpos($author, '*') === false) ) {
++			$sql = $sql = 'SELECT user_id
++				FROM ' . USERS_TABLE . "
++				WHERE username_clean = '" . $db->sql_escape(utf8_clean_string($author)) . "'
++				AND user_type IN (" . USER_NORMAL . ', ' . USER_FOUNDER . ')';
++			$result = $db->sql_query($sql);
++			if ($row = $db->sql_fetchrow($result)) {
++				$phpbb_seo->set_user_url( $author, $row['user_id'] );
++			}
++		}
++		$author = empty($author) ? $author_name : $author;
++	}
++	$u_search = append_sid( "{$phpbb_root_path}search.$phpEx" . (!empty($u_search) ? '?' . $u_search : '') );
++	// www.phpBB-SEO.com SEO TOOLKIT END
+ 
+ 	$template->assign_vars(array(
+ 		'SEARCH_TITLE'		=> $l_search_title,
+@@ -780,7 +820,10 @@
+ 			{
+ 				$u_forum_id = $forum_id;
+ 			}
+-
++			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++			$phpbb_seo->set_url($row['forum_name'], $u_forum_id, $phpbb_seo->seo_static['forum']);
++			$phpbb_seo->prepare_iurl($row, 'topic', $row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$u_forum_id]);
++			// www.phpBB-SEO.com SEO TOOLKIT END
+ 			$view_topic_url_params = "f=$u_forum_id&amp;t=$result_topic_id" . (($u_hilit) ? "&amp;hilit=$u_hilit" : '');
+ 			$view_topic_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", $view_topic_url_params);
+ 
+Index: index.php
+===================================================================
+--- index.php	(phpBB 3.0.5)
++++ index.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -72,6 +72,9 @@
+ 	}
+ 	else
+ 	{
++		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++		$phpbb_seo->prepare_url('group', $row['group_name'], $row['group_id']);
++		// www.phpBB-SEO.com SEO TOOLKIT END
+ 		$legend[] = '<a' . $colour_text . ' href="' . append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']) . '">' . $group_name . '</a>';
+ 	}
+ }
+Index: common.php
+===================================================================
+--- common.php	(phpBB 3.0.5)
++++ common.php	(phpBB 3.0.5 + Ultimate 0.6.0)
+@@ -214,7 +214,12 @@
+ 
+ // Grab global variables, re-cache if necessary
+ $config = $cache->obtain_config();
+-
++// www.phpBB-SEO.com SEO TOOLKIT BEGIN
++if (empty($phpbb_seo) ) {
++	require_once($phpbb_root_path . 'phpbb_seo/phpbb_seo_class.'.$phpEx);
++	$phpbb_seo = new phpbb_seo();
++}
++// www.phpBB-SEO.com SEO TOOLKIT END
+ // Add own hook handler
+ require($phpbb_root_path . 'includes/hooks/index.' . $phpEx);
+ $phpbb_hook = new phpbb_hook(array('exit_handler', 'phpbb_user_session_handler', 'append_sid', array('template', 'display')));

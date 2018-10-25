@@ -1,0 +1,267 @@
+##############################################################
+## MOD Title: 		phpBB SEO Advanced mod Rewrite 0.4.6 => 0.4.8 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO Advanced mod Rewrite 0.4.6 => 0.4.8 update.
+## 			Check http://www.phpbb-seo.com/boards/advanced-seo-url/advanced-phpbb3-seo-url-vt1219.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	10 Minutes
+## Files To Edit: 	(6)
+##			includes/functions_content.php,
+##			includes/functions_posting.php,
+##			memberlist.php,
+##			phpbb_seo/phpbb_seo_class.php (DIY),
+##			search.php,
+##			viewtopic.php.
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Advanced mod Rewrite 0.4.6 => 0.4.8 update.
+##
+##############################################################
+## MOD History:
+##
+##	2008-12-20 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+_________________________________________
+>>>>   INSTALLATION INSTRUCTIONS    <<<<<
+_________________________________________
+
+This update procedure will keep the previous URL standard used depending on the phpbb_seo_class.php settings.
+
+!!!!! YOU WILL HAVE TOO take the new phpbb_seo_class.php file and redo the mod you eventually made there, 
+Like the zero duplicate or the static and delimiters.
+There are many changes in this file so it is faster this way.
+
+You will need to upload / overwrite the following files :
+	includes/acp/acp_phpbb_seo.php
+	includes/acp/info/acp_phpbb_seo.php
+	language/en/acp/phpbb_seo.php
+	language/fr/acp/phpbb_seo.php
+	phpbb_seo/phpbb_seo_install.php
+
+Once you will have updated, you will have to refresh your theme's cache as well as phpBB's cache (ACP => STYLE, Themes => Refresh).
+
+#
+#-----[ COPY ]------------------------------------------
+#
+
+root/includes/acp/acp_phpbb_seo.php		to 	includes/acp/acp_phpbb_seo.php
+root/includes/acp/info/acp_phpbb_seo.php	to 	includes/acp/info/acp_phpbb_seo.php
+root/language/en/acp/phpbb_seo.php		to 	language/en/acp/phpbb_seo.php
+root/language/fr/acp/phpbb_seo.php		to 	language/fr/acp/phpbb_seo.php
+root/phpbb_seo/phpbb_seo_install.php		to 	phpbb_seo/phpbb_seo_install.php
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions_content.php
+
+#
+#-----[ FIND ]------------------------------------------
+# NOTE : This part consists in removing the old code in get_username_string()
+
+	global $phpbb_root_path, $phpEx, $user, $auth;
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ REPLACE WITH ]------------------------------------------
+# NOTE : This part consists in removing the old code in get_username_string()
+
+	global $phpbb_root_path, $phpEx, $user, $auth;
+
+#
+#-----[ FIND ]------------------------------------------
+# NOTE : This part consists in removing the old code in get_username_string()
+
+		$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace('={USER_ID}', '=' . (int) $user_id, $_base_profile_url);
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$phpbb_seo->set_user_url( strip_tags($username), $user_id );
+			// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+# NOTE : This part consists in removing the old code in get_username_string()
+
+		$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace('={USER_ID}', '=' . (int) $user_id, $_base_profile_url);
+
+#
+#-----[ FIND ]------------------------------------------
+# NOTE : This part consists in adding the new code in get_username_string()
+
+		if (empty($_base_profile_url))
+		{
+			$_base_profile_url = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile&amp;u={USER_ID}');
+		}
+		$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace('={USER_ID}', '=' . (int) $user_id, $_base_profile_url);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+# NOTE : This part consists in adding the new code in get_username_string()
+
+		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		/*if (empty($_base_profile_url))
+		{
+			$_base_profile_url = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile&amp;u={USER_ID}');
+		}
+		$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace('={USER_ID}', '=' . (int) $user_id, $_base_profile_url);*/
+		global $phpbb_seo;
+		$phpbb_seo->set_user_url( strip_tags($username), $user_id );
+		$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile&amp;u=' . (int) $user_id);
+		// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions_posting.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+				$messenger->assign_vars(array(
+					'USERNAME'		=> htmlspecialchars_decode($addr['name']),
+					'TOPIC_TITLE'	=> htmlspecialchars_decode($topic_title),
+					'FORUM_NAME'	=> htmlspecialchars_decode($forum_name),
+
+					'U_FORUM'				=> generate_board_url() . "/viewforum.$phpEx?f=$forum_id",
+					'U_TOPIC'				=> generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id",
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+				global $phpbb_seo;
+				if ( empty($phpbb_seo->seo_url['topic'][$topic_id]) ) {
+					$phpbb_seo->seo_url['topic'][$topic_id] = $phpbb_seo->format_url(htmlspecialchars_decode($topic_title));
+				}
+				if ( empty($phpbb_seo->seo_url['forum'][$forum_id]) ) {
+					$phpbb_seo->seo_url['forum'][$forum_id] = $phpbb_seo->set_url(htmlspecialchars_decode($forum_name), $forum_id, $phpbb_seo->seo_static['forum']);
+				}
+				$messenger->assign_vars(array(
+					'USERNAME'		=> htmlspecialchars_decode($addr['name']),
+					'TOPIC_TITLE'	=> htmlspecialchars_decode($topic_title),
+					'FORUM_NAME'	=> htmlspecialchars_decode($forum_name),
+
+					'U_FORUM'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid(append_sid("{$phpbb_root_path}viewforum.$phpEx?f=$forum_id")) : generate_board_url() . "/viewforum.$phpEx?f=$forum_id",
+					'U_TOPIC'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid(append_sid("{$phpbb_root_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id")) : generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id",
+				// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+memberlist.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	if (!$phpbb_seo->is_utf8($_REQUEST['un']) && function_exists('utf8_encode')) {
+		$_REQUEST['un'] = utf8_normalize_nfc(utf8_encode($_REQUEST['un']));
+	}
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	if (!$phpbb_seo->is_utf8($_REQUEST['un'])) {
+		$_REQUEST['un'] = utf8_normalize_nfc(utf8_recode($_REQUEST['un'], 'iso-8859-1'));
+	}
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+search.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+$can_encode = function_exists('utf8_encode') ? true : false;
+$clean_request = array('keywords', 'author', 'add_keywords');
+foreach ($clean_request as $request) {
+	if (!empty($_REQUEST[$request])) {
+		$_REQUEST[$request] = rawurldecode($_REQUEST[$request]);
+		if (!$phpbb_seo->is_utf8($_REQUEST[$request]) && $can_encode) {
+			$_REQUEST[$request] = utf8_normalize_nfc(utf8_encode($_REQUEST[$request]));
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+$clean_request = array('keywords', 'author', 'add_keywords');
+foreach ($clean_request as $request) {
+	if (!empty($_REQUEST[$request])) {
+		$_REQUEST[$request] = rawurldecode($_REQUEST[$request]);
+		if (!$phpbb_seo->is_utf8($_REQUEST[$request])) {
+			$_REQUEST[$request] = utf8_normalize_nfc(utf8_recode($_REQUEST[$request], 'iso-8859-1'));
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+viewtopic.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	if (!$phpbb_seo->is_utf8($_REQUEST['hilit']) && function_exists('utf8_encode')) {
+		$_REQUEST['hilit'] = utf8_normalize_nfc(utf8_encode($_REQUEST['hilit']));
+	}
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	if (!$phpbb_seo->is_utf8($_REQUEST['hilit'])) {
+		$_REQUEST['hilit'] = utf8_normalize_nfc(utf8_recode($_REQUEST['hilit'], 'iso-8859-1'));
+	}
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	'U_TOPIC'				=> "{$server_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id",
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_TOPIC'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid($viewtopic_url) : "{$server_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id",
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

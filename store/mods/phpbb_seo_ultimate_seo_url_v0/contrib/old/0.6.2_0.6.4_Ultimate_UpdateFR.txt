@@ -1,0 +1,289 @@
+##############################################################
+## MOD Title: 		phpBB SEO Rewrite Avancé MAJ 0.6.2 => Ultimate SEO URL 0.6.4
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	Ceci est la procédure de mise à jour du MOD phpBB SEO Rewrite Avancé pour la transition version 0.6.2 => Ultimate SEO URL 0.6.4
+## 			Rendez-vous sur http://www.phpbb-seo.com/fr/mod-rewrite-phpbb/ultimate-seo-url-t4489.html
+## 			pour toujours obtenir la dernière version ou de l'aide pour ce MOD.
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Intermediate)
+## Installation Time: 	15 Minutes
+## Files To Edit: 	(8)
+##			includes/functions.php,
+##			includes/functions_display.php,
+##			phpbb_seo/includes/setup_phpbb_seo.php (voir contrib/setup_phpbb_seo_class_0.6.2_to_0.6.4.diff)
+##			phpbb_seo/phpbb_seo_class.php (voir contrib/phpbb_seo_class_0.6.2_to_0.6.4.diff)
+##			styles/prosilver/template/forum_fn.js,
+##			styles/prosilver/template/viewtopic_body.html,
+##			styles/subsilver2/template/overall_header.html,
+##			styles/subsilver2/template/viewtopic_body.html.
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## Voici les instructions de mise à jour : phpBB3 SEO Mod Rewrite Avancé 0.6.2 => Ultimate SEO URL 0.6.4
+##
+##############################################################
+## MOD History:
+##
+##	2010-04-05 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+
+_____________________________________________
+>>>> INSTALLATION POUR VOTRE FORUM <<<<<
+_____________________________________________
+
+Vos réglages d'urls de la classe phpbb_seo ne seront pas altérés par la MAJ, mais de nouvelle options sont ajoutés.
+Vous DEVREZ mettre à jour votre .htaccess un fois cette mise à jour effectuée.
+Le fichier phpbb_seo_class.php ne contient plus les personnalisation des parties statiques et des délimiteurs de vos URLs, ces réglages se font désormais dans phpbb_seo/includes/setup_phpbb_seo.php. Si vous aviez personnalisé les réglages par défaut pour les parties statiques et les délimiteurs, vous DEVREZ reporter ces modification dans ce fichier. Veuillez vous reporter au fichier d'installation pour plus de détails.
+
+Une fois les nouveaux fichiers en place, il vous faudra vider le cache de phpBB et rafraichir vos thèmes (ACP => STYLE => Thèmes => Rafraichir).
+
+Vous devrez uploader / écraser :
+	includes/acp/acp_phpbb_seo.php
+	includes/acp/info/acp_phpbb_seo.php
+	phpbb_seo/includes/setup_phpbb_seo.php (voir contrib/setup_phpbb_seo_class_0.6.2_to_0.6.4.diff)
+	phpbb_seo/phpbb_seo_class.php (voir contrib/phpbb_seo_class_0.6.2_to_0.6.4.diff)
+	phpbb_seo/phpbb_seo_install.php
+	phpbb_seo/sync_url.php
+
+#
+#-----[ COPY ]------------------------------------------
+#
+
+root/includes/acp/acp_phpbb_seo.php		to 	phpBB/includes/acp/acp_phpbb_seo.php
+root/includes/acp/info/acp_phpbb_seo.php	to 	phpBB/includes/acp/info/acp_phpbb_seo.php
+root/language/en/mods/acp_phpbb_seo.php		to 	phpBB/language/en/mods/acp_phpbb_seo.php
+root/language/fr/mods/acp_phpbb_seo.php		to 	phpBB/language/fr/mods/acp_phpbb_seo.php
+root/phpbb_seo/includes/setup_phpbb_seo.php	to 	phpBB/phpbb_seo/includes/setup_phpbb_seo.php
+root/phpbb_seo/phpbb_seo_install.php		to 	phpBB/phpbb_seo/phpbb_seo_install.php
+root/phpbb_seo/sync_url.php			to 	phpBB/phpbb_seo/sync_url.php
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$prev =  ($on_page == 1) ? '' : $base_url . "{$url_delim}start=" . (($on_page - 2) * $per_page);
+	$next = ($on_page == $total_pages) ? '' : $base_url . "{$url_delim}start=" . ($on_page * $per_page);
+	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+		static $pagin_find = array();
+		static $pagin_replace = array();
+		static $prev_find = array();
+		if (empty($pagin_replace)) {
+			$pagin_find = array('`\<a href="(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)(\.(?!' . $phpEx . ')[a-z0-9]+)(\?([\w\#$%&~\-;:=,@+\.]+))?(&amp;|\?)start=([0-9]+)"\>`i', '`\<a href="(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)/(\?([\w\#$%&~\-;:=,@+\.]+))?(&amp;|\?)start=([0-9]+)"\>`i' );
+			$pagin_replace = array( '<a href="\1' . $phpbb_seo->seo_delim['start'] . '\6\2\3">', '<a href="\1/' . $phpbb_seo->seo_static['pagination'] . '\5' . $phpbb_seo->seo_ext['pagination'] . '\2">' );
+			$prev_find = array($phpbb_seo->seo_delim['start'] . '0', $phpbb_seo->seo_static['pagination'] . '0' . $phpbb_seo->seo_ext['pagination']);
+		}
+		$page_string = str_replace($url_delim . 'start=0', '', $page_string);
+		$page_string = preg_replace($pagin_find, $pagin_replace, $page_string);
+		$prev = preg_replace($pagin_find, $pagin_replace, $prev);
+		$prev = str_replace($prev_find, '', $prev);
+		$next = preg_replace( $pagin_find, $pagin_replace, $next);
+	}
+	$template->assign_vars(array(
+		$tpl_prefix . 'BASE_URL'	=> $base_url,
+		'A_' . $tpl_prefix . 'BASE_URL'	=> addslashes($base_url),
+		$tpl_prefix . 'PER_PAGE'	=> $per_page,
+		$tpl_prefix . 'PREVIOUS_PAGE'	=> $prev,
+		$tpl_prefix . 'NEXT_PAGE'	=> $next,
+		$tpl_prefix . 'TOTAL_PAGES'	=> $total_pages)
+	);
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$prev =  ($on_page == 1) ? '' : $base_url . "{$url_delim}start=" . (($on_page - 2) * $per_page);
+	$next = ($on_page == $total_pages) ? '' : $base_url . "{$url_delim}start=" . ($on_page * $per_page);
+	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+		static $pagin_find = array();
+		static $pagin_replace = array();
+		if (empty($pagin_replace)) {
+			$pagin_find = array('`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)(\.[a-z0-9]+)(\?[\w$%&~\-;:=,@+\.]+)?(#[a-z0-9_\.-]+)?(&amp;|\?)start=([0-9]+)`i', '`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\-]+)/(\?[\w$%&~\-;:=,@+\.]+)?(#[a-z0-9_\.-]+)?(&amp;|\?)start=([0-9]+)`i');
+			$pagin_replace = array( '\1' . $phpbb_seo->seo_delim['start'] . '\6\2\3\4', '\1/' . $phpbb_seo->seo_static['pagination'] . '\5' . $phpbb_seo->seo_ext['pagination'] . '\2\3');
+		}
+		$rewrite_pagination = false;
+		// here we rewrite rewritten urls only, and they do hold the full url with http
+		if (preg_match('`^https?://[a-z0-9_\.-]+/(.*)$`i', $base_url, $match)) {
+			$rewrite_pagination = true;
+			if (!empty($match[1])) {
+				// though, we won't do it for .php files.
+				if (preg_match('`^.*\.' . $phpEx . '(|\?.*|#.*)$`i', trim($match[1]))) {
+					$rewrite_pagination = false;
+
+				}
+			}
+
+		}
+		// in all cases remove the start=0 dupe
+		$page_string = str_replace($url_delim . 'start=0', '', $page_string);
+		$prev = str_replace($url_delim . 'start=0', '', $prev);
+		if ($rewrite_pagination) {
+			$page_string = preg_replace($pagin_find, $pagin_replace, $page_string);
+			$prev = $prev ? preg_replace($pagin_find, $pagin_replace, $prev) : '';
+			$next = $next ? preg_replace( $pagin_find, $pagin_replace, $next) : '';
+		} else {
+			// take care about eventual hashes
+			if (strpos($base_url, '#') !== false) {
+				static $hash_find = '`((https?\://)?[a-z0-9_/\.-]+\.[a-z0-9]+)(\?[\w$%&~\-;:=,@+\.]+)?(#[a-z0-9_\.-]+)((&amp;|\?)start=[0-9]+)`';
+				static $hash_replace = '\1\3\5\4';
+				$page_string = preg_replace($hash_find, $hash_replace, $page_string);
+				$prev = $prev ? preg_replace($hash_find, $hash_replace, $prev) : '';
+				$next = $next ? preg_replace($hash_find, $hash_replace, $next) : '';
+			}
+		}
+	}
+	$template->assign_vars(array(
+		$tpl_prefix . 'BASE_URL'	=> $base_url,
+		'A_' . $tpl_prefix . 'BASE_URL'	=> addslashes($base_url),
+		$tpl_prefix . 'PER_PAGE'	=> $per_page,
+		$tpl_prefix . 'PREVIOUS_PAGE'	=> $prev,
+		$tpl_prefix . 'NEXT_PAGE'	=> $next,
+		$tpl_prefix . 'TOTAL_PAGES'	=> $total_pages)
+	);
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	if (isset($user->lang['Page']) && !empty($config['seo_append_sitename'])) {
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	if (isset($user->lang['Page']) && !empty($config['seo_append_sitename']) && !empty($config['sitename'])) {
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions_display.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+				$pagin_find = array('`\<a href="(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)(\.(?!' . $phpEx . ')[a-z0-9]+)(\?([\w\#$%&~\-;:=,@+\.]+))?(&amp;|\?)start=([0-9]+)"\>`i', '`\<a href="(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)/(\?([\w\#$%&~\-;:=,@+\.]+))?(&amp;|\?)start=([0-9]+)"\>`i' );
+				$pagin_replace = array( '<a href="\1' . $phpbb_seo->seo_delim['start'] . '\6\2\3">', '<a href="\1/' . $phpbb_seo->seo_static['pagination'] . '\5' . $phpbb_seo->seo_ext['pagination'] . '\2">' );
+
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+				$pagin_find = array('`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)(\.(?!' . $phpEx . ')[a-z0-9]+)(\?[\w\#$%&~\-;:=,@+\.]+)?(&amp;|\?)start=([0-9]+)`i', '`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)/(\?[\w\#$%&~\-;:=,@+\.]+)?(&amp;|\?)start=([0-9]+)`i' );
+				$pagin_replace = array( '\1' . $phpbb_seo->seo_delim['start'] . '\5\2\3', '\1/' . $phpbb_seo->seo_static['pagination'] . '\4' . $phpbb_seo->seo_ext['pagination'] . '\2' );
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/forum_fn.js
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		if (el.onclick || (el.href == '') || (el.href.indexOf('javascript') >=0 ) || (hrefinner.indexOf('<a') >= 0) ) {
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+		if (el.onclick || (el.href == '') || (el.href.indexOf('javascript') >=0 ) || (el.href.indexOf('mailto') >=0 ) || (hrefinner.indexOf('<a') >= 0) ) {
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/viewtopic_body.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+<a href="#p{postrow.POST_ID}">
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+<a href="{U_VIEW_TOPIC}#p{postrow.POST_ID}">
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+<a href="#wrap" class="top" title="{L_BACK_TO_TOP}">
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+<a href="{U_VIEW_TOPIC}#wrap" class="top" title="{L_BACK_TO_TOP}">
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/subsilver2/template/overall_header.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		if (el.onclick || (el.href == '') || (el.href.indexOf('javascript') >=0 ) || (hrefinner.indexOf('<a') >= 0) ) {
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+		if (el.onclick || (el.href == '') || (el.href.indexOf('javascript') >=0 ) || (el.href.indexOf('mailto') >=0 ) || (hrefinner.indexOf('<a') >= 0) ) {
+
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/subsilver2/template/viewtopic_body.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+<a href="#wrapheader">
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+<a href="{U_VIEW_TOPIC}#wrapheader">
+
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

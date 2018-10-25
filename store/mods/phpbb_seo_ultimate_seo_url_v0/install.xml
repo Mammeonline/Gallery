@@ -1,0 +1,2087 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (offline version)"/>
+		<license><![CDATA[http://www.opensource.org/licenses/rpl1.5.txt Reciprocal Public License 1.5]]></license>
+		<title lang="en"><![CDATA[phpBB SEO Ultimate SEO URL]]></title>
+		<title lang="fr"><![CDATA[phpBB SEO Ultimate SEO URL]]></title>
+		<description lang="en"><![CDATA[This mod will URL rewrite phpBB URLs in various manners, injecting, or not, forums and topic titles in their URLS, each URL being rewritten once, no matter the number of links using it on the page.
+				You will be able to run the mod in Advanced, Mixed and Simple mode.
+				Please read the author notes BEFORE using this mod.
+				Check http://www.phpbb-seo.com/en/phpbb-mod-rewrite/ultimate-seo-url-t4608.html
+				for the latest version or to get help with this MOD.]]></description>
+		<description lang="fr"><![CDATA[Ce mod réécrit les URLs des forums phpBB de différentes manières en injectant ou non le titre des forums et sujets dans leurs URLs, chaque URL étant réécrite une seule fois peut importe le nombre de fois ou elle apparait sur la page.
+				Vous pourrez choisir entre les modes Avancé, Intermédiaire et Simple.
+				Veuillez lire les notes de l'auteur avent d'installer ce mod.
+				Visitez http://www.phpbb-seo.com/fr/mod-rewrite-phpbb/ultimate-seo-url-t4489.html
+				pour obtenir du support et vérifier l'existence de mise à jour.]]></description>
+		<author-notes lang="en"><![CDATA[This is the phpBB SEO Advanced mod_rewrite core.
+Please note that this version will not inject topic titles in post's URLS. This is to make it easier
+to disallow them with our robots.txt file, since these are duplicates any way.
+
+Starting from v0.6.0, the three phpBB SEO mod rewrites are merged into a single mod, the phpBB SEO Ultimate SEO URL mod.
+Each one of the previous mods has now become a mode of the phpBB SEO Ultimate SEO URL mod.
+You can just choose which mode to use in the ACP.
+
+Version 0.6.0 as well introduces a new powerful option : SQL Rewriting.
+You will now be able to chose topic URL on a per case basis, no matter the URL standard used.
+This make the mixed mode with virtual folder option more powerful than ever, since you can keep static URL
+for most cases and use selected keywords for the more important threads.
+
+Enabling this option is optional, but even if you do not intend to set custom URLs for your threads,
+it still makes the rewriting process faster than ever. Turning on the SQL rewriting option will not change your topic URLs,
+it will only allow admins and moderators (of the concerned thread's forum) to do it on a per case basis
+while posting and editing topic first post.
+
+The phpbb_seo class was completely rewrote, all three types of URL rewriting are now merged without performance loss,
+if not with better performance even without the SQL rewriting option activated.
+
+You can insall the No Duplicate mod ( http://www.phpbb-seo.com/en/phpbb-seo-toolkit/phpbb3-seo-no-duplicate-t1225.html )
+if you want to replace post URL with their corresponding topic URL.
+
+This mod requires running Apache Server with mod_Rewrite module loaded, or IIS server running isapi_rewrite.
+
+
+With this mod, phpBB URL will be transformed this way :
+
+	viewforum.php?f=xx				=>	any-keywords-fxx.html (by default),
+								any-keywords-fxx/ (optional),
+								any-keywords/ (optional),
+								forumxx.html (optional),
+								forumxx/(optional)
+
+	viewforum.php?f=xx&start=yy			=>	any-keywords-fxx-yy.html (by default),
+								any-keywords-fxx/pageyy.html (optional),
+								any-keywords/pageyy.html (optional),
+								forumxx-yy.html (optional),
+								forumxx/pageyy.html(optional)
+
+	viewtopic.php?f=xx&t=yy				=>	topicyy.html (by default),
+								topic-title-tyy.html (optional),
+								any-keywords-tyy.html (optional),
+								any-keywords-fxx/topic-title-tyy.html (optional),
+								any-keywords-fxx/any-keywords-tyy.html (optional),
+								any-keywords/topicyy.html (optional),
+								any-keywords/topic-title-tyy.html (optional),
+								any-keywords/any-keywords-tyy.html (optional)
+
+	viewtopic.php?f=xx&t=yy&start=zz		=>	topicyy-zz.html (by default),
+								topic-title-tyy-zz.html (optional),
+								any-keywords-tyy-zz.html (optional),
+								any-keywords-fxx/topic-title-tyy-zz.html (optional),
+								any-keywords-fxx/any-keywords-tyy-zz.html (optional),
+								any-keywords/topicyy-zz.html (optional),
+								any-keywords/topic-title-tyy-zz.html (optional),
+								any-keywords/any-keywords-tyy-zz.html (optional)
+
+	viewtopic.php?p=xx				=>	postxx.html (by default)
+
+	download/file.php?id=xx(&t=1)			=>	resources/file-title/(thumb/)xx (optional)
+
+	memberlist.php?mode=viewprofile&u=xx		=>	memberxx.html (by default),
+	memberlist.php?mode=viewprofile&un=nickname		memberxx/ (by default),
+	if possible						nickname-uxx.html (optional),
+								nickname-uxx/ (optional),
+								member/nickname (optional)
+
+	memberlist.php?mode=group&g=xx			=>	groupxx.html (by default),
+								groupe-name-gxx.html (optional)
+
+	memberlist.php?mode=group&g=xx&start=yy		=>	groupxx-yy.html (by default),
+								groupe-name-gxx-yy.html (optional),
+								groupxx/pageyy.html (optional),
+								groupe-name-gxx/pageyy.html (optional)
+
+	memberlist.php?mode=leaders			=>	the-team.html (by default)
+
+	search.php?author_id=xx&sr=post|topics		=>	memberxx-posts|topics.html (optional),
+	search_id=egosearch					memberxx/posts|topics/ (optional),
+	search.php?author=nickname&sr=post|topics		nickname-uxx-posts|topics.html (optional),
+	if possible				 		nickname-uxx/posts|topics/ (optional),
+								member/nickname/posts|topics/ (optional)
+
+	search.php?author_id=xx&sr=post|topics&start=yy	=>	memberxx-posts|topics-yy.html (optional),
+	search.php?author=nickname&sr=post|topics&start=yy	memberxx/posts|topics/pageyy.html (optional),
+	if possible			 			nickname-uxx-posts|topics-yy.html (optional),
+					 			nickname-uxx/posts|topics/pageyy.html (optional),
+								member/nickname/posts|topics/pageyy.html (optional)
+
+	search_id=active_topics				=> 	active-topics.html
+
+	search_id=active_topics&start=xx		=> 	active-topics-xx.html
+
+	search_id=unanswered&sr=topics			=> 	unanswered.html,
+
+	search_id=unanswered&start=xx&sr=topics		=> 	unanswered-xx.html,
+
+	search_id=newposts&sr=topics			=> 	newposts.html,
+
+	search_id=newposts&start=xx&sr=topics		=> 	newposts-xx.html,
+
+	search_id=unreadposts				=> 	unreadposts.html,
+
+	search_id=unreadposts&start=xx			=> 	unreadposts-xx.html,
+
+	If the virtual folder is turned on, global announces will be treated in a separate virtual folder :
+
+	viewtopic.php?f=xx&t=yy				=>	announces/announces-title-tyy.html
+
+	viewtopic.php?f=xx&t=yy&start=zz		=>	announces/announces-title-tyy-zz.html
+
+This mod has nothing in common with other phpBB mod rewrite, it will perform the URL rewriting
+without using ob_start() nor adding any SQL. It is thus faster and not messing anymore with Gun-Zip
+or with the html link format, and will not output any pagination duplicates.
+
+The process is optimized, titles and URLs are transformed once, even if the url is called and outputted many times.
+
+WARNING : Topic title injection in URL can be hard to deal with depending on the type of subjects your
+forum is about. In most cases phpBB SEO recommend the use of the phpBB SEO mixed mod Rewrite instead.
+Please read : http://boards.phpbb-seo.com/phpbb-seo-toolkit/phpbb-seo-mod-rewrites-vt66.html
+
+This mod is and will be compatible to all phpBB SEO modules, specific install instructions may apply.
+phpBB SEO will provide patches to allow for other URL standards support upon request,
+so that everyone can take advantage of the phpBB mod Rewrites enhancement without jeopardising his Page-Ranking.
+
+
+Char-sets :
+___________
+
+	phpBB3 uses UTF-8 as final encoding, and this should be enough to handle all cases.
+UTF-8 is fully supported by this mod.
+The mod rewrite will only inject the ASCII Chars ( after removing all accents ) available in the titles.
+
+For example : "[non ASCII chars] Software niño" will be formated this way prior to injection : "software-nino".
+It is still possible that some characters only having a decimal HTML/XML entity won't be handled properly at first.
+The method to filter these is simple, please ask for help in our forums.
+
+Migration :
+___________
+
+If you are migration, eg if your forum is already indexed using different URLs,
+you'll have to use another robots.txt and install the zero duplicate.
+The migrating procedure will allow you to migrate and keep your previously indexed pages.
+Older links will be HTTP 301 redirected to the new ones. It is rather simple, but the solution depends on cases.
+Let's meet in the phpBB SEO mod rewrite forum ( http://www.phpbb-seo.com/en/phpbb-mod-rewrite/ ).
+
+
+ UPDATE
+0.6.4 => 0.6.6 Update : Required changes to be found in contrib/maj/0.6.4_0.6.6_Ultimate_Update.txt
+Previous updates are to be found in the contrib/old/ folder.
+
+
+LICENSE:
+
+We, phpBB SEO, have decided to license this mod under the RPL Licence ( http://www.opensource.org/licenses/rpl.php )
+which states you cannot remove the phpBB SEO credits and if you make any modifications you have to resubmit them
+to phpBB SEO for inclusion into this package again. You can read the license for yourself for further info.
+
+You can of course use this mod without any more limitations than those stated here and in the licence.
+
+At least a link ( http://www.phpbb-seo.com/ ) is required on every web site using this mod, or,
+if your web site does not comply with what phpBB SEO can link to, one proven link within a
+general audience hard link directory of your choice not already listing phpBB SEO.
+For more details about possible exceptions, please contact a phpBB SEO administrator (primarily SeO or dcz).
+
+Failure to comply will jeopardize support and developments.
+
+This mod is stable, despite the comment you will see bellow in the Disclaimer & Other Notes.]]></author-notes>
+		<author-notes lang="fr"><![CDATA[Ce mod nécessite un serveur Apache avec le mod_Rewrite On, ou un serveur IIS avec le module isapi_rewrite.
+
+A partir de la version 0.6.0, tous les mod rewrites phpBB SEO sont réuinis en un seul.
+Chacun des trois mod rewrite est désormais un mode du mod Ultimate SEO URL. Vous pouvez choisir lequel utiliser dans l'acp.
+La version 0.6.0 introduit une nouvelle option puissante : SQL Rewriting.
+Vous serez désormais en mesure de choisir des URLs personnalisées au cas pas cas pour chaque sujet,
+et peu importe le standard d'URL choisi au départ. Cela rend le mode Intermédiaire avec dossiers virtuels plus puissant
+que jamais, vu qu'il vous sera possible de conserver une réécriture statique pour la plupart des sujets tout en
+choisissant des mots clés intéressant pour des sujets plus importants.
+Activer cette option est optionnel, mais même sans utiliser d'URL personnalisées pour vos sujets,
+elle rend la réécriture d'url plus rapide que jamais.
+Activer cette option ne modifiera pas vos URL actuelles, cela permettra simplement aux admins et modérateurs
+(du forum du sujet) de le faire au cas par cas, c'est à dire en postant un sujet ou en éditant le premier post d'un sujet.
+
+La classe phpbb_seo a été complètement réécrite, les trois types de réécriture d'url sont désormais unifiés
+sans perte de performance, si ce n'est avec un gain de performance même sans activer l'option SQL rewriting.
+
+Ce mod va modifier les URLs de phpBB de la façon suivante :
+
+	viewforum.php?f=xx				=>	any-keywords-fxx.html (by default),
+								any-keywords-fxx/ (optional),
+								any-keywords/ (optional),
+								forumxx.html (optional),
+								forumxx/(optional)
+
+	viewforum.php?f=xx&start=yy			=>	any-keywords-fxx-yy.html (by default),
+								any-keywords-fxx/pageyy.html (optional),
+								any-keywords/pageyy.html (optional),
+								forumxx-yy.html (optional),
+								forumxx/pageyy.html(optional)
+
+	viewtopic.php?f=xx&t=yy				=>	topicyy.html (by default),
+								topic-title-tyy.html (optional),
+								any-keywords-tyy.html (optional),
+								any-keywords-fxx/topic-title-tyy.html (optional),
+								any-keywords-fxx/any-keywords-tyy.html (optional),
+								any-keywords/topicyy.html (optional),
+								any-keywords/topic-title-tyy.html (optional),
+								any-keywords/any-keywords-tyy.html (optional)
+
+	viewtopic.php?f=xx&t=yy&start=zz		=>	topicyy-zz.html (by default),
+								topic-title-tyy-zz.html (optional),
+								any-keywords-tyy-zz.html (optional),
+								any-keywords-fxx/topic-title-tyy-zz.html (optional),
+								any-keywords-fxx/any-keywords-tyy-zz.html (optional),
+								any-keywords/topicyy-zz.html (optional),
+								any-keywords/topic-title-tyy-zz.html (optional),
+								any-keywords/any-keywords-tyy-zz.html (optional)
+
+	viewtopic.php?p=xx				=>	postxx.html (by default)
+
+	download/file.php?id=xx(&t=1)			=>	ressources/file-title/(thumb/)xx (optional)
+
+	memberlist.php?mode=viewprofile&u=xx		=>	memberxx.html (by default),
+	memberlist.php?mode=viewprofile&un=nickname		pseudo-uxx.html (optional),
+	si possible						membre/pseudo (optional)
+
+	memberlist.php?mode=group&g=xx			=>	groupxx.html (by default),
+								groupe-name-gxx.html (optional)
+
+	memberlist.php?mode=group&g=xx&start=yy		=>	groupxx-yy.html (by default),
+								groupe-name-gxx-yy.html (optional),
+								groupxx/pageyy.html (optional),
+								groupe-name-gxx/pageyy.html (optional)
+
+	memberlist.php?mode=leaders			=>	equipe.html (by default)
+
+	search.php?author_id=xx&sr=post|topics		=>	membrexx-posts|topics.html (optional),
+	search_id=egosearch					membrexx/posts|topics/ (optional),
+	search.php?author=pseudo&sr=post|topics			pseudo-uxx-posts|topics.html (optional),
+	si possible			 			pseudo-uxx/posts|topics/ (optional),
+								membre/pseudo/posts|topics/ (optional)
+
+	search.php?author_id=xx&sr=post|topics&start=yy	=>	membrexx-posts|topics-yy.html (optional),
+	search.php?author=nickname&sr=post|topics&start=yy	membrexx/posts|topics/pageyy.html (optional),
+	si possible			 			pseudo-uxx-posts|topics-yy.html (optional),
+					 			pseudo-uxx/posts|topics/pageyy.html (optional),
+								membre/pseudo/posts|topics/pageyy.html (optional)
+
+	search_id=active_topics				=> 	sujets-actifs.html
+
+	search_id=active_topics&start=xx		=> 	sujets-actifs-xx.html
+
+	search_id=unanswered&sr=topics			=> 	sans-reponses.html,
+
+	search_id=unanswered&start=xx&sr=topics		=> 	sans-reponses-xx.html,
+
+	search_id=newposts&sr=topics			=> 	nouveaux-messages.html,
+
+	search_id=newposts&start=xx&sr=topics		=> 	nouveaux-messages-xx.html,
+
+	search_id=unreadposts				=> 	non-lu.html,
+
+	search_id=unreadposts&start=xx			=> 	non-lu-xx.html,
+
+	Quand les dossiers virtuels sont activés, les annonces globales apparaitront dans leur propre dossier virtuel :
+
+	viewtopic.php?f=xx&t=yy				=>	annonces/titre-annonce-tyy.html
+
+	viewtopic.php?f=xx&t=yy&start=zz		=>	annonces/titre-annonce-tyy-zz.html
+
+Ce mod n'a rien de commun avec d'autres mods de réécriture d'URL (URL rewriting) pour phpBB. La réécriture d'URL
+est réalisée sans utiliser la fonction ob_start() ni ajouter de requête SQL.
+
+Le processus est optimisé, les titres à injecter, ainsi que les URLs elles mêmes, ne sont calculés qu'une fois,
+et réutilisés en cas de nécessité.
+Il est donc plus rapide et ne crée plus aucun problème avec la compression Gzip ou le format html des liens.
+De plus, il ne génère aucun duplicates de pagination.
+
+ATTENTION : l'injection des titres des sujets dans leur URL peut s'avérer délicat à bien gérer.
+Cela dépend du type de sujets traités sur votre forum.
+Dans pratiquement tous les cas, phpBB SEO recommande le mod Rewrite Intermédiaire (Mixed).
+Veuillez lire : http://forums.phpbb-seo.com/toolkit-phpbb-seo/mod-rewrites-phpbb-seo-vt65.html
+
+Ce mod est et sera compatible avec tous les mods phpBB SEO, des instructions supplémentaires pouvant intervenir pour l'installation.
+phpBB SEO fournira les solutions nécessaires pour prendre en charge d'autres formats d'URL,
+pour que tous puissent tirer parti des avancées des mods Rewrite phpBB SEO sans pour autant risquer de perdre leurs acquis
+en référencement et PageRank.
+
+
+Char-sets :
+___________
+
+	phpBB3 utilise l'UTF-8 comme encodage final, ce qui devrait être suffisant pour tous les types d'alphabets.
+L'UTF-8 est totallement pris en charge par ce mod.
+
+Ce mod rewrite injectera uniquement les caractères ASSII, débarrassés de leurs accents, présents dans les titres.
+
+Par exemple : "[caractères non ASCII] Software niño" sera formaté de cette façon : "software-nino".
+
+
+Migration :
+___________
+
+Si vous effectuez une migration, c'est-à-dire que votre forum est déjà référencé avec d'anciennes URLs,
+vous devrez utiliser un autre fichier robots.txt, et installer le zéro dupe.
+Les anciennes URLs seront redirigées (avec en-tête HTTP 301) vers les nouvelles.
+La procédure vous permettant de migrer tout en conservant vos pages indexées est simple, mais doit s'effectuer au cas par cas.
+Rendez-vous sur le forum mod rewrite phpBB SEO ( http://www.phpbb-seo.com/fr/mod-rewrite-phpbb/ ).
+
+
+ MISE A JOUR
+0.6.4 => 0.6.6 Mise à Jour : Les changements à effectuer se trouvent dans contrib/maj/0.6.4_0.6.6_Ultimate_UpdateFR.txt
+Les mise à jour précédentes se trouvent dans les dossier contrib/old/
+
+
+LICENSE:
+________
+
+Nous, phpBB SEO, avons décidé de diffuser les mods Rewrite phpBB SEO sous la licence RPL ( http://www.opensource.org/licenses/rpl.php )
+qui indique que vous ne pouvez pas retirer les crédits phpBB SEO, et que vos améliorations et changements doivent être soumis
+à l'équipe de phpBB SEO avant d'être éventuellement ajoutés au package.
+Vous pouvez lire l'intégralité de la licence pour plus de détails.
+
+Bien entendu, l'utilisation selon les présents critères de ce mod est totalement libre, gratuite et sans autres limitations.
+
+Au moins un lien ( http://www.phpbb-seo.com/ ) en retour est demandé pour utiliser ce mod, et ce sur chacun des sites les utilisant,
+ou à défaut, dans le cas où votre forum ne remplirait pas les critères lui permettant d'être lié depuis phpBB SEO (porno, warez, etc.)
+un minimum d'une soumission prouvée dans un annuaire généraliste de lien en dur n'ayant pas déjà le lien phpBB SEO.
+Pour plus de détails concernant les exceptions possibles, merci de contacter un administrateur de phpBB SEO (Prioritairement SeO ou dcz).
+
+Tout manquement à ces règles contribuera à mettre le support et le développement sur www.phpbb-seo.com en péril.
+
+Ce mod est stable, contrairement à ce qu'indique le message que vous verrez ci-dessous dans la partie Clause de non-responsabilité  & Autres notes.]]></author-notes>
+		<author-group>
+			<author>
+				<username><![CDATA[dcz]]></username>
+				<homepage><![CDATA[http://www.phpbb-seo.com/]]></homepage>
+			</author>
+		</author-group>
+		<mod-version><![CDATA[0.6.6]]></mod-version>
+		<installation>
+			<level><![CDATA[advanced]]></level>
+			<time><![CDATA[1500]]></time>
+			<target-version><![CDATA[3.0.8]]></target-version>
+		</installation>
+		<history>
+			<entry>
+				<date><![CDATA[2010/11/30]]></date>
+				<rev-version><![CDATA[0.6.6]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added : Full ssl support]]></change>
+					<change><![CDATA[Fix : phpbb_seo::set_url calls breaking custom static forum]]></change>
+					<change><![CDATA[Few minor fixes and enhancements]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2010-03-05]]></date>
+				<rev-version><![CDATA[0.6.4]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed : php5.3 deprecated references in install_phpbb_seo]]></change>
+					<change><![CDATA[Fixed : Broken image rewriterule with virtual root]]></change>
+					<change><![CDATA[Fixed : Attachement with virtual root]]></change>
+					<change><![CDATA[Fixed : Empty $config['sitename'] case]]></change>
+					<change><![CDATA[Fixed : Pagination with hashes in url and next/previous]]></change>
+					<change><![CDATA[Fixed : .htaccess generator fix for custom post extensions]]></change>
+					<change><![CDATA[Fixed : Do only show virtual root option when actually usable.]]></change>
+					<change><![CDATA[Fixed : Email links when opening external links in a new window.]]></change>
+					<change><![CDATA[Added : Full url to pretty much all phpBB URLs]]></change>
+					<change><![CDATA[Added : URL rewriting for unread posts]]></change>
+					<change><![CDATA[Moved stripslashes_deep to phpbb_seo::stripslashes to keep all it inside the phpbb_seo class]]></change>
+					<change><![CDATA[En language pack fixes from sevenalive (@phpBB SEO)]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-11-23]]></date>
+				<rev-version><![CDATA[0.6.2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to comply with phpBB 3.0.6]]></change>
+					<change><![CDATA[Fixed : Issue with user name with dot pagination when common search rewriting if off]]></change>
+					<change><![CDATA[Fixed : PM pop up with virtual root option]]></change>
+					<change><![CDATA[Fixed : Paginated search when searching on several forums]]></change>
+					<change><![CDATA[Fixed : For real the port != 80 case!]]></change>
+					<change><![CDATA[Fixed : Issues with global announcements on active topic listing]]></change>
+					<change><![CDATA[Fixed : $custom_profile_url usage]]></change>
+					<change><![CDATA[Added : Extended ACP menu for new $config based options]]></change>
+					<change><![CDATA[Added : Open external links in new windows (configurable in the extended menu)]]></change>
+					<change><![CDATA[Added : Append site name to page title when the Optimal title mod is installed]]></change>
+					<change><![CDATA[Added : Error message for when the db user does not have enough right to alter tables (sql rewriting &amp; no dupe)]]></change>
+					<change><![CDATA[Added : Rewriterules to handle dummy clients who do not understand base href tags in addition to the new PHPBB_USE_BOARD_URL_PATH constant activation]]></change>
+					<change><![CDATA[Reorganized language pack]]></change>
+					<change><![CDATA[Made req_file info available in setup_phpbb_seo.php]]></change>
+					<change><![CDATA[parse_string is now used again, with a proper stripslahe handling and a fix for http://www.phpbb.com/bugs/phpbb3/52315]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-06-08]]></date>
+				<rev-version><![CDATA[0.6.0]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to comply with phpBB 3.0.5]]></change>
+					<change><![CDATA[Complete rewrite of the phpbb_seo class, URL rewriting never was this fast]]></change>
+					<change><![CDATA[Added : SQL Rewriting for topic urls, allowing per case URLs for each topics (optional)]]></change>
+					<change><![CDATA[Added : Attachment Rewriting (optional)]]></change>
+					<change><![CDATA[All types of URL rewritings are now merged into a single mod: Ultimate SEO URL]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-12-20]]></date>
+				<rev-version><![CDATA[0.4.8]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to comply with phpBB 3.0.4]]></change>
+					<change><![CDATA[Added : topic and forum url are now rewritten in notification emails]]></change>
+					<change><![CDATA[Added : topic url in print view is now rewritten]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-11-20]]></date>
+				<rev-version><![CDATA[0.4.6]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Complete rewrite of the phpbb_seo::url_rewrite method]]></change>
+					<change><![CDATA[the phpbb_seo class is now path aware]]></change>
+					<change><![CDATA[Fixed : global annoucement display when the lowest forum id is not public]]></change>
+					<change><![CDATA[Fixed : possibly wrong forum id in active topic last posts links]]></change>
+					<change><![CDATA[Many minor bug fixes and enhancements in phpbb_seo_class.php]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-07-14]]></date>
+				<rev-version><![CDATA[0.4.4]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed the update bug caused by the empty phpbb_seo class]]></change>
+					<change><![CDATA[Fixed pagination rewriterules for forum url without id and with a suffixe different that "/"]]></change>
+					<change><![CDATA[Fixed install script for no MYSQL DB]]></change>
+					<change><![CDATA[Fixed search for word startting / ending with a,m or p]]></change>
+					<change><![CDATA[Fixed various virtual root wrong links]]></change>
+					<change><![CDATA[Various optimization in phpbb_seo_class.php]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-04-14]]></date>
+				<rev-version><![CDATA[0.4.2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated : User messages pages URLs structure]]></change>
+					<change><![CDATA[Added : virtual folder option for user messages pages]]></change>
+					<change><![CDATA[Added : copyright link formatting options]]></change>
+					<change><![CDATA[Added : support for active_topics link]]></change>
+					<change><![CDATA[Added : support for unanswered link]]></change>
+					<change><![CDATA[Added : support for newposts link]]></change>
+					<change><![CDATA[Added : support for egosearch link]]></change>
+					<change><![CDATA[Added : support for most active topic link on profile view]]></change>
+					<change><![CDATA[Fixed : group sort option links]]></change>
+					<change><![CDATA[Fixed : unread link it topic view]]></change>
+					<change><![CDATA[Fixed : Session tracking : Sessions tracking is now fully fixed for viewforum, but will only work with virtual folder trick in viewtopic]]></change>
+					<change><![CDATA[Various optimizations in phpbb_seo_class.php and acp_phpbb_seo.php]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-12-18]]></date>
+				<rev-version><![CDATA[0.4.0]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added : Group URL rewriting, with optional group name injection]]></change>
+					<change><![CDATA[Added : profile URL can use nickname injection (optional)]]></change>
+					<change><![CDATA[Added : profile URL can use nickname injection without ID (optional)]]></change>
+					<change><![CDATA[Added : User messages URL can use nickname injection (optional)]]></change>
+					<change><![CDATA[Added : User messages URL can use nickname injection without ID (optional)]]></change>
+					<change><![CDATA[Added : 404 header is now returned for forums that do not exist (both rewritten and vanilla URLs)]]></change>
+					<change><![CDATA[Added : subsilver2 code changes]]></change>
+					<change><![CDATA[Fixed : Usage of a slash as a suffix is now fully supported for all rewritten URLs]]></change>
+					<change><![CDATA[Fixed : Base href handling (bug with virtual root option)]]></change>
+					<change><![CDATA[Fixed : 100% XHTML valid output]]></change>
+					<change><![CDATA[Updated to comply with phpBB3.0.0.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-10-15]]></date>
+				<rev-version><![CDATA[0.4.0-RC4]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed JS jump to page script]]></change>
+					<change><![CDATA[Updated to comply with phpBB3.0.RC7]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-09-15]]></date>
+				<rev-version><![CDATA[0.4.0-RC3]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Enhanced the phpBB SEO ACP a bit]]></change>
+					<change><![CDATA[Updated part of the code to take the other two versions into account]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-09-06]]></date>
+				<rev-version><![CDATA[0.4.0-RC2-2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed ACP bug with the zero duplicate]]></change>
+					<change><![CDATA[Fixed typo in install]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-08-31]]></date>
+				<rev-version><![CDATA[0.4.0-RC2-1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added phpBB3 acp module with installer]]></change>
+					<change><![CDATA[Added an option to be able to turn on / off URL rewriting]]></change>
+					<change><![CDATA[Updated the install to comply with phpBB3.0.RC5]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-08-10]]></date>
+				<rev-version><![CDATA[0.4.0-RC1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added a custom pagination for when forum are treated as virtual folders]]></change>
+					<change><![CDATA[Added a forum URLs cache and setting page]]></change>
+					<change><![CDATA[Added a phpBB SEO mod rewrite setting page]]></change>
+					<change><![CDATA[Added an .htaccess setup page]]></change>
+					<change><![CDATA[Fixed small word filtering (thx pvchat1)]]></change>
+					<change><![CDATA[Fixed back to top link in viewtopic (thx GTT)]]></change>
+					<change><![CDATA[Fixed notification link redirection (thx Illuminati)]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-07-29]]></date>
+				<rev-version><![CDATA[0.2.0-RC3]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to work with phpBB3 RC4 (no changes with phpBB3 RC3)]]></change>
+					<change><![CDATA[New option : To add or not the forum url in the topic ones]]></change>
+					<change><![CDATA[New base href handling, now conditioned to the required files only]]></change>
+					<change><![CDATA[Added rewriting of the return link while posting]]></change>
+					<change><![CDATA[Added small words filtering using the fast preg_replace() method]]></change>
+					<change><![CDATA[Optimized URL caching]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-06-27]]></date>
+				<rev-version><![CDATA[0.2.0-RC2-2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed last and newest post link in search view]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-06-27]]></date>
+				<rev-version><![CDATA[0.2.0-RC2-1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to work with phpBB3 RC2]]></change>
+					<change><![CDATA[Easier install, better virtual folder handling]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-05-26]]></date>
+				<rev-version><![CDATA[0.2.0-RC1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[First public Version]]></change>
+				</changelog>
+			</entry>
+		</history>
+		<link-group>
+			<link type="template" href="./xml/subsilver2.xml" lang="en"><![CDATA[subsilver2 modifications]]></link>
+			<link type="template" href="./xml/subsilver2.xml" lang="fr"><![CDATA[Modification pour subsilver2]]></link>
+		</link-group>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/*.*" to="*.*"/>
+		</copy>
+		<open src="common.php">
+			<edit>
+				<find><![CDATA[// Grab global variables, re-cache if necessary
+$config = $cache->obtain_config();]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+if (empty($phpbb_seo) ) {
+	require_once($phpbb_root_path . 'phpbb_seo/phpbb_seo_class.'.$phpEx);
+	$phpbb_seo = new phpbb_seo();
+	@define('PHPBB_USE_BOARD_URL_PATH', true);
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="index.php">
+			<edit>
+				<find><![CDATA[		$legend[] = '<a' . $colour_text . ' href="' . append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']) . '">' . $group_name . '</a>';]]></find>
+				<action type="before-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		$phpbb_seo->prepare_url('group', $row['group_name'], $row['group_id']);
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="memberlist.php">
+			<edit>
+				<find><![CDATA[// Start session management
+$user->session_begin();
+$auth->acl($user->data);
+$user->setup(array('memberlist', 'groups'));]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+if (!empty($_REQUEST['un'])) {
+	$_REQUEST['un'] = rawurldecode($_REQUEST['un']);
+	if (!$phpbb_seo->is_utf8($_REQUEST['un'])) {
+		$_REQUEST['un'] = utf8_normalize_nfc(utf8_recode($_REQUEST['un'], 'ISO-8859-1'));
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];]]></find>
+				<action type="after-add"><![CDATA[				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+				$phpbb_seo->prepare_url('group', $row['group_name'], $row['group_id']);
+				// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		$user_id = (int) $member['user_id'];]]></find>
+				<action type="after-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		$phpbb_seo->set_user_url( $member['username'], $user_id );
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		// Generate page
+		$template->assign_vars(array(]]></find>
+				<action type="before-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		$seo_sep = strpos($sort_url, '?') === false ? '?' : '&amp;';
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			'U_SORT_USERNAME'		=> $sort_url . '&amp;sk=a&amp;sd=' . (($sort_key == 'a' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_FROM'			=> $sort_url . '&amp;sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_JOINED'			=> $sort_url . '&amp;sk=c&amp;sd=' . (($sort_key == 'c' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_POSTS'			=> $sort_url . '&amp;sk=d&amp;sd=' . (($sort_key == 'd' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_EMAIL'			=> $sort_url . '&amp;sk=e&amp;sd=' . (($sort_key == 'e' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_WEBSITE'		=> $sort_url . '&amp;sk=f&amp;sd=' . (($sort_key == 'f' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_LOCATION'		=> $sort_url . '&amp;sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_ICQ'			=> $sort_url . '&amp;sk=g&amp;sd=' . (($sort_key == 'g' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_AIM'			=> $sort_url . '&amp;sk=h&amp;sd=' . (($sort_key == 'h' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_MSN'			=> $sort_url . '&amp;sk=i&amp;sd=' . (($sort_key == 'i' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_YIM'			=> $sort_url . '&amp;sk=j&amp;sd=' . (($sort_key == 'j' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_ACTIVE'			=> ($auth->acl_get('u_viewonline')) ? $sort_url . '&amp;sk=l&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a') : '',
+			'U_SORT_RANK'			=> $sort_url . '&amp;sk=m&amp;sd=' . (($sort_key == 'm' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_LIST_CHAR'			=> $sort_url . '&amp;sk=a&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a'),]]></find>
+				<action type="replace-with"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			'U_SORT_USERNAME'		=> $sort_url . $seo_sep . 'sk=a&amp;sd=' . (($sort_key == 'a' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_FROM'			=> $sort_url . $seo_sep . 'sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_JOINED'			=> $sort_url . $seo_sep . 'sk=c&amp;sd=' . (($sort_key == 'c' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_POSTS'			=> $sort_url . $seo_sep . 'sk=d&amp;sd=' . (($sort_key == 'd' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_EMAIL'			=> $sort_url . $seo_sep . 'sk=e&amp;sd=' . (($sort_key == 'e' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_WEBSITE'		=> $sort_url . $seo_sep . 'sk=f&amp;sd=' . (($sort_key == 'f' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_LOCATION'		=> $sort_url . $seo_sep . 'sk=b&amp;sd=' . (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_ICQ'			=> $sort_url . $seo_sep . 'sk=g&amp;sd=' . (($sort_key == 'g' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_AIM'			=> $sort_url . $seo_sep . 'sk=h&amp;sd=' . (($sort_key == 'h' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_MSN'			=> $sort_url . $seo_sep . 'sk=i&amp;sd=' . (($sort_key == 'i' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_YIM'			=> $sort_url . $seo_sep . 'sk=j&amp;sd=' . (($sort_key == 'j' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_SORT_ACTIVE'			=> ($auth->acl_get('u_viewonline')) ? $sort_url . $seo_sep . 'sk=l&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a') : '',
+			'U_SORT_RANK'			=> $sort_url . $seo_sep . 'sk=m&amp;sd=' . (($sort_key == 'm' && $sort_dir == 'a') ? 'd' : 'a'),
+			'U_LIST_CHAR'			=> $sort_url . $seo_sep . 'sk=a&amp;sd=' . (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a'),
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			'S_MODE_ACTION'		=> $pagination_url)]]></find>
+				<action type="replace-with"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			// Here we circumvent because our append_sid does not allow
+			// an url to end with an ?, as it should.
+			'S_MODE_ACTION'		=> $pagination_url . (strpos($pagination_url, '?') !== false ? '' : '?') )
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="posting.php">
+			<edit>
+				<find><![CDATA[	$post_data['enable_bbcode']		= (!$bbcode_status || isset($_POST['disable_bbcode'])) ? false : true;
+	$post_data['enable_smilies']	= (!$smilies_status || isset($_POST['disable_smilies'])) ? false : true;
+	$post_data['enable_urls']		= (isset($_POST['disable_magic_url'])) ? 0 : 1;
+	$post_data['enable_sig']		= (!$config['allow_sig'] || !$auth->acl_get('f_sigs', $forum_id) || !$auth->acl_get('u_sig')) ? false : ((isset($_POST['attach_sig']) && $user->data['is_registered']) ? true : false);]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
+		if ($mode == 'post' || ($mode == 'edit' && $post_data['topic_first_post_id'] == $post_id)) {
+			$phpbb_seo->set_url($post_data['forum_name'], $forum_id, 'forum');
+			$_parent = $post_data['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$forum_id];
+			$_t = !empty($post_data['topic_id']) ? max(0, (int) $post_data['topic_id'] ) : 0;
+			$_url = $phpbb_seo->url_can_edit($forum_id) ? utf8_normalize_nfc(request_var('url', '', true)) : ( isset($post_data['topic_url']) ? $post_data['topic_url'] : '' );
+			if (!$phpbb_seo->check_url('topic', $_url, $_parent)) {
+				if (!empty($_url)) {
+					// Here we get rid of the seo delim (-t) and put it back even in simple mod
+					// to be able to handle all cases at once
+					$_url = preg_replace('`' . $phpbb_seo->seo_delim['topic'] . '$`i', '', $_url);
+					$_title = $phpbb_seo->get_url_info('topic', $_url . $phpbb_seo->seo_delim['topic'] . $_t);
+				} else {
+					$_title = $phpbb_seo->modrtype > 2 ? censor_text($post_data['post_subject']) : '';
+				}
+				unset($phpbb_seo->seo_url['topic'][$_t]);
+				$_url = $phpbb_seo->get_url_info('topic', $phpbb_seo->prepare_url( 'topic', $_title, $_t, $_parent ,  (( empty($_title) || ($_title == $phpbb_seo->seo_static['topic']) ) ? true : false)), 'url');
+				unset($phpbb_seo->seo_url['topic'][$_t]);
+			}
+			$post_data['topic_url'] = $_url;
+		}
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				'post_approved'			=> (isset($post_data['post_approved'])) ? $post_data['post_approved'] : false,
+			);]]></find>
+				<action type="after-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
+				$data += array('topic_url' => isset($post_data['topic_url']) ? $post_data['topic_url'] : '');
+			}
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	'TOPIC_TITLE'			=> censor_text($post_data['topic_title']),]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'TOPIC_URL'		=> isset($post_data['topic_url']) ? preg_replace('`' . $phpbb_seo->seo_delim['topic'] . '$`i', '', $post_data['topic_url']) : '',
+	'S_URL'			=> ($mode == 'post' || ($mode == 'edit' && $post_id == $post_data['topic_first_post_id'])) ? $phpbb_seo->url_can_edit($forum_id) : false,
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="search.php">
+			<edit>
+				<find><![CDATA[$user->setup('search');]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+$clean_request = array('keywords', 'author', 'add_keywords');
+foreach ($clean_request as $request) {
+	if (!empty($_REQUEST[$request])) {
+		$_REQUEST[$request] = rawurldecode($_REQUEST[$request]);
+		if (!$phpbb_seo->is_utf8($_REQUEST[$request])) {
+			$_REQUEST[$request] = utf8_normalize_nfc(utf8_recode($_REQUEST[$request], 'iso-8859-1'));
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	$u_search = append_sid("{$phpbb_root_path}search.$phpEx", $u_sort_param . $u_show_results);
+	$u_search .= ($search_id) ? '&amp;search_id=' . $search_id : '';
+	$u_search .= ($u_hilit) ? '&amp;keywords=' . urlencode(htmlspecialchars_decode($keywords)) : '';
+	$u_search .= ($search_terms != 'all') ? '&amp;terms=' . $search_terms : '';
+	$u_search .= ($topic_id) ? '&amp;t=' . $topic_id : '';
+	$u_search .= ($author) ? '&amp;author=' . urlencode(htmlspecialchars_decode($author)) : '';
+	$u_search .= ($author_id) ? '&amp;author_id=' . $author_id : '';
+	$u_search .= ($u_search_forum) ? '&amp;fid%5B%5D=' . $u_search_forum : '';
+	$u_search .= (!$search_child) ? '&amp;sc=0' : '';
+	$u_search .= ($search_fields != 'all') ? '&amp;sf=' . $search_fields : '';
+	$u_search .= ($return_chars != 300) ? '&amp;ch=' . $return_chars : '';]]></find>
+				<action type="replace-with"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	//$u_search = append_sid("{$phpbb_root_path}search.$phpEx", $u_sort_param . $u_show_results);
+	$u_search = $u_sort_param . $u_show_results;
+	$u_search .= ($search_id) ? '&amp;search_id=' . $search_id : '';
+	$u_search .= ($u_hilit) ? '&amp;keywords=' . urlencode(htmlspecialchars_decode($keywords)) : '';
+	$u_search .= ($search_terms != 'all') ? '&amp;terms=' . $search_terms : '';
+	$u_search .= ($topic_id) ? '&amp;t=' . $topic_id : '';
+	$u_search .= ($author) ? '&amp;author=' . urlencode(htmlspecialchars_decode($author)) : '';
+	$u_search .= ($author_id) ? '&amp;author_id=' . $author_id : '';
+	$u_search .= ($u_search_forum) ? '&amp;fid%5B%5D=' . $u_search_forum : '';
+	$u_search .= (!$search_child) ? '&amp;sc=0' : '';
+	$u_search .= ($search_fields != 'all') ? '&amp;sf=' . $search_fields : '';
+	$u_search .= ($return_chars != 300) ? '&amp;ch=' . $return_chars : '';
+	$u_search = preg_replace('`(^&amp;|&amp;$)`i', '', $u_search);
+	if ( $phpbb_seo->seo_opt['rewrite_usermsg'] && (!empty($author) || !empty($author_id)) ) {
+		$author_name = '';
+		if (!empty($author_id)) {
+			$sql = $sql = 'SELECT username
+				FROM ' . USERS_TABLE . "
+				WHERE user_id = $author_id
+				AND user_type IN (" . USER_NORMAL . ', ' . USER_FOUNDER . ')';
+			$result = $db->sql_query($sql);
+			if ($row = $db->sql_fetchrow($result)) {
+				$author_name = $row['username'];
+				$phpbb_seo->set_user_url( $author_name, $author_id );
+			}
+		}
+		if (!empty($author) && (strpos($author, '*') === false) ) {
+			$sql = $sql = 'SELECT user_id
+				FROM ' . USERS_TABLE . "
+				WHERE username_clean = '" . $db->sql_escape(utf8_clean_string($author)) . "'
+				AND user_type IN (" . USER_NORMAL . ', ' . USER_FOUNDER . ')';
+			$result = $db->sql_query($sql);
+			if ($row = $db->sql_fetchrow($result)) {
+				$phpbb_seo->set_user_url( $author, $row['user_id'] );
+			}
+		}
+		$author = empty($author) ? $author_name : $author;
+	}
+	$u_search = append_sid( "{$phpbb_root_path}search.$phpEx" . (!empty($u_search) ? '?' . $u_search : '') );
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			$view_topic_url_params = "f=$u_forum_id&amp;t=$result_topic_id" . (($u_hilit) ? "&amp;hilit=$u_hilit" : '');
+			$view_topic_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", $view_topic_url_params);]]></find>
+				<action type="before-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$phpbb_seo->set_url($row['forum_name'], $u_forum_id, 'forum');
+			$phpbb_seo->prepare_iurl($row, 'topic', $row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$u_forum_id]);
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="viewforum.php">
+			<edit>
+				<find><![CDATA[include($phpbb_root_path . 'includes/functions_display.' . $phpEx);]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+if (empty($_REQUEST['f'])) {
+	$phpbb_seo->get_forum_id($session_forum_id);
+	if ($session_forum_id == 0) {
+		header('HTTP/1.1 404 Not Found');
+	} else {
+		$_REQUEST['f'] = (int) $session_forum_id;
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[if (!$forum_data)
+{
+	trigger_error('NO_FORUM');
+}]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+$phpbb_seo->set_url($forum_data['forum_name'], $forum_data['forum_id'], 'forum');
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		$topic_forum_id = ($row['forum_id']) ? (int) $row['forum_id'] : $forum_id;]]></find>
+				<action type="after-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		if (!empty($row['topic_url'])) {
+			$phpbb_seo->prepare_iurl($row, 'topic', '');
+		} else {
+			if ($phpbb_seo->modrtype > 2) {
+				$row['topic_title'] = censor_text($row['topic_title']);
+			}
+			$parent_forum = $row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : (!empty($phpbb_seo->seo_url['forum'][$topic_forum_id]) ? $phpbb_seo->seo_url['forum'][$topic_forum_id] : false);
+			if ($parent_forum) {
+				$phpbb_seo->prepare_iurl($row, 'topic', $parent_forum);
+			}
+		}
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="viewtopic.php">
+			<edit>
+				<find><![CDATA[include($phpbb_root_path . 'includes/bbcode.' . $phpEx);]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+if (empty($_REQUEST['f'])) {
+	$phpbb_seo->get_forum_id($session_forum_id);
+	if ($session_forum_id > 0) {
+		$_REQUEST['f'] = (int) $session_forum_id;
+	}
+}
+if (!empty($_REQUEST['hilit'])) {
+	$_REQUEST['hilit'] = rawurldecode($_REQUEST['hilit']);
+	if (!$phpbb_seo->is_utf8($_REQUEST['hilit'])) {
+		$_REQUEST['hilit'] = utf8_normalize_nfc(utf8_recode($_REQUEST['hilit'], 'iso-8859-1'));
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[$topic_id = (int) $topic_data['topic_id'];]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+$phpbb_seo->set_url($topic_data['forum_name'], $forum_id, 'forum');
+if ($topic_data['topic_type'] == POST_GLOBAL) {
+	// Let's make sure user will see global annoucements
+	$auth->cache[$forum_id]['f_read'] = 1;
+	$_parent = $phpbb_seo->seo_static['global_announce'];
+} else {
+	$_parent = $phpbb_seo->seo_url['forum'][$forum_id];
+}
+if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
+	if ( !$phpbb_seo->check_url('topic', $topic_data['topic_url'], $_parent)) {
+		if (!empty($topic_data['topic_url'])) {
+			// Here we get rid of the seo delim (-t) and put it back even in simple mod
+			// to be able to handle all cases at once
+			$_url = preg_replace('`' . $phpbb_seo->seo_delim['topic'] . '$`i', '', $topic_data['topic_url']);
+			$_title = $phpbb_seo->get_url_info('topic', $_url . $phpbb_seo->seo_delim['topic'] . $topic_id, 'title');
+		} else {
+			$_title = $phpbb_seo->modrtype > 2 ? censor_text($topic_data['topic_title']) : '';
+		}
+		unset($phpbb_seo->seo_url['topic'][$topic_id]);
+		$topic_data['topic_url'] = $phpbb_seo->get_url_info('topic', $phpbb_seo->prepare_url( 'topic', $_title, $topic_id, $_parent, (( empty($_title) || ($_title == $phpbb_seo->seo_static['topic']) ) ? true : false) ), 'url');
+		unset($phpbb_seo->seo_url['topic'][$topic_id]);
+		if ($topic_data['topic_url']) {
+			// Update the topic_url field for later re-use
+			$sql = "UPDATE " . TOPICS_TABLE . " SET topic_url = '" . $db->sql_escape($topic_data['topic_url']) . "'
+				WHERE topic_id = $topic_id";
+			$db->sql_query($sql);
+		}
+	}
+} else {
+	$topic_data['topic_url'] = '';
+}
+$phpbb_seo->prepare_iurl($topic_data, 'topic', $_parent);
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	$redirect_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id");]]></find>
+				<action type="replace-with"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	//$redirect_url = append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id");
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		login_box($redirect_url . "&amp;p=$post_id&amp;e=$jump_to", $user->lang['LOGIN_NOTIFY_TOPIC']);]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		login_box(append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;p=$post_id&amp;e=$jump_to"), $user->lang['LOGIN_NOTIFY_TOPIC']);
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		redirect($redirect_url . ((!$post_id) ? "&amp;p=$jump_to" : "&amp;p=$post_id") . "#p$jump_to");]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		redirect(append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id" . ((!$post_id) ? "&amp;p=$jump_to" : "&amp;p=$post_id")) . "#p$jump_to");
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	'U_TOPIC'				=> "{$server_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id",]]></find>
+				<action type="replace-with"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_TOPIC'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid($viewtopic_url) : "{$server_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id",
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? $viewtopic_url . '&amp;view=print' : '',]]></find>
+				<action type="replace-with"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start" . ((strlen($u_sort_param)) ? "&amp;$u_sort_param" : '') . (($highlight_match) ? "&amp;hilit=$highlight" : '') . "&amp;view=print") : '',
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	'U_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks']) ? $viewtopic_url . '&amp;bookmark=1&amp;hash=' . generate_link_hash("topic_$topic_id") : '',]]></find>
+				<action type="replace-with"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks']) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;bookmark=1&amp;hash=" . generate_link_hash("topic_$topic_id")) : '',
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		'U_VIEW_RESULTS'	=> $viewtopic_url . '&amp;view=viewpoll')]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'U_VIEW_RESULTS'	=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;view=viewpoll") )
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	$poster_id = (int) $row['poster_id'];]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$phpbb_seo->set_user_url( $row['username'], $poster_id );
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		'U_MINI_POST'		=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id']) . (($topic_data['topic_type'] == POST_GLOBAL) ? '&amp;f=' . $forum_id : '') . '#p' . $row['post_id'],]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'U_MINI_POST' => append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id'] . (($topic_data['topic_type'] == POST_GLOBAL) ? '&amp;f=' . $forum_id : '')) . '#p' . $row['post_id'],
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		'L_IGNORE_POST'		=> ($row['hide_post']) ? sprintf($user->lang['POST_BY_FOE'], get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']), '<a href="' . $viewtopic_url . "&amp;p={$row['post_id']}&amp;view=show#p{$row['post_id']}" . '">', '</a>') : '',]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'L_IGNORE_POST'		=> ($row['hide_post']) ? sprintf($user->lang['POST_BY_FOE'], get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']), '<a href="' . append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;p={$row['post_id']}&amp;view=show") . '#p' . $row['post_id'] . '">', '</a>') : '',
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="web.config">
+			<edit>
+				<find><![CDATA[</configuration>]]></find>
+				<action type="before-add"><![CDATA[	<!-- www.phpBB-SEO.com SEO TOOLKIT BEGIN -->
+	<location path="phpbb_seo">
+		<system.webServer>
+			<security>
+				<requestFiltering>
+					<hiddenSegments>
+						<add segment="cache" />
+					</hiddenSegments>
+				</requestFiltering>
+			</security>
+		</system.webServer>
+	</location>
+	<!-- www.phpBB-SEO.com SEO TOOLKIT END -->]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions.php">
+			<edit>
+				<find><![CDATA[function generate_pagination($base_url, $num_items, $per_page, $start_item, $add_prevnext_text = false, $tpl_prefix = '')
+{
+	global $template, $user;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo, $phpEx;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	$template->assign_vars(array(
+		$tpl_prefix . 'BASE_URL'		=> $base_url,
+		'A_' . $tpl_prefix . 'BASE_URL'	=> addslashes($base_url),
+		$tpl_prefix . 'PER_PAGE'		=> $per_page,
+
+		$tpl_prefix . 'PREVIOUS_PAGE'	=> ($on_page == 1) ? '' : $base_url . "{$url_delim}start=" . (($on_page - 2) * $per_page),
+		$tpl_prefix . 'NEXT_PAGE'		=> ($on_page == $total_pages) ? '' : $base_url . "{$url_delim}start=" . ($on_page * $per_page),
+		$tpl_prefix . 'TOTAL_PAGES'		=> $total_pages,
+	));]]></find>
+				<action type="replace-with"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$prev =  ($on_page == 1) ? '' : $base_url . "{$url_delim}start=" . (($on_page - 2) * $per_page);
+	$next = ($on_page == $total_pages) ? '' : $base_url . "{$url_delim}start=" . ($on_page * $per_page);
+	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+		static $pagin_find = array();
+		static $pagin_replace = array();
+		if (empty($pagin_replace)) {
+			$pagin_find = array('`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)(\.[a-z0-9]+)(\?[\w$%&~\-;:=,@+\.]+)?(#[a-z0-9_\.-]+)?(&amp;|\?)start=([0-9]+)`i', '`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\-]+)/(\?[\w$%&~\-;:=,@+\.]+)?(#[a-z0-9_\.-]+)?(&amp;|\?)start=([0-9]+)`i');
+			$pagin_replace = array( '\1' . $phpbb_seo->seo_delim['start'] . '\6\2\3\4', '\1/' . $phpbb_seo->seo_static['pagination'] . '\5' . $phpbb_seo->seo_ext['pagination'] . '\2\3');
+		}
+		$rewrite_pagination = false;
+		// here we rewrite rewritten urls only, and they do hold the full url with http
+		if (preg_match('`^https?://[a-z0-9_\.-]+/(.*)$`i', $base_url, $match)) {
+			$rewrite_pagination = true;
+			if (!empty($match[1])) {
+				// though, we won't do it for .php files.
+				if (preg_match('`^.*\.' . $phpEx . '(|\?.*|#.*)$`i', trim($match[1]))) {
+					$rewrite_pagination = false;
+
+				}
+			}
+
+		}
+		// in all cases remove the start=0 dupe
+		$page_string = str_replace($url_delim . 'start=0', '', $page_string);
+		$prev = str_replace($url_delim . 'start=0', '', $prev);
+		if ($rewrite_pagination) {
+			$page_string = preg_replace($pagin_find, $pagin_replace, $page_string);
+			$prev = $prev ? preg_replace($pagin_find, $pagin_replace, $prev) : '';
+			$next = $next ? preg_replace( $pagin_find, $pagin_replace, $next) : '';
+		} else {
+			// take care about eventual hashes
+			if (strpos($base_url, '#') !== false) {
+				static $hash_find = '`((https?\://)?[a-z0-9_/\.-]+\.[a-z0-9]+)(\?[\w$%&~\-;:=,@+\.]+)?(#[a-z0-9_\.-]+)((&amp;|\?)start=[0-9]+)`';
+				static $hash_replace = '\1\3\5\4';
+				$page_string = preg_replace($hash_find, $hash_replace, $page_string);
+				$prev = $prev ? preg_replace($hash_find, $hash_replace, $prev) : '';
+				$next = $next ? preg_replace($hash_find, $hash_replace, $next) : '';
+			}
+		}
+	}
+	$template->assign_vars(array(
+		$tpl_prefix . 'BASE_URL'	=> $base_url,
+		'A_' . $tpl_prefix . 'BASE_URL'	=> addslashes($base_url),
+		$tpl_prefix . 'PER_PAGE'	=> $per_page,
+		$tpl_prefix . 'PREVIOUS_PAGE'	=> $prev,
+		$tpl_prefix . 'NEXT_PAGE'	=> $next,
+		$tpl_prefix . 'TOTAL_PAGES'	=> $total_pages)
+	);
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function append_sid($url, $params = false, $is_amp = true, $session_id = false)
+{
+	global $_SID, $_EXTRA_URL, $phpbb_hook;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	// We bypass the hook function here, the same effect as a standalone hook, which we want, but faster ;-)
+	global $phpbb_seo;
+	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+		return $phpbb_seo->url_rewrite($url, $params, $is_amp, $session_id);
+	} else
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function page_header($page_title = '', $display_online_list = true, $item_id = 0, $item = 'forum')
+{
+	global $db, $config, $template, $SID, $_SID, $user, $auth, $phpEx, $phpbb_root_path;
+
+	if (defined('HEADER_INC'))
+	{
+		return;
+	}]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	$template->assign_vars( array( 'PHPBB_FULL_URL' => $phpbb_seo->seo_path['phpbb_url'],
+		'SEO_BASE_HREF' => $phpbb_seo->seo_opt['seo_base_href'],
+		'SEO_START_DELIM' => $phpbb_seo->seo_delim['start'],
+		'SEO_SATIC_PAGE' => $phpbb_seo->seo_static['pagination'],
+		'SEO_EXT_PAGE' => $phpbb_seo->seo_ext['pagination'],
+		'SEO_CANONICAL_URL' => !empty($phpbb_seo->seo_opt['no_dupe']['on']) ? $phpbb_seo->get_canonical() : '',
+		'SEO_EXTERNAL' => !empty($config['seo_ext_links']) ? 'true' : 'false',
+		'SEO_EXTERNAL_SUB' => !empty($config['seo_ext_subdomain']) ? 'true' : 'false',
+		'SEO_EXT_CLASSES' => !empty($config['seo_ext_classes']) ? "'" . preg_replace('`[^a-z0-9_|-]+`', '', str_replace(',', '|', trim($config['seo_ext_classes'], ', '))) . "'" : 'false',
+		'SEO_HASHFIX' => $phpbb_seo->seo_opt['url_rewrite'] && $phpbb_seo->seo_opt['virtual_folder'] ? 'true' : 'false',
+	));
+	if (isset($user->lang['Page']) && !empty($config['seo_append_sitename']) && !empty($config['sitename'])) {
+		$page_title = $page_title && strpos($page_title, $config['sitename']) === false ? $page_title . ' - ' . $config['sitename'] : $page_title;
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		'UA_POPUP_PM'			=> addslashes(append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=pm&amp;mode=popup')),]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'UA_POPUP_PM'			=> addslashes(append_sid($phpbb_seo->seo_path['phpbb_url'] . "ucp.$phpEx", 'i=pm&amp;mode=popup')),
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[/**
+* Generate page footer
+*/
+function page_footer($run_cron = true)
+{
+	global $db, $config, $template, $user, $auth, $cache, $starttime, $phpbb_root_path, $phpEx;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	if (!empty($phpbb_seo)) {
+		$phpbb_seo->seo_end();
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions_content.php">
+			<edit>
+				<find><![CDATA[function parse_attachments($forum_id, &$message, &$attachments, &$update_count, $preview = false)
+{
+	if (!sizeof($attachments))
+	{
+		return;
+	}
+
+	global $template, $cache, $user;
+	global $extensions, $config, $phpbb_root_path, $phpEx;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			$download_link = append_sid("{$phpbb_root_path}download/file.$phpEx", 'id=' . $attachment['attach_id']);]]></find>
+				<action type="replace-with"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			//$download_link = append_sid("{$phpbb_root_path}download/file.$phpEx", 'id=' . $attachment['attach_id']);
+			$download_link = "{$phpbb_root_path}download/file.$phpEx?id=" . $attachment['attach_id'];
+			$comment_clean = preg_replace('`<[^>]*>`Ui', ' ', $comment);
+			$block_array += array(
+				'COMMENT_CLEAN'		=> $comment_clean,
+			);
+			if (!empty($phpbb_seo->seo_opt['rewrite_files'])) {
+				if (empty($phpbb_seo->seo_url['file'][$attachment['attach_id']])) {
+					if (($_pos = utf8_strpos($comment, '<br')) !== false) {
+						$comment_url = strip_tags(utf8_substr($comment, 0, $_pos));
+					} else {
+						$comment_url = $comment_clean;
+					}
+					$comment_url = utf8_strlen($comment_url) > 60 ? utf8_substr($comment_url, 0, 60) : $comment_url;
+					$phpbb_seo->seo_url['file'][$attachment['attach_id']] = $phpbb_seo->format_url($comment_url, $phpbb_seo->seo_static['file'][$display_cat]);
+				}
+			}
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[					$block_array += array(
+						'S_FLASH_FILE'	=> true,
+						'WIDTH'			=> $width,
+						'HEIGHT'		=> $height,
+						'U_VIEW_LINK'	=> $download_link . '&amp;view=1',
+					);]]></find>
+				<action type="replace-with"><![CDATA[					$block_array += array(
+						'S_FLASH_FILE'	=> true,
+						'WIDTH'			=> $width,
+						'HEIGHT'		=> $height,
+						// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+						'U_VIEW_LINK'	=> append_sid($download_link . '&amp;view=1'),
+						// www.phpBB-SEO.com SEO TOOLKIT END
+					);]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			$l_download_count = (!isset($attachment['download_count']) || $attachment['download_count'] == 0) ? $user->lang[$l_downloaded_viewed . '_NONE'] : (($attachment['download_count'] == 1) ? sprintf($user->lang[$l_downloaded_viewed], $attachment['download_count']) : sprintf($user->lang[$l_downloaded_viewed . 'S'], $attachment['download_count']));]]></find>
+				<action type="before-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$download_link = append_sid($download_link);
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				$profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace(array('={USER_ID}', '=%7BUSER_ID%7D'), '=' . (int) $user_id, $_profile_cache['base_url']);]]></find>
+				<action type="replace-with"><![CDATA[				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+				// $profile_url = ($custom_profile_url !== false) ? $custom_profile_url . '&amp;u=' . (int) $user_id : str_replace(array('={USER_ID}', '=%7BUSER_ID%7D'), '=' . (int) $user_id, $_profile_cache['base_url']);
+				global $phpbb_seo, $phpbb_root_path, $phpEx;
+				$phpbb_seo->set_user_url( $username, $user_id );
+				if ($custom_profile_url !== false) {
+					$profile_url = reapply_sid($custom_profile_url . (strpos($custom_profile_url, '?') !== false ?  '&amp;' : '?' ) . 'u=' . (int) $user_id);
+				} else {
+					$profile_url = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=viewprofile&amp;u=' . (int) $user_id);
+				}
+				// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions_display.php">
+			<edit>
+				<find><![CDATA[function display_forums($root_data = '', $display_moderators = true, $return_moderators = false)
+{
+	global $db, $auth, $user, $template;
+	global $phpbb_root_path, $phpEx, $config;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	while ($row = $db->sql_fetchrow($result))
+	{
+		$forum_id = $row['forum_id'];]]></find>
+				<action type="after-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		$phpbb_seo->set_url($row['forum_name'], $forum_id, 'forum');
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function generate_forum_nav(&$forum_data)
+{
+	global $db, $user, $template, $auth, $config;
+	global $phpEx, $phpbb_root_path;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		foreach ($forum_parents as $parent_forum_id => $parent_data)
+		{
+			list($parent_name, $parent_type) = array_values($parent_data);]]></find>
+				<action type="after-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$phpbb_seo->set_url($parent_name, $parent_forum_id, 'forum');
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[/**
+* Generate topic pagination
+*/
+function topic_generate_pagination($replies, $url)
+{
+	global $config, $user;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo, $phpEx;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	}
+	else
+	{
+		$pagination = '';
+	}]]></find>
+				<action type="before-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+			static $pagin_find = array();
+			static $pagin_replace = array();
+			if (empty($pagin_find)) {
+				$pagin_find = array('`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)(\.(?!' . $phpEx . ')[a-z0-9]+)(\?[\w\#$%&~\-;:=,@+\.]+)?(&amp;|\?)start=([0-9]+)`i', '`(https?\://[a-z0-9_/\.-]+/[a-z0-9_\.-]+)/(\?[\w\#$%&~\-;:=,@+\.]+)?(&amp;|\?)start=([0-9]+)`i' );
+				$pagin_replace = array( '\1' . $phpbb_seo->seo_delim['start'] . '\5\2\3', '\1/' . $phpbb_seo->seo_static['pagination'] . '\4' . $phpbb_seo->seo_ext['pagination'] . '\2' );
+			}
+			$pagination = preg_replace( $pagin_find, $pagin_replace, $pagination );
+		}
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function get_moderators(&$forum_moderators, $forum_id = false)
+{
+	global $config, $template, $db, $phpbb_root_path, $phpEx, $user, $auth;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			$group_name = (($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name']);]]></find>
+				<action type="before-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$phpbb_seo->prepare_url('group', $row['group_name'], $row['group_id']);
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function display_user_activity(&$userdata)
+{
+	global $auth, $template, $db, $user;
+	global $phpbb_root_path, $phpEx;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		$sql = 'SELECT topic_title
+			FROM ' . TOPICS_TABLE . '
+			WHERE topic_id = ' . $active_t_row['topic_id'];
+		$result = $db->sql_query($sql);
+		$active_t_row['topic_title'] = (string) $db->sql_fetchfield('topic_title');
+		$db->sql_freeresult($result);]]></find>
+				<action type="replace-with"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		$sql_array = array(
+			'SELECT'	=> 't.topic_title, t.topic_type ' . (!empty($phpbb_seo->seo_opt['sql_rewrite']) ? ', t.topic_url' : '') . ', f.forum_id, f.forum_name',
+			'FROM'		=> array(
+				TOPICS_TABLE	=> 't',
+			),
+			'LEFT_JOIN' => array(
+				array(
+					'FROM'	=> array(FORUMS_TABLE => 'f'),
+					'ON'	=> 'f.forum_id = t.forum_id',
+				),
+			),
+			'WHERE' => 't.topic_id = ' . (int) $active_t_row['topic_id']
+		);
+		$result = $db->sql_query($db->sql_build_query('SELECT', $sql_array));
+		$seo_active_t_row = $db->sql_fetchrow($result);
+		$db->sql_freeresult($result);
+		if ($seo_active_t_row) {
+			$active_t_row = array_merge($active_t_row, $seo_active_t_row);
+		}
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		$active_f_pct = ($userdata['user_posts']) ? ($active_f_count / $userdata['user_posts']) * 100 : 0;]]></find>
+				<action type="after-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		$phpbb_seo->set_url($active_f_name, $active_f_id, 'forum');
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		$active_t_pct = ($userdata['user_posts']) ? ($active_t_count / $userdata['user_posts']) * 100 : 0;]]></find>
+				<action type="after-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		if (!empty($seo_active_t_row)) {
+			$active_t_forum_id = (int) $active_t_row['forum_id'];
+			$phpbb_seo->set_url($active_t_row['forum_name'], $active_t_forum_id, 'forum');
+			$phpbb_seo->prepare_iurl($active_t_row, 'topic', $active_t_row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$active_t_forum_id]);
+		}
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions_posting.php">
+			<edit>
+				<find><![CDATA[				$messenger->assign_vars(array(
+					'USERNAME'		=> htmlspecialchars_decode($addr['name']),
+					'TOPIC_TITLE'	=> htmlspecialchars_decode($topic_title),
+					'FORUM_NAME'	=> htmlspecialchars_decode($forum_name),
+
+					'U_FORUM'				=> generate_board_url() . "/viewforum.$phpEx?f=$forum_id",
+					'U_TOPIC'				=> generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id",]]></find>
+				<action type="replace-with"><![CDATA[				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+				global $phpbb_seo;
+				$phpbb_seo->set_url(htmlspecialchars_decode($forum_name), $forum_id, 'forum');
+				$phpbb_seo->prepare_iurl(array('topic_id' => $topic_id, 'topic_title' => htmlspecialchars_decode($topic_title)), 'topic', $phpbb_seo->seo_url['forum'][$forum_id]);
+				$messenger->assign_vars(array(
+					'USERNAME'		=> htmlspecialchars_decode($addr['name']),
+					'TOPIC_TITLE'	=> htmlspecialchars_decode($topic_title),
+					'FORUM_NAME'	=> htmlspecialchars_decode($forum_name),
+
+					'U_FORUM'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid(append_sid("{$phpbb_root_path}viewforum.$phpEx?f=$forum_id")) : generate_board_url() . "/viewforum.$phpEx?f=$forum_id",
+					'U_TOPIC'				=> !empty($phpbb_seo->seo_opt['url_rewrite']) ? $phpbb_seo->drop_sid(append_sid("{$phpbb_root_path}viewtopic.$phpEx?f=$forum_id&amp;t=$topic_id")) : generate_board_url() . "/viewtopic.$phpEx?f=$forum_id&t=$topic_id",
+				// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function submit_post($mode, $subject, $username, $topic_type, &$poll, &$data, $update_message = true, $update_search_index = true)
+{
+	global $db, $auth, $user, $config, $phpEx, $template, $phpbb_root_path;]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				'topic_attachment'			=> (!empty($data['attachment_data'])) ? 1 : 0,
+			);]]></find>
+				<action type="after-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
+				$sql_data[TOPICS_TABLE]['sql'] += array('topic_url' => isset($data['topic_url']) ? $data['topic_url'] : '');
+			}
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				'topic_attachment'			=> (!empty($data['attachment_data'])) ? 1 : (isset($data['topic_attachment']) ? $data['topic_attachment'] : 0),
+			);]]></find>
+				<action type="after-add"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			if (!empty($phpbb_seo->seo_opt['sql_rewrite'])) {
+				$sql_data[TOPICS_TABLE]['sql'] += array('topic_url' => isset($data['topic_url']) ? $data['topic_url'] : '');
+			}
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	$url = (!$params) ? "{$phpbb_root_path}viewforum.$phpEx" : "{$phpbb_root_path}viewtopic.$phpEx";
+	$url = append_sid($url, 'f=' . $data['forum_id'] . $params) . $add_anchor;]]></find>
+				<action type="before-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$phpbb_seo->set_url($data['forum_name'], $data['forum_id'], 'forum');
+	if ( $params ) {
+		$phpbb_seo->prepare_iurl($data, 'topic', $topic_type == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : $phpbb_seo->seo_url['forum'][$data['forum_id']]);
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="includes/session.php">
+			<edit>
+				<find><![CDATA[			if (isset($_GET['sid']))
+			{
+				redirect(build_url(array('sid')));
+			}]]></find>
+				<action type="replace-with"><![CDATA[			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			// This part will be fixed in 3.0.9 (see http://tracker.phpbb.com/browse/PHPBB3-9908)
+			// But as is or updated, it will not mix well with USU and Zero Duplicate (which already removes them)
+			// Bot user, if they have a SID in the Request URI we need to get rid of it
+			// otherwise they'll index this page with the SID, duplicate content oh my!
+			/*if (isset($_GET['sid']))
+			{
+				redirect(build_url(array('sid')));
+			}*/
+			// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="includes/db/dbal.php">
+			<edit>
+				<find><![CDATA[	function sql_report($mode, $query = '')
+	{
+		global $cache, $starttime, $phpbb_root_path, $user;]]></find>
+				<action type="after-add"><![CDATA[		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		global $phpbb_seo;
+		// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[						<link href="' . $phpbb_root_path . 'adm/style/admin.css" rel="stylesheet" type="text/css" media="screen" />]]></find>
+				<action type="replace-with"><![CDATA[						<link href="' . $phpbb_seo->seo_path['phpbb_url'] . 'adm/style/admin.css" rel="stylesheet" type="text/css" media="screen" />]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/attachment.html">
+			<edit>
+				<find><![CDATA[			<dt><a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" title="{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}" /></a></dt>]]></find>
+				<action type="replace-with"><![CDATA[			<dt><a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / {_file.DOWNLOAD_NAME}<!-- ELSE -->{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}<!-- ENDIF -->" /></a></dt>]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			<dt class="attach-image"><img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" onclick="viewableArea(this);" /></dt>]]></find>
+				<action type="replace-with"><![CDATA[			<dt class="attach-image"><img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}" onclick="viewableArea(this);" /></dt>]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			<dt><!-- IF _file.UPLOAD_ICON -->{_file.UPLOAD_ICON} <!-- ENDIF --><a class="postlink" href="{_file.U_DOWNLOAD_LINK}">{_file.DOWNLOAD_NAME}</a></dt>]]></find>
+				<action type="replace-with"><![CDATA[			<dt><!-- IF _file.UPLOAD_ICON -->{_file.UPLOAD_ICON} <!-- ENDIF --><a class="postlink" href="{_file.U_DOWNLOAD_LINK}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}">{_file.DOWNLOAD_NAME}</a></dt>]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/forum_fn.js">
+			<edit>
+				<find><![CDATA[function jumpto()
+{
+	var page = prompt(jump_page, on_page);
+
+	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0)
+	{
+		if (base_url.indexOf('?') == -1)
+		{
+			document.location.href = base_url + '?start=' + ((page - 1) * per_page);
+		}
+		else
+		{
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * per_page);
+		}
+	}
+}]]></find>
+				<action type="replace-with"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+function jumpto() {
+	var page = prompt(jump_page, on_page);
+
+	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0) {
+		var seo_page = (page - 1) * per_page;
+		var anchor = '';
+		var anchor_parts = base_url.split('#');
+		if ( anchor_parts[1] ) {
+			base_url = anchor_parts[0];
+			anchor = '#' + anchor_parts[1];
+		}
+		if ( base_url.indexOf('?') >= 0 ) {
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page + anchor;
+		} else if ( seo_page > 0 ) {
+			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
+			if (seo_type1 !== null) {
+				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1 + anchor;
+			}
+			var seo_type2 = base_url.match(/\/$/);
+			if (seo_type2 !== null) {
+				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination + anchor;
+			}
+		} else {
+			document.location.href = base_url + anchor;
+		}
+	}
+}
+// Open external links in new window in a XHTML 1.x compliant way.
+/**
+*  phpbb_seo_href()
+*  Fixes href="#something" links with virtual directories
+*  Optionally open external or marked with a css class links in a new window
+*  in a XHTML 1.x compliant way.
+*/
+function phpbb_seo_href() {
+	var current_domain = document.domain.toLowerCase();
+	if (!current_domain || !document.getElementsByTagName) return;
+	if (seo_external_sub && current_domain.indexOf('.') >= 0) {
+		current_domain = current_domain.replace(new RegExp(/^[a-z0-9_-]+\.([a-z0-9_-]+\.([a-z]{2,6}|[a-z]{2,3}\.[a-z]{2,3}))$/i), '$1');
+	}
+	if (seo_ext_classes) {
+		var extclass = new RegExp("(^|\s)(" + seo_ext_classes + ")(\s|$)");
+	}
+	if (seo_hashfix) {
+		var basehref = document.getElementsByTagName('base')[0];
+		if (basehref) {
+			basehref = basehref.href;
+			var hashtest = new RegExp("^(" + basehref + "|)#[a-z0-9_-]+$");
+			var current_href = document.location.href.replace(/#[a-z0-9_-]+$/i, "");
+		} else {
+			seo_hashfix = false;
+		}
+	}
+	var hrefels = document.getElementsByTagName("a");
+	var hrefelslen = hrefels.length;
+	for (var i = 0; i < hrefelslen; i++) {
+		var el = hrefels[i];
+		var hrefinner = el.innerHTML.toLowerCase();
+		if (el.onclick || (el.href == '') || (el.href.indexOf('javascript') >=0 ) || (el.href.indexOf('mailto') >=0 ) || (hrefinner.indexOf('<a') >= 0) ) {
+			continue;
+		}
+		if (seo_hashfix && el.hash && hashtest.test(el.href)) {
+			el.href = current_href + el.hash;
+		}
+		if (seo_external) {
+			if ((el.href.indexOf(current_domain) >= 0) && !(seo_ext_classes && extclass.test(el.className))) {
+				continue;
+			}
+			el.onclick = function () { window.open(this.href); return false; };
+		}
+	}
+}
+if (seo_external || seo_hashfix) {
+	onload_functions.push('phpbb_seo_href()');
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_header.html">
+			<edit>
+				<find><![CDATA[<head>]]></find>
+				<action type="after-add"><![CDATA[{SEO_BASE_HREF}]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	var onload_functions = new Array();
+	var onunload_functions = new Array();]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	var seo_delim_start = '{SEO_START_DELIM}';
+	var seo_static_pagination = '{SEO_SATIC_PAGE}';
+	var seo_ext_pagination = '{SEO_EXT_PAGE}';
+	var seo_external = {SEO_EXTERNAL};
+	var seo_external_sub = {SEO_EXTERNAL_SUB};
+	var seo_ext_classes = {SEO_EXT_CLASSES};
+	var seo_hashfix = {SEO_HASHFIX};
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/posting_editor.html">
+			<edit>
+				<find><![CDATA[	<dl style="clear: left;">
+		<dt><label for="subject">{L_SUBJECT}:</label></dt>
+		<dd><input type="text" name="subject" id="subject" size="45" maxlength="<!-- IF S_NEW_MESSAGE -->60<!-- ELSE -->64<!-- ENDIF -->" tabindex="2" value="{SUBJECT}{DRAFT_SUBJECT}" class="inputbox autowidth" /></dd>
+	</dl>]]></find>
+				<action type="after-add"><![CDATA[	<!-- IF S_URL -->
+	<dl style="clear: left;">
+		<dt><label for="url">URL:</label></dt>
+			<dd><input type="text" name="url" id="url" size="45" maxlength="250" tabindex="2" value="{TOPIC_URL}" class="inputbox autowidth" /></dd>
+	</dl>
+	<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/simple_header.html">
+			<edit>
+				<find><![CDATA[<head>]]></find>
+				<action type="after-add"><![CDATA[{SEO_BASE_HREF}]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[	var onload_functions = new Array();
+	var onunload_functions = new Array();
+	var style_cookie_settings = '{A_COOKIE_SETTINGS}';]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	var seo_delim_start = '{SEO_START_DELIM}';
+	var seo_static_pagination = '{SEO_SATIC_PAGE}';
+	var seo_ext_pagination = '{SEO_EXT_PAGE}';
+	var seo_external = {SEO_EXTERNAL};
+	var seo_external_sub = {SEO_EXTERNAL_SUB};
+	var seo_ext_classes = {SEO_EXT_CLASSES};
+	var seo_hashfix = {SEO_HASHFIX};
+	// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/viewtopic_body.html">
+			<edit>
+				<find><![CDATA[<a href="#p{postrow.POST_ID}">]]></find>
+				<inline-edit>
+					<inline-find><![CDATA[#p{postrow.POST_ID}]]></inline-find>
+					<inline-action type="before-add"><![CDATA[{U_VIEW_TOPIC}]]></inline-action>
+				</inline-edit>
+			</edit>
+			<edit>
+				<find><![CDATA[<a href="#wrap" class="top" title="{L_BACK_TO_TOP}">]]></find>
+				<inline-edit>
+					<inline-find><![CDATA[#wrap]]></inline-find>
+					<inline-action type="before-add"><![CDATA[{U_VIEW_TOPIC}]]></inline-action>
+				</inline-edit>
+			</edit>
+		</open>
+		<php-installer><![CDATA[phpbb_seo/phpbb_seo_install.php]]></php-installer>
+		<diy-instructions lang="en"><![CDATA[________________________________________
+>>>>   INSTALLATION INSTRUCTION    <<<<<
+________________________________________
+
+You will find the premodded phpBB 3.0.8 files in contrib/phpBB_3.0.8_modified_files/root/,
+you can safely overwrite the phpBB 3.0.8 files with these and skip the file editing part of this install
+if you did not modify these before you install this mod.
+
+A phpBB 3.0.8 => ultimate mod rewrite 0.6.6 diff file is as well available in the
+contrib/ directory of this release.
+
+___________
+IMPORTANT :
+________________________________________
+Before you start, read this with caution.
+=> For a smooth install :
+	1) Backup all your files;
+	2) Apply the mod code changes on copies of your files;
+	3) Upload all files;
+	4) CHMOD the phpbb_seo/cache/ folder to 0777;
+	5) Empty the phpBB/cache/ folder : just delete all files EXCEPTS the .htaccess.
+	6) Go to yoursite.com/phpBB/phpbb_seo/phpbb_seo_install.php and follow the install instruction
+	7) Go to phpBB ACP : It's now time to play with settings described bellow;
+	8) Generate your personalized .htaccess and upload or move it following the instructions;
+	9) Test a rewritten URL, such as yoursite.com/phpBB/post1.html, if you end up with a 404 (not a phpBB message), go back to step 8;
+	10) Activate URL rewriting in phpBB ACP and allow yourself some auto-congratulation :D
+________________________________________
+
+Once you will have installed the mod, you will have to refresh your theme's cache as well as phpBB's cache (ACP => STYLE, Themes => Refresh).
+
+__________
+Settings :
+__________
+
+The settings must be done before step 4 above for the generated .htaccess to be up to date.
+Later modification will most likely require a new .htaccess as well as personalized redirections.
+
+IMPORTANT :
+	A new option was added staring from v0.6.0 : SQL rewriting.
+
+	This option will allow you to choose url for each topic. You will be able to accurately set topic url when posting new
+	topic or when editing an existing one. This functionality is though limited to forum admins and moderators.
+	Turning on this option will not change topic urls. Existing urls will be stored as they are displayed in the data
+	base.
+	But it may not be the case if you turn it off after you started to use it. In such case, personalized URLs may be
+	treated as if they weren't.
+	The feature also has the great advantage to fasten the url rewriting by a lot, especially when using the virtual folder
+	option in advanced mode, and to make it a lot easier to retrieve rewritten urls from any page.
+
+	If you start using this option after you updated from prior to 3.0.5, or if you are installing the premod over a
+	pre-existing phpBB install, you should run the phpbb_seo/sync_url.php script to update the data base (with topic urls).
+	Doing this will not change your URLs. If you do not run the script, topic urls will be updated in the data base each time
+	topics will be first visited.
+
+
+=> By Default, this mod will get rid of index.php for phpBB's index.
+
+You can change this in phpbb_seo/includes/setup_phpbb_seo.php if you prefer.
+To do this, you can for example add :
+
+		$this->seo_static['index'] = 'forum';
+
+before :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+
+This is mostly useful if you're running a portal in the folder where phpBB is installed.
+
+=> The first setting to do is to select which static part to use in your URLs.
+
+To do so, you can override default values in phpbb_seo/includes/setup_phpbb_seo.php, still before :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+EXAMPLES :
+__________
+
+// => the-team :
+		$this->seo_static['leaders'] = 'my-team'; // instead of the default "the-team"
+
+// => announces :
+		$this->seo_static['global_announce'] = 'announcements'; // instead of the default "announces"
+
+// => Active topics :
+		$this->seo_static['atopic'] = 'important-topics'; // instead of the default "active-topics"
+
+// => Unaswered :
+		$this->seo_static['utopic'] = 'not-answered'; // instead of the default "unanswered"
+
+// => Newposts :
+		$this->seo_static['npost'] = 'new-messages'; // instead of the default "newposts"
+
+=> As well as for (and the same way) :
+forum ($this->seo_static['forum']), topic ($this->seo_static['topic']), post ($this->seo_static['post']), member ($this->seo_static['member']), groups ($this->seo_static['group']), attachments virtual directory ($this->seo_static['file_index'], read the comments in the file for more attachments customizing) and virtual folder pagination ($this->seo_static['page'])
+
+________________________________________________________________________________________________________
+
+
+=> And the suffixes too, if you do not like .html, using the phpbb_seo::seo_ext array ($this->seo_ext) still before :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+EXAMPLES :
+__________
+		$this->seo_ext['forum'] = '.htm';
+		$this->seo_ext['topic'] = '/';
+
+	PLEASE NOTE :
+	_____________
+	Suffixes may not be ".php" or empty, if you set a suffix to "/", it will automatically activate the pagexx.html pagination.
+
+Once set, these settings will be taken into account while generating the .htaccess.
+
+________________________________________________________________________________________________________
+
+
+=> Other options are configurable on the setting page (step 7 of the above list).
+Go to the "phpBB SEO Class Settings" page, and take your time to set up the class as you wish.
+
+=> It is now time to play with your forum URLs.
+To do so, go to the "Forum URL management" page and start selecting good keywords for your forum URLs.
+Take your time to do it, and remember that using the remove IDs option in the settings makes it a bit harder to build appropriate redirection, in case you edit the forum URLs later.
+If you later create more forums, you'll just have to go to this page again an eventually update the
+new forum URL.
+If not, the new forum URL will not be cached and the default one will be used (forum-title-fxx).
+
+________________________________________
+Custom replacement for title injection :
+________________________________________
+
+The phpbb_seo class handles de-accentuation for most of the occidental characters, but you could need to handle more cases for your project.
+Starting from v0.6.0, we introduced a simple way to set up custom replacements.
+This is useful for special characters not properly handled by default, such as Russian ones (Г => G), or to implement custom replacements such as $ => dollar.
+It works with any string, but you MUST perform the edits with an UTF-8 (without BOM) capable text editor.
+This is still done in phpbb_seo/includes/setup_phpbb_seo.php, and still before :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+The principle is simple, you can set up your custom replacement by filling the phpbb_seo::url_replace array ($this->url_replace).
+The pattern to use is :
+
+		$this->url_replace = array(
+			'character(s) to find' => 'replacement to apply',
+		);
+
+EXAMPLE :
+_________
+
+		$this->url_replace = array(
+			// Purely cosmetic replace
+			'$' => 'dollar', '€' => 'euro',
+			"'s" => 's', // it's => its / mary's => marys ...
+			// Language specific replace (German example)
+			'ß' => 'ss',
+			'Ä' => 'Ae', 'ä' => 'ae',
+			'Ö' => 'Oe', 'ö' => 'oe',
+			'Ü' => 'Ue', 'ü' => 'ue',
+		);
+
+Just make sure that the characters you may add are not already handled properly but the default replacements before you add some more.
+Please note that English characters are already properly handled.
+Please read for more details : http://www.phpbb-seo.com/en/phpbb-mod-rewrite/custom-title-injection-t4709.html
+___________
+NOTE: Cache
+___________
+The cache files are in the phpbb_seo_/cache/ folder.
+phpbb_cache.php is the cached file containing both your settings and forum URLs.
+
+The mod always creates a backups of the current cached file :
+	=> phpbb_cache.php.current is a copy of the phpbb_cache.php file.
+	It will automatically be used in case phpbb_cache.php is deleted or corrupted (which should not occur but).
+	=> phpbb_cache.php.old is a copy of the previous settings you had set, before the last update you performed.
+
+You should backup these file when you update them, they are as crucial as you data base for your forum
+since they are required for your forum URL to work properly.
+So relax, this is just a basic precaution, you should not have trouble with these,
+but never is better, hence the backup.
+
+_________________
+NOTE: .htaccess :
+_________________
+
+On the phpBB SEO ACP module, go to the ".htaccess" page.
+A personalised .htaccess will be generated. It's the first one to consider trying.
+You will have too put it where the red bolded messages of the .htaccess generator tells you to.
+If you cannot find the location mentioned, it means that you did not properly set your phpBB server settings in the ACP.
+If the default suggestion does not work, you will be to try more options, and generate several alternative.
+You'll find an empty .htaccess file in this mod's archive contrib/ folder, you can use it to paste the .htaccess content generated on the htaccess page or save it directly on the server (saved .htaccess will be found in the phpbb/cache/ directory).
+
+The .htaccess generator will add the required rewriterules to make your domain canonical, but they will be
+left commented (un-active) at first, as this is the kind of thing that require human attention.
+Please take a look at : http://www.phpbb-seo.com/en/seo-techniques/locking-the-www-in-urls-t30.html
+to find out how to lock the use (or non use) of the www prefix in your domain's url.
+This is a major Search Engine Optimisation issue to take care of the www prefix issue.
+
+__________________
+NOTE: robots.txt :
+__________________
+
+You will find a sample robots.txt file in the contrib/ folder of this package.
+The robots.txt file must be uploaded in your domain's root folder (can be different from the phpBB one).
+You must obviously replace phpbb/ with your real phpBB installation folder (or with nothing if it's installed in the domain's root).
+
+IMPORTANT :
+	If your forum previously was indexed with the natural urls (viewtopic.php etc...), then you must make sure
+	that the robots.txt advised for our mod rewrite is not installed, if so DELETE it from the server.
+	This because we want to redirect old urls before we disallow them, it's CRUCIAL!
+	In such case, at least two after you install and activate the zero duplicate (http://www.phpbb-seo.com/en/zero-duplicate/phpbb-seo-zero-duplicate-t1220.html), you can start thinking about implementing the robots.txt.
+
+__________________________________________________
+NOTE: profile and user messages pages ID removing:
+__________________________________________________
+
+phpBB/member/nicknames VS  phpBB/nicknames-uxx.html
+
+If you use profile and / or user messages pages ID removing, you should know that a custom urlencode
+will be used to circumvent a bug with mod_rewrite.
+This imply that some chars like "&", "/", "#" and spaces will always be double encoded.
+For example a user named rock&roll will require rock%2526roll (double urlencoded &) to be usable.
+( http://www.php.net/urlencode => http://issues.apache.org/bugzilla/show_bug.cgi?id=34602 )
+
+There are other issues with custom characters, like accents, which will add some urlencoded chars in urls.
+It's not an SEO issue, since bots knows about urlencoding, but it can end up building pretty long url with multi byte characters.
+This does not concern the a-zA-Z0-9 chars, underscore ("_"), hyphen ("-") and dot (".") included.
+In phpbb_seo/phpbb_seo_class.php, you will no longer see different methods.
+
+This of course means that the ID removing on profile and user messages pages is more comfy and universally efficient
+to use with alphanumeric chars user names (without accents).
+
+If you only allow alphanumeric chars for your user nicknames, then you can make the injection process faster by adding :
+
+	return $url;
+
+right after :
+
+	function seo_url_encode( $url ) {
+
+Remember that keeping the ID here will always work and that you still can simulate a folder structure for user messages pages.]]></diy-instructions>
+		<diy-instructions lang="fr"><![CDATA[_____________________________________________
+>>>>   INSTALLATION POUR VOTRE FORUM    <<<<<
+_____________________________________________
+
+Vous trouverez les fichiers pré-modifiés pour phpBB 3.0.8 dans le dossier contrib/phpBB_3.0.8_modified_files/root/.
+Vous pouvez les utilisez et ne pas procéder aux changement de code manuels de cette installation si vous ne les avez pas modifiés avant d'installer ce mod.
+
+Un fichier diff phpBB 3.0.8 => Ultimate mod rewrite 0.6.6 est également disponible dans le dossier contrib/ du présent package.
+
+_____________
+TRADUCTIONS :
+_____________
+
+Les fichiers de langues française sont incluses par défaut.
+
+___________
+IMPORTANT :
+______________________________________________________
+Avant de commencer, lisez attentivement ce qui suit.
+=> Pour une installation en douceur :
+	1) Faites une sauvegardes de vos fichiers;
+	2) Appliquez tous les changements ci dessous sur des copies de vos fichiers;
+	3) Uploadez tous les fichiers;
+	4) CHMODez le dossier phpbb_seo/cache/ à 0777;
+	5) Videz le dossier phpBB/cache/ : effacez simplement tout son contenu SAUF le .htaccess.
+	6) Rendez vous sur votresite.com/phpBB/phpbb_seo/phpbb_seo_install.php et suivez les instruction d'installation.
+	7) Rendez vous dans l'ACP de phpBB : C'est le moment de faire des réglages, décrits ci dessous;
+	8) Générez votre .htaccess et uploadez le en suivant les instructions de l'interface;
+	9) Testez une URL réécrite, comme votresite.com/phpBB/post1.html, si vous obtenez une 404 (pas un message de phpBB), revenez à l'étape précédente;
+	10) Activez la réécriture d'URL et accordez vous une pointe d'autosatisfaction :D
+______________________________________________________
+
+Une fois les nouveaux fichiers en place, il vous faudra vider le cache de phpBB et rafraîchir vos thèmes (ACP => STYLE => Thèmes => Rafraîchir).
+
+___________
+ Réglages :
+___________
+
+Les réglages doivent être fait avant l'étape numéro 4 ci dessus,
+des modification tardives entraîneront probablement des changement dans le .htaccess,
+et pourront nécessiter des redirections personnalisées.
+
+IMPORTANT :
+	Une nouvelle option a été introduite depuis la version 0.6.0 : Le stockage des URL de sujets dans la base de donnée.
+
+	Cette option permet d’activer les url personnalisées pour les sujets. Vous pourrez alors choisir une url précise pour
+	chaque sujet, soit au moment de le créer, soit en éditant simplement celui-ci. Cette possibilité est toutefois réservée
+	aux administrateurs et modérateurs du forum.
+	L’activation de cette option est sans conséquence sur vos url existantes, elles seront stockées telles qu’elles dans la
+	base de donnée. Cependant, cela ne pourrait plus être le cas si vous désactivez l’option après l’avoir utilisée. Les URLs
+	qui auraient été personnalisées pourraient alors de nouveau être traités comme si elle ne l’étaient pas.
+	L’option a également le mérite de rendre beaucoup plus rapide la réécriture, principalement en mode avancé avec dossier
+	virtuels, et de permettre une récupération bien plus simple des url récrites depuis n’importe quelle page.
+
+	Si vous mettez à jour depuis une version antérieure à la 3.0.5 ou si vous installez la premod sur une installation de
+	phpBB existante, vous pouvez (et devriez) lancer le script phpbb_seo/sync_url.php pour mettre à jour la base de donnée
+	(ajout des url de sujets) d'un coup.
+	Cette opération ne changera pas vos url, si vous n'utilisez pas le script, les url de chaque sujets seront mise à jour
+	dans la base de donnée lors de la première (nouvelle) visite de chaque sujet.
+
+
+=> Par défaut, ce mod va retirer index.php de l'URL de l'index de phpBB.
+
+Vous pouvez changer cela dans phpbb_seo/includes/setup_phpbb_seo.php.
+Pour ce faire vous pouvez par exemple ajouter :
+
+		$this->seo_static['index'] = 'forum';
+
+avant :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+
+C'est surtout pratique dans le cas ou vous utiliseriez un portail dans le même dossier que phpBB.
+
+=> Les premiers réglages à faire sont le choix des parties statiques de vos URL, dont forum.html fait parti.
+Pour ce faire, vous pouvez écraser les valeurs par défaut dans phpbb_seo/includes/setup_phpbb_seo.php, toujours avant :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+EXEMPLES :
+__________
+
+		$this->seo_static = array( 'forum' => 'forum', 'topic' => 'topic', 'post' => 'post', 'user' => 'member', 'group' => 'group', 'index' => '', 'global_announce' => 'announces', 'leaders' => 'the-team', 'atopic' => 'active-topics', 'utopic' => 'unanswered', 'npost' => 'newposts', 'pagination' => 'page', 'gz_ext' => '.gz' );
+
+// => equipe
+		$this->seo_static['leaders'] = 'mon-equipe'; // au lieux de "equipe" (par défaut)
+
+// => annonces
+		$this->seo_static['global_announce'] = 'annonces-importantes'; // au lieux de "annonces" (par défaut)
+
+// => Sujets actifs :
+		$this->seo_static['atopic'] = 'sujets-importants'; // au lieux de "sujets-actifs" (par défaut)
+
+// => Unaswered :
+		$this->seo_static['utopic'] = 'pas-de-reponses'; // au lieux de "sans-reponses" (par défaut)
+
+	=> Newposts :
+		$this->seo_static['npost'] = 'nouveaux'; // au lieux de "nouveaux-messages" (par défaut)
+
+=> Ainsi que pour (et de la même manière) :
+forum ($this->seo_static['forum']), topic ($this->seo_static['topic']), post ($this->seo_static['post']), member ($this->seo_static['member']), groups ($this->seo_static['group']), dossier virtuel des fichiers joints ($this->seo_static['file_index'], reportez vous aux commentaire du fichiers pour plus de détails sur les fichiers joints) ainsi que la pagination pour les dossier virtuels ($this->seo_static['page'])
+
+________________________________________________________________________________________________________
+
+
+=> et les extensions, si .html ne vous conviens pas, en utilisant cette fois le tableau phpbb_seo::seo_ext ($this->seo_ext) et toujours avant :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+EXEMPLES :
+__________
+		$this->seo_ext['forum'] = '.htm';
+		$this->seo_ext['topic'] = '/';
+
+	NOTA BENE :
+	___________
+	Les extensions ne peuvent pas prendre la valeur ".php" ni être vides, si vous configurer une extensions à "/", cela activera automatiquement la pagination en pagexx.html
+
+________________________________________________________________________________________________________
+
+
+Ces changements seront pris en compte lors de la génération du .htaccess.
+
+=> Les autres options sont accessible sur une page de réglage, stade 7) de l'installation.
+Rendez vous tout d'abords sur la page "Réglages de la classe phpBB SEO", et faites les réglages qui vous conviennent.
+
+=> C'est le moment de jouer avec les URLs de vos forums.
+Pour cela, rendez vous sur la page "Gestion des URL des Forums", et commencez à choisir
+de bon mots clés pour les URLs de vos forums.
+Prenez votre temps pour ce faire, et n'oubliez pas que d'utiliser l'option
+"Retirer les IDs de forum" rendra les redirections un peu plus compliquées si vous modifiez
+des URLs de forum après avoir commencer à les utiliser.
+Si vous créez de nouveaux forums par la suite, vous devrez simplement vous rendre de nouveaux
+sur la page "Gestion des URL des Forums" pour personnaliser l'url de votre forum.
+Si non, l'url ne sera pas en cache, et celle par défaut sera utilisée pour ce forum (titre-forum-fxx).
+
+_______________________________________
+Customisation des injections de titre :
+_______________________________________
+
+La classe phpbb_seo prend en charge la dés-accentuation de la plupart des caractères occidentaux, mais il se peut que cela ne suffise pas pour votre projet.
+A partir de la version 0.6.0, nous avons introduit une méthode simple pour mettre en place des remplacements spéciaux.
+C'est utile pour les caractères spéciaux qui ne seraient pas ou mal pris en charge par défaut, comme les caractères Russes (Г => G), ou pour mettre en place des remplacement spéciaux comme € => euro.
+Cela fonctionne avec n'importe quelle chaîne de caractères pourvu que vous utilisez un éditeur de texte supportant l'UTF-8 sans BOM.
+Cela se met en place dans phpbb_seo/includes/setup_phpbb_seo.php, toujours avant :
+
+		// Let's make sure that settings are consistent
+		$this->check_config();
+
+Le principe est simple, vous devez juste remplir le tableau phpbb_seo::url_replace ($this->url_replace).
+De cette manière :
+
+		$this->url_replace = array(
+			'caractère(s) à trouver' => 'remplacement à appliquer',
+		);
+
+EXEMPLE :
+_________
+
+		$this->url_replace = array(
+			// Remplacements spéciaux
+			'$' => 'dollar', '€' => 'euro',
+			// Remplacements pour une langue (exemple pour l'allemand)
+			'ß' => 'ss',
+			'Ä' => 'Ae', 'ä' => 'ae',
+			'Ö' => 'Oe', 'ö' => 'oe',
+			'Ü' => 'Ue', 'ü' => 'ue',
+		);
+
+
+Assurez vous simplement que les caractères que vous ajoutez ne sont pas déjà pris en charge par défaut.
+Notez que tous les caractères de la langue française sont déjà pris en charge correctement.
+
+___________
+NOTE: Cache
+___________
+
+Les fichiers cachés se trouve dans le dossier phpbb_seo_/cache/.
+phpbb_cache.php est le fichier contenant vos réglages ainsi que les URL personnalisés de vos forums.
+
+Le mod crée toujours un backup du fichier cache en cours :
+	=> phpbb_cache.php.current est une copie de phpbb_cache.php.
+	Elle sera utilisée automatiquement si jamais phpbb_cache.php venait à être effacé ou corrompu (ce qui e devrait pas arriver, mais ...).
+	=> phpbb_cache.php.old est une copie de vos précédent réglages, avant la dernière modification que vous avez faite.
+
+Vous devriez sauvegarder ces fichiers après les avoir modifier, ils sont aussi important que
+votre base de donnée pour vos forums, vu qu'il sont requis pour le fonctionnement de leur URLs.
+Rassurez vous, ce n'est qu'une précaution standard, vous ne devriez pas avoir de soucis avec ces fichiers,
+mais jamais, c'est mieux, d'où la sauvegarde.
+
+____________
+ .htaccess :
+____________
+
+Dans le module d'administration phpBB SEO, rendez vous sur la page "htaccess".
+Un .htaccess adapté à vos réglages y sera affiché. C'est le premier .htaccess à essayer.
+Si la suggestion par défaut ne fonctionne pas, vous pourrez afficher des options supplémentaires, et générer plusieurs variantes.
+Vous trouverez un fichier .htaccess vide dans le dossier contrib/ de l'archive du mod.
+Vous pouvez l'utilisez pour y copier le contenu du .htaccess généré par la page de réglage ou l'enregistré directement sur le serveur (le .htaccess est alors sauvegarder dans phpbb_seo/cache/).
+
+Le générateur de .htaccess va ajouter les rewriterules nécessaires pour vous assurer de l'unicité de votre domaine,
+mais elles seront au départ commentées (inactives), car c'est le genre de chose qui requiert une intervention humaine.
+Veuillez vous rendre sur : http://www.phpbb-seo.com/fr/techniques-referencement/forcer-www-dans-un-domaine-t31.html
+pour voir comment forcer l'utilisation ou l'absence du préfixe www dans l'URL de votre domaine.
+C'est une chose importante à faire pour une bonne optimisation de votre référencement.
+
+____________
+robots.txt :
+____________
+
+Vous trouverez un exemple de robots.txt dans le dossier contrib/ de ce package.
+Le robots.txt doit être placé à la racine de votre domaine (qui peut être différent du dossier de phpBB).
+Il faut bien entendu remplacer dossierphpbb/ par votre vrai dossier d'installation (ou par rien pour une installation à la racine du domaine).
+
+IMPORTANT :
+	Si vous installez ce mod surun forum phpBB préalablement indexé avec des urls non réécrites,
+	vous devrez installer le mod Zéro duplicate (http://www.phpbb-seo.com/fr/zero-duplicate/zero-duplicate-phpbb-seo-t1502.html)
+	et mettre son option "Redirection des messages" sur au moins "invités".
+	Vous devrez attendre au moins deux mois après l'activation du zéro duplicate avant de mettre le robots.txt en place.
+	Car dans ce cas, nous voulons rediriger avant d'interdire.
+
+_____________________________________________________
+NOTE: URL de profil et de messages de membre sans ID:
+_____________________________________________________
+
+phpBB/member/pseudo VS  phpBB/pseudo-uxx.html
+
+Si vous utilisez les URL de profil et de messages de membre sans ID, vous devez noter que de l'urlencodage
+va entrer en jeux pour prévenir un bug de mod_rewrite.
+Ceci impleque que certains cas particuliers, comme "&", "/", "#" et les espaces seront doublement encodés dans un pseudo.
+Par exemple, un membre dont le pseudo serait rock&roll devrait être doublement urlencodé pour être utilisable : rock%2526roll
+( http://www.php.net/urlencode => http://issues.apache.org/bugzilla/show_bug.cgi?id=34602 )
+
+Il y a d'autre cas ou des caractères seront urlencodés, comme les accents.
+Ce n'est pas vraiment un problème pour les bots, ils comprennent l'urlencodage, mais cela peu finir
+par faire d'assez longues URLs avec des caractères multy byte.
+Cela ne concerne pas les caractères a-zA-Z0-9 chars, underscore ("_"), tiret ("-") et point (".") inclus.
+
+Cela veut bien entendu dire que les URL de profil et de messages de membre sans ID est bien plus adapté
+a des pseudo utilisant des caractères alphanumériques (sans accents).
+
+Si vous autorisez uniquement les caractères alphanumériques dans les pseudo de vos membres, vous pouvez accélérer
+le processus de retrait des ID en ajoutant :
+
+	return $url;
+
+juste après :
+
+	function seo_url_encode( $url, $type = 1 ) {
+
+Enfin, n'oubliez pas que vous pouvez obtenir de très bon résultats avec les ID et que vous pouvez toujours simuler des dossier dans ces urls.]]></diy-instructions>
+	</action-group>
+</mod>

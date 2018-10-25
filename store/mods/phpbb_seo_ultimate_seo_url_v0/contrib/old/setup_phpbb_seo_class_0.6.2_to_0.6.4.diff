@@ -1,0 +1,32 @@
+Index: setup_phpbb_seo.php
+===================================================================
+--- setup_phpbb_seo.php	(0.6.2)
++++ setup_phpbb_seo.php	(0.6.4)
+@@ -2,8 +2,8 @@
+ /**
+ *
+ * @package Ultimate SEO URL phpBB SEO
+-* @version $Id: setup_phpbb_seo.php 112 2009-09-30 17:21:34Z dcz $
+-* @copyright (c) 2006 - 2009 www.phpbb-seo.com
++* @version $Id: setup_phpbb_seo.php 222 2010-02-27 13:08:48Z dcz $
++* @copyright (c) 2006 - 2010 www.phpbb-seo.com
+ * @license http://www.opensource.org/licenses/rpl1.5.txt Reciprocal Public License 1.5
+ *
+ */
+@@ -83,6 +83,7 @@
+ 			$this->seo_static['atopic'] = 'sujets-actifs';
+ 			$this->seo_static['utopic'] = 'sans-reponses';
+ 			$this->seo_static['npost'] = 'nouveaux-messages';
++			$this->seo_static['urpost'] = 'non-lu';
+ 			$this->seo_static['file_index'] = 'ressources';
+ 		}
+ 		// <== Special for lazy French, others may delete this part
+@@ -91,5 +92,5 @@
+ 		$this->check_config();
+ 	}
+ 	// Here start the add-on methods
+-} // End of the phpbb_seo_modules class 
++}
+ ?>
+\ No newline at end of file
+

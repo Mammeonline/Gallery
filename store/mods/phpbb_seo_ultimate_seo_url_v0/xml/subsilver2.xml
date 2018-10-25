@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (offline version)"/>
+		<license><![CDATA[http://www.opensource.org/licenses/rpl1.5.txt Reciprocal Public License 1.5]]></license>
+		<title lang="en"><![CDATA[phpBB SEO Ultimate SEO URL - subsilver2 modifications]]></title>
+		<title lang="fr"><![CDATA[phpBB SEO Ultimate SEO URL - Modification pour subsilver2]]></title>
+		<description lang="en"><![CDATA[subsilver2 modifications]]></description>
+		<description lang="fr"><![CDATA[Modification pour subsilver2]]></description>
+		<author-group>
+			<author>
+				<username><![CDATA[dcz]]></username>
+				<homepage><![CDATA[http://www.phpbb-seo.com/]]></homepage>
+			</author>
+		</author-group>
+		<mod-version><![CDATA[0.6.6]]></mod-version>
+		<installation>
+			<level><![CDATA[easy]]></level>
+			<time><![CDATA[300]]></time>
+			<target-version><![CDATA[3.0.8]]></target-version>
+		</installation>
+		<link-group>
+			<link type="parent" href="./../install.xml" lang="en"><![CDATA[Main installation file]]></link>
+			<link type="parent" href="./../install.xml" lang="fr"><![CDATA[Fichier d'installation principal]]></link>
+		</link-group>
+	</header>
+	<action-group>
+		<open src="styles/subsilver2/template/attachment.html">
+			<edit>
+				<find><![CDATA[			<a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" /></a><br />]]></find>
+				<action type="replace-with"><![CDATA[			<a href="{_file.U_DOWNLOAD_LINK}"><img src="{_file.THUMB_IMAGE}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / {_file.DOWNLOAD_NAME}<!-- ELSE -->{_file.DOWNLOAD_NAME} ({_file.FILESIZE} {_file.SIZE_LANG}) {_file.L_DOWNLOAD_COUNT}<!-- ENDIF -->"/></a><br />]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[			<img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" /><br />]]></find>
+				<action type="replace-with"><![CDATA[			<img src="{_file.U_INLINE_LINK}" alt="{_file.DOWNLOAD_NAME}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}"/><br />]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[				<a href="{_file.U_DOWNLOAD_LINK}">{_file.DOWNLOAD_NAME}</a> [{_file.FILESIZE} {_file.SIZE_LANG}]]]></find>
+				<action type="replace-with"><![CDATA[				<a href="{_file.U_DOWNLOAD_LINK}" title="<!-- IF _file.COMMENT_CLEAN -->{_file.COMMENT_CLEAN} / <!-- ENDIF -->{_file.DOWNLOAD_NAME}">{_file.DOWNLOAD_NAME}</a> [{_file.FILESIZE} {_file.SIZE_LANG}]]]></action>
+			</edit>
+		</open>
+		<open src="styles/subsilver2/template/overall_header.html">
+			<edit>
+				<find><![CDATA[<head>]]></find>
+				<action type="after-add"><![CDATA[{SEO_BASE_HREF}]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[function jumpto()
+{
+	var page = prompt('{LA_JUMP_PAGE}:', '{ON_PAGE}');
+	var per_page = '{PER_PAGE}';
+	var base_url = '{A_BASE_URL}';
+
+	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0)
+	{
+		if (base_url.indexOf('?') == -1)
+		{
+			document.location.href = base_url + '?start=' + ((page - 1) * per_page);
+		}
+		else
+		{
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + ((page - 1) * per_page);
+		}
+	}
+}]]></find>
+				<action type="replace-with"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+function jumpto() {
+	var page = prompt('{LA_JUMP_PAGE}:', '{ON_PAGE}');
+	var perpage = '{PER_PAGE}';
+	var base_url = '{A_BASE_URL}';
+	var seo_delim_start = '{SEO_START_DELIM}';
+	var seo_static_pagination = '{SEO_SATIC_PAGE}';
+	var seo_ext_pagination = '{SEO_EXT_PAGE}';
+	if (page !== null && !isNaN(page) && page == Math.floor(page) && page > 0) {
+		var seo_page = (page - 1) * perpage;
+		var anchor = '';
+		var anchor_parts = base_url.split('#');
+		if ( anchor_parts[1] ) {
+			base_url = anchor_parts[0];
+			anchor = '#' + anchor_parts[1];
+		}
+		if ( base_url.indexOf('?') >= 0 ) {
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page + anchor;
+		} else if ( seo_page > 0 ) {
+			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
+			if (seo_type1 !== null) {
+				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1 + anchor;
+			}
+			var seo_type2 = base_url.match(/\/$/);
+			if (seo_type2 !== null) {
+				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination + anchor;
+			}
+		} else {
+			document.location.href = base_url + anchor;
+		}
+	}
+}
+var seo_external = {SEO_EXTERNAL};
+var seo_external_sub = {SEO_EXTERNAL_SUB};
+var seo_ext_classes = {SEO_EXT_CLASSES};
+var seo_hashfix = {SEO_HASHFIX};
+/**
+*  phpbb_seo_href()
+*  Fixes href="#something" links with virtual directories
+*  Optionally open external or marked with a css class links in a new window
+*  in a XHTML 1.x compliant way.
+*/
+function phpbb_seo_href() {
+	var current_domain = document.domain.toLowerCase();
+	if (!current_domain || !document.getElementsByTagName) return;
+	if (seo_external_sub && current_domain.indexOf('.') >= 0) {
+		current_domain = current_domain.replace(new RegExp(/^[a-z0-9_-]+\.([a-z0-9_-]+\.([a-z]{2,6}|[a-z]{2,3}\.[a-z]{2,3}))$/i), '$1');
+	}
+	if (seo_ext_classes) {
+		var extclass = new RegExp("(^|\s)(" + seo_ext_classes + ")(\s|$)");
+	}
+	if (seo_hashfix) {
+		var basehref = document.getElementsByTagName('base')[0];
+		if (basehref) {
+			basehref = basehref.href;
+			var hashtest = new RegExp("^(" + basehref + "|)#[a-z0-9_-]+$");
+			var current_href = document.location.href.replace(/#[a-z0-9_-]+$/i, "");
+		} else {
+			seo_hashfix = false;
+		}
+	}
+	var hrefels = document.getElementsByTagName("a");
+	var hrefelslen = hrefels.length;
+	for (var i = 0; i < hrefelslen; i++) {
+		var el = hrefels[i];
+		var hrefinner = el.innerHTML.toLowerCase();
+		if (el.onclick || (el.href == '') || (el.href.indexOf('javascript') >=0 ) || (el.href.indexOf('mailto') >=0 ) || (hrefinner.indexOf('<a') >= 0) ) {
+			continue;
+		}
+		if (seo_hashfix && el.hash && hashtest.test(el.href)) {
+			el.href = current_href + el.hash;
+		}
+		if (seo_external) {
+			if ((el.href.indexOf(current_domain) >= 0) && !(seo_ext_classes && extclass.test(el.className))) {
+				continue;
+			}
+			el.onclick = function () { window.open(this.href); return false; };
+		}
+	}
+}
+window.onload = function() {
+	if (seo_external || seo_hashfix) {
+		phpbb_seo_href();
+	}
+	// here you can add other window.onload events
+}
+// www.phpBB-SEO.com SEO TOOLKIT END]]></action>
+			</edit>
+		</open>
+		<open src="styles/subsilver2/template/posting_body.html">
+			<edit>
+				<find><![CDATA[<tr>
+	<td class="row1" width="22%"><b class="genmed">{L_SUBJECT}:</b></td>
+	<td class="row2" width="78%"><input class="post" style="width:450px" type="text" name="subject" size="45" maxlength="<!-- IF S_NEW_MESSAGE -->60<!-- ELSE -->64<!-- ENDIF -->" tabindex="2" value="{SUBJECT}" /></td>
+</tr>]]></find>
+				<action type="after-add"><![CDATA[<!-- IF S_URL -->
+<tr>
+	<td class="row1" width="22%"><b class="genmed">URL:</b></td>
+	<td class="row2" width="78%"><input class="post" style="width:450px" type="text" name="url" size="45" maxlength="250" tabindex="2" value="{TOPIC_URL}" /></td>
+</tr>
+<!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/subsilver2/template/simple_header.html">
+			<edit>
+				<find><![CDATA[<head>]]></find>
+				<action type="after-add"><![CDATA[{SEO_BASE_HREF}]]></action>
+			</edit>
+		</open>
+		<open src="styles/subsilver2/template/viewtopic_body.html">
+			<edit>
+				<find><![CDATA[<a href="#wrapheader">]]></find>
+				<inline-edit>
+					<inline-find><![CDATA[#wrapheader]]></inline-find>
+					<inline-action type="before-add"><![CDATA[{U_VIEW_TOPIC}]]></inline-action>
+				</inline-edit>
+			</edit>
+		</open>
+	</action-group>
+</mod>

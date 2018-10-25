@@ -1,0 +1,310 @@
+##############################################################
+## MOD Title:		Update phpBB3 SEO Dynamic Metatags 0.2.2 => 0.2.4
+## 
+## MOD Author:		dcz <n/a> http://www.phpbb-seo.com/
+##
+## MOD Description:	This are the update steps for the phpBB3 SEO Dynamic Metatags 0.2.2 => 0.2.4
+##			Check http://www.phpbb-seo.com/boards/phpbb3-seo-toolkit/seo-dynamic-meta-tags-vt1308.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	Easy
+## Installation Time: 	3 Minutes
+## Files To Edit:	2
+##       		includes/functions.php,
+##       		viewtopic.php,
+##
+## Included Files: 	n/a
+##
+## License: 		http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Dynamic Metatags 0.2.2 => 0.2.4 update.
+## 
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN  - META
+class seo_meta {
+	var $meta = array();
+	/**
+	* Some config :
+	*	=> keywordlimit : number of keywords (max) in the keyword tag,
+	*	=> wordlimit : number of words (max) in the desc tag,
+	*	=> wordminlen : only words with more than wordminlen letters will be used, default is 2,
+	*	=> bbcodestrip : | separated list of bbcode to fully delete, tag + content, default is 'img|url|flash',
+	*	=> ellipsis : ellipsis to use if clipping,
+	*	=> topic_sql : Do a SQL to build topic meta keywords or just use the meta desc tag,
+	*	=> kewd_adddesc : If you query for topic keywords, you can still add the meta desc tag in the keyword list.
+	**/
+	var $mconfig = array('keywordlimit' => 15, 'wordlimit' => 25, 'wordminlen' => 2, 'bbcodestrip' => 'img|url|flash|code', 'ellipsis' => ' ...', 'topic_sql' => true, 'kewd_adddesc' => false);
+	/**
+	* Returns meta tag code
+	*/
+	function build_meta( $page_title = '') {
+		$this->meta['meta_desc'] = ( !empty($this->meta['meta_desc']) ) ? $this->meta['meta_desc'] : $this->meta_filter_txt($page_title . ' : ' . $this->meta['meta_desc_def']);
+		$this->meta['keywords'] = ( !empty($this->meta['keywords']) ) ? $this->meta['keywords'] : $this->make_keywords( $page_title . ' ' . $this->meta['meta_keywords_def']);
+		$this->meta['meta_title'] = ( !empty($this->meta['meta_title']) ) ? meta_filter_txt($this->meta['meta_title']) : $page_title;
+		return sprintf( $this->meta['meta_tpl'], $this->meta['meta_title'], $this->meta['meta_lang'], $this->meta['meta_desc'], $this->meta['keywords'], $this->meta['meta_cat'], $this->meta['meta_robots'], $this->meta['meta_distrib'], $this->meta['meta_restype'], $this->meta['meta_copy'] );
+	}
+	/**
+	* Returns a word list separated by comas
+	*   By default, "'" "." and "," are deleted.
+	*/
+	function make_keywords($text) {
+		$keywords = '';
+		$num = 0;
+		$text = preg_replace(array('`&(amp;)?[a-z0-9]+;`i', '`[[:punct:]]+`', '`[\s]+`'), ' ', strip_tags($text) );
+		$text = explode(' ', $text);
+		// We take the most used words first
+		$text = array_count_values($text);
+		arsort($text);
+		foreach ($text as $word => $count) {
+			if ( utf8_strlen($word) > $this->mconfig['wordminlen'] ) {
+				$keywords .= empty($keywords) ? $word : ', ' . $word;
+				$num++;
+				if ( $num >= $this->mconfig['keywordlimit'] ) {
+					unset($text);
+					break;
+				}
+			}	
+		}
+		return $keywords;
+	}
+	/**
+	* Filter php/html tags and white spaces and returns htmlspecialchared string with limit in words
+	*/
+	function meta_filter_txt($text, $bbcode = true) {
+		if ($bbcode) {
+			static $RegEx = array();
+			static $replace = array(' ', ' ', '', ' ');
+			if (empty($RegEx)) {
+				$RegEx = array('`<[^>]*>(.*<[^>]*>)?`Usi', // HTML code
+					'`\[(' . $this->mconfig['bbcodestrip'] . ')[^\[\]]+\].*\[/\1[^\[\]]+\]`Usi', // bbcode to strip
+					'`\[/?[^\[\]]+\]`mi', // Strip all bbcode tags
+					'`[\s]+`' // Multiple spaces
+				);
+			}
+			return $this->word_limit(htmlspecialchars(preg_replace($RegEx, $replace, $text), ENT_COMPAT, 'UTF-8'));
+		}
+		return $this->word_limit(htmlspecialchars(preg_replace(array('`<[^>]*>(.*<[^>]*>)?`Usi', '`[\s]+`'), ' ', $text), ENT_COMPAT, 'UTF-8'));
+	}
+	/**
+	* Cut the text according to the number of words.
+	* Borrowed from www.php.net http://www.php.net/preg_replace
+	*/
+	function word_limit($string) {
+		return count($words = preg_split('/\s+/', ltrim($string), $this->mconfig['wordlimit'] + 1)) > $this->mconfig['wordlimit'] ? rtrim(utf8_substr($string, 0, utf8_strlen($string) - utf8_strlen(end($words)))) . $this->mconfig['ellipsis'] : $string;
+	}
+	/**
+	* Initialize meta tags
+	*/
+	function seo_meta_tags() {
+		global $config;
+		$this->meta['meta_tpl'] =  '<meta name="title" content="%s" />' . "\n" . '<meta name="description" lang="%s" content="%s" />' . "\n" . '<meta name="keywords"    content="%s" />' . "\n" . '<meta name="category"    content="%s" />' . "\n" . '<meta name="robots"      content="%s" />'. "\n" . '<meta name="distribution" content="%s" />' . "\n" . '<meta name="resource-type" content="%s" />' . "\n" . '<meta name="copyright" content="%s" />' . "\n";
+		// Here you can hard code a static default title, description and keywords
+		// As is, the mod will return information based on the phpbb config
+		$this->meta['meta_title_def'] = $config['sitename'];
+		$this->meta['meta_desc_def'] = $config['site_desc'];
+		$this->meta['meta_keywords_def'] =  $config['site_desc'];
+		$this->meta['meta_lang'] =  $config['default_lang'];
+		$this->meta['meta_cat'] =  'general';
+		$this->meta['meta_robots'] =  'index,follow';
+		$this->meta['meta_distrib'] =  'global';
+		$this->meta['meta_restype'] =  'document';
+		$this->meta['meta_copy'] =  $config['sitename'];
+		return;
+	}
+}
+$seo_meta = new seo_meta();
+// www.phpBB-SEO.com SEO TOOLKIT END - META
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN  - META
+class seo_meta {
+	var $meta = array();
+	/**
+	* Some config :
+	*	=> keywordlimit : number of keywords (max) in the keyword tag,
+	*	=> wordlimit : number of words (max) in the desc tag,
+	*	=> wordminlen : only words with more than wordminlen letters will be used, default is 2,
+	*	=> bbcodestrip : | separated list of bbcode to fully delete, tag + content, default is 'img|url|flash',
+	*	=> ellipsis : ellipsis to use if clipping,
+	*	=> topic_sql : Do a SQL to build topic meta keywords or just use the meta desc tag,
+	*	=> disallowed : Disallow tag based on GET var used : varname => 1|0, 1 will through a disallow meta tag.
+	* Some default values are set bellow in the seo_meta_tags() method
+	**/
+	var $mconfig = array('keywordlimit' => 15, 'wordlimit' => 25, 'wordminlen' => 2, 'bbcodestrip' => 'img|url|flash|code', 'ellipsis' => ' ...', 'topic_sql' => true,
+		// Consider adding ", 'p' => 1" if your forum is no indexed yet or if no post urls are to be redirected
+		// to add a noindex tag on post urls
+		'disallowed' => array('style' => 1, 'hilit' => 1, 'print' => 1, 'sid' => 1),
+	);
+	/**
+	* Returns meta tag code
+	*/
+	function build_meta( $page_title = '') {
+		$this->meta['meta_desc'] = ( !empty($this->meta['meta_desc']) ) ? $this->meta['meta_desc'] : $this->meta_filter_txt($page_title . ' : ' . $this->meta['meta_desc_def']);
+		$this->meta['keywords'] = ( !empty($this->meta['keywords']) ) ? $this->meta['keywords'] : $this->make_keywords( $page_title . ' ' . $this->meta['meta_keywords_def']);
+		$this->meta['meta_title'] = ( !empty($this->meta['meta_title']) ) ? meta_filter_txt($this->meta['meta_title']) : $page_title;
+		// Do we allow indexing
+		$this->meta['meta_robots'] = $this->meta['meta_robots_def'];
+		foreach ( $this->mconfig['disallowed'] as $get => $disallow) {
+			if ($disallow && isset($_REQUEST[$get])) {
+				$this->meta['meta_robots'] = 'noindex,follow';
+				break;
+			}
+		}
+		return sprintf( $this->meta['meta_tpl'], $this->meta['meta_title'], $this->meta['meta_lang'], $this->meta['meta_desc'], $this->meta['keywords'], $this->meta['meta_cat'], $this->meta['meta_robots'], $this->meta['meta_distrib'], $this->meta['meta_restype'], $this->meta['meta_copy'] );
+	}
+	/**
+	* Returns a word list separated by comas
+	*   By default, "'" "." and "," are deleted.
+	*/
+	function make_keywords($text) {
+		$keywords = '';
+		$num = 0;
+		$text = preg_replace(array('`&(amp;)?#?[a-z0-9]+;`i', '`[[:punct:]]+`', '`[\s]+`'), ' ', strip_tags($text) );
+		$text = explode(' ', $text);
+		// We take the most used words first
+		$text = array_count_values($text);
+		arsort($text);
+		foreach ($text as $word => $count) {
+			if ( utf8_strlen($word) > $this->mconfig['wordminlen'] ) {
+				$keywords .= empty($keywords) ? $word : ', ' . $word;
+				$num++;
+				if ( $num >= $this->mconfig['keywordlimit'] ) {	
+					break;
+				}
+			}	
+		}
+		return $keywords;
+	}
+	/**
+	* Filter php/html tags and white spaces and returns htmlspecialchared string with limit in words
+	*/
+	function meta_filter_txt($text, $bbcode = true) {
+		if ($bbcode) {
+			static $RegEx = array();
+			static $replace = array(' ', ' ', '', ' ');
+			if (empty($RegEx)) {
+				$RegEx = array('`<[^>]*>(.*<[^>]*>)?`Usi', // HTML code
+					'`\[(' . $this->mconfig['bbcodestrip'] . ')[^\[\]]+\].*\[/\1[^\[\]]+\]`Usi', // bbcode to strip
+					'`\[/?[^\[\]]+\]`mi', // Strip all bbcode tags
+					'`[\s]+`' // Multiple spaces
+				);
+			}
+			return $this->word_limit(htmlspecialchars(preg_replace($RegEx, $replace, $text), ENT_COMPAT, 'UTF-8'));
+		}
+		return $this->word_limit(htmlspecialchars(preg_replace(array('`<[^>]*>(.*<[^>]*>)?`Usi', '`[\s]+`'), ' ', $text), ENT_COMPAT, 'UTF-8'));
+	}
+	/**
+	* Cut the text according to the number of words.
+	* Borrowed from www.php.net http://www.php.net/preg_replace
+	*/
+	function word_limit($string) {
+		return count($words = preg_split('/\s+/', ltrim($string), $this->mconfig['wordlimit'] + 1)) > $this->mconfig['wordlimit'] ? rtrim(utf8_substr($string, 0, utf8_strlen($string) - utf8_strlen(end($words)))) . $this->mconfig['ellipsis'] : $string;
+	}
+	/**
+	* Initialize meta tags
+	*/
+	function seo_meta_tags() {
+		global $config, $phpbb_seo;
+		$this->meta['meta_tpl'] =  '<meta name="title" content="%s" />' . "\n" . '<meta name="description" lang="%s" content="%s" />' . "\n" . '<meta name="keywords"    content="%s" />' . "\n" . '<meta name="category"    content="%s" />' . "\n" . '<meta name="robots"      content="%s" />'. "\n" . '<meta name="distribution" content="%s" />' . "\n" . '<meta name="resource-type" content="%s" />' . "\n" . '<meta name="copyright" content="%s" />' . "\n";
+		// If url Rewriting is on, we shall be more strict on noindex (since we can :p)
+		if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+			$this->mconfig['disallowed'] = array_merge($this->mconfig['disallowed'], array('st' => 1, 'sk' => 1, 'sd' => 1, 'ch' => 1,));
+		}
+		// Here you can hard code a static default title, description and keywords
+		// As is, the mod will return information based on the phpbb config
+		$this->meta['meta_title_def'] = $config['sitename'];
+		$this->meta['meta_desc_def'] = $config['site_desc'];
+		$this->meta['meta_keywords_def'] =  $config['site_desc'];
+		$this->meta['meta_lang'] =  $config['default_lang'];
+		$this->meta['meta_cat'] =  'general';
+		$this->meta['meta_robots_def'] =  'index,follow';
+		$this->meta['meta_distrib'] =  'global';
+		$this->meta['meta_restype'] =  'document';
+		$this->meta['meta_copy'] =  $config['sitename'];
+		return;
+	}
+}
+$seo_meta = new seo_meta();
+// www.phpBB-SEO.com SEO TOOLKIT END - META
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+viewtopic.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN  - META
+	if ($i == 0) {
+		$m_kewrd = '';
+		$seo_meta->meta['meta_desc'] = $seo_meta->meta_filter_txt($message);
+		$sql = "SELECT w.word_text
+			FROM " . SEARCH_WORDMATCH_TABLE . " m, " . SEARCH_WORDLIST_TABLE . " w
+			WHERE m.post_id = {$row['post_id']}
+				AND w.word_id = m.word_id
+				ORDER BY w.word_count DESC";
+		if( ($result = $db->sql_query_limit($sql, 15)) ) {
+			while ( $meta_row = $db->sql_fetchrow($result) ) {
+				$m_kewrd .= " " . $meta_row['word_text'];
+			}
+		}
+		$db->sql_freeresult($result);
+		$seo_meta->meta['keywords'] = !empty($m_kewrd) ? $seo_meta->make_keywords( $m_kewrd ) : $seo_meta->make_keywords($seo_meta->meta['meta_desc']);
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END  - META
+
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN  - META
+	if ($i == 0) {
+		$m_kewrd = '';
+		$seo_meta->meta['meta_desc'] = $seo_meta->meta_filter_txt($message);
+		if ($seo_meta->mconfig['topic_sql']) {
+			$sql = "SELECT w.word_text
+				FROM " . SEARCH_WORDMATCH_TABLE . " m, " . SEARCH_WORDLIST_TABLE . " w
+				WHERE m.post_id = {$row['post_id']}
+					AND w.word_id = m.word_id
+					AND w.word_common = 0
+				ORDER BY w.word_count DESC";
+			if( ($result = $db->sql_query_limit($sql, 15)) ) {
+				while ( $meta_row = $db->sql_fetchrow($result) ) {
+					$m_kewrd .= ' ' . $meta_row['word_text'];
+				}
+			}
+			$db->sql_freeresult($result);
+		}
+		$seo_meta->meta['keywords'] = !empty($m_kewrd) ? $seo_meta->make_keywords($m_kewrd) : $seo_meta->make_keywords($seo_meta->meta['meta_desc']);
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END  - META
+
+#
+#---[ SAVE/CLOSE ALL FILES ]-----------------------
+#
+# EoM

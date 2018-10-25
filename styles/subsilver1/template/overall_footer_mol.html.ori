@@ -1,0 +1,195 @@
+</div><!-- #squeeze -->
+
+
+<div id="right">
+<br />
+
+<div class="ROS">
+<!--JavaScript Tag // Tag for network 980: Hi-media Italy // Website: IT_TN_Mammeonline // Page: forum // Placement: mammeonline.it-forum_300x250-300x250 (2294808) // created at: Mar 11, 2010 5:21:51 PM-->
+<script language="javascript"><!--
+var adlSite='mammeonline.it';
+	var adlZone='forum';
+	var adlKv='';
+	var adlHasDcopt = false;
+	var adlPro=window.location.protocal=='https:'?'https:':'http:';
+	document.write('<'+'sc'+'ript type="text/javascript" src="'+adlPro+'//js.himediads.com/js?lang=it&s='+adlSite+'&z='+adlZone+'&d='+Math.floor(Math.random()*10000000000)+'"><\/'+'sc'+'ript>');
+//-->
+</script>
+<script language="javascript" type="text/javascript">if (typeof getAdLinkAdTag=='function') getAdLinkAdTag( '300x250' );</script>
+<noscript><a href="http://rd.himediads.com/it/jump/mammeonline.it/forum;sz=300x250;tile=1;ord=" target="_blank"><img src="http://rd.himediads.com/it/ad/mammeonline.it/forum;sz=300x250;tile=1;ord=?" width="300" height="250" alt="" /></a></noscript>
+<!-- End of JavaScript Tag -->
+</div>
+
+
+<br />
+<div class="multicentrum">
+<h2>Newsletter Mammeonline</h2>
+<script language="Javascript" type="text/javascript">
+function checkform() {
+  for (i=0;i<fieldstocheck.length;i++) {
+    if (eval("document.subscribeform.elements['"+fieldstocheck[i]+"'].type") == "checkbox") {
+      if (document.subscribeform.elements[fieldstocheck[i]].checked) {
+      } else {
+        alert("Per favore, inserisci il tuo "+fieldnames[i]);
+        eval("document.subscribeform.elements['"+fieldstocheck[i]+"'].focus()");
+        return false;
+      }
+    }
+    else {
+      if (eval("document.subscribeform.elements['"+fieldstocheck[i]+"'].value") == "") {
+        alert("Per favore, inserisci il tuo "+fieldnames[i]);
+        eval("document.subscribeform.elements['"+fieldstocheck[i]+"'].focus()");
+        return false;
+      }
+    }
+  }
+  for (i=0;i<groupstocheck.length;i++) {
+    if (!checkGroup(groupstocheck[i],groupnames[i])) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+var fieldstocheck = new Array();
+var fieldnames = new Array();
+
+function addFieldToCheck(value,name) {
+  fieldstocheck[fieldstocheck.length] = value;
+  fieldnames[fieldnames.length] = name;
+}
+var groupstocheck = new Array();
+var groupnames = new Array();
+function addGroupToCheck(value,name) {
+  groupstocheck[groupstocheck.length] = value;
+  groupnames[groupnames.length] = name;
+}
+
+function compareEmail()
+{
+  return (document.subscribeform.elements["email"].value == document.subscribeform.elements["emailconfirm"].value);
+}
+
+function checkGroup(name,value) {
+  option = -1;
+  for (i=0;i<document.subscribeform.elements[name].length;i++) {
+    if (document.subscribeform.elements[name][i].checked) {
+      option = i;
+    }
+  }
+  if (option == -1) {
+    alert ("Per favore, inserisci il tuo "+value);
+    return false;
+  }
+  return true;
+}
+</script><form action="http://news.mammeonline.com/?p=subscribe&amp;id=4" method="post" name="signup" onsubmit="window.open('', this.target,
+'dialog,modal,scrollbars=no,resizable=no,width=800,height=250,left=0,top=0');" target="windowName">
+	<input name="formtoken" type="hidden" value="32737379475e41035129a03c8bcb8684" /> <input name="htmlemail" type="hidden" value="1" />	
+        <div style="color:red;font-weight:bold" align="left">Email:</div>
+	<input name="email" size="35" type="text" value="" /> <script language="Javascript" type="text/javascript">addFieldToCheck("email","Email");</script>
+	<div style="display:none">
+		<input checked="checked" name="list[7]" type="checkbox" value="signup" /><b>mammeonline</b><input name="list[7]" type="hidden" value="mammeonline" />La community di Mammeonline <input name="VerificationCodeX" size="20" type="text" value="" /></div>
+	<input name="subscribe" onclick="return checkform();" size="35" type="submit" value="Iscrivimi" /></form>
+</div>
+<br />
+<!--
+<div class="multicentrum">
+<p style=""><a href="http://www.mammeonline.net/ninnotto"><img alt="Giveaway delle Feste Il Ninnotto" src="http://www.mammeonline.net/sites/default/files/images/ninnotto_teaser.jpg" style="width: 300px; height: 210px;" /></a></p>
+<p>&nbsp;</p>
+</div>
+
+<div class="multicentrum">
+<p><a href="http://www.mammeonline.net/taxonomy/term/105/all" target="_blank" title="Speciale Natale"><img alt="Speciale Natale" height="150" src="/sites/default/files/images/SpecialeNatale15x30.jpg" width="300" /></a></p>
+</div>
+-->
+<div class="multicentrum">
+<p>
+
+<a href="http://www.mammeonline.net/blogs/mamma-mamma" title="Provato per te" target="_blank">
+<img width="300" height="200" src="/sites/default/files/images/Provatoperte20x30.jpg" alt="Provato per te" /></a>
+<br />
+<strong>da mamma a mamma</strong>
+</p>
+</div>
+
+
+<!-- IF ADS_8 --><br />{ADS_8}<!-- ENDIF -->
+<div class="multicentrum"><br />
+<p>
+
+<a href="http://www.mamyblue.it/" title="MamyBlue" target="_blank">
+<img width="300" height="115" src="/sites/default/files/images/mamyblue.png" alt="MamyBlue" /></a>
+<br />
+<strong>La bellezza nella natura</strong>
+</p>
+</div>
+<br />
+
+<div class="multicentrum">
+<p>
+<a href="http://alberocasacucinastella.blogspot.com/" title="Tiziana" target="_blank">
+<img width="300" height="115" src="/sites/default/files/image/inverno_rinaldi.jpg" alt="Tiziana" /></a>
+</p>
+</div>
+
+<div class="multicentrum">
+<p>
+<a href="http://echinogiornalebambino.blogspot.com/" title="Echino" target="_blank">
+<img width="300" height="87" src="/sites/default/files/image/echinoblogtestata.png" alt="Echino" /></a>
+</p>
+</div>
+
+<div id="editrice">
+<p>
+<a href="http://www.casaeditricemammeonline.it/" title="Casa Editrice Mammeonline" target="_blank">
+<img width="200" height="93" src="/sites/default/files/image/logo-editrice-mol.gif" alt="Casa Editrice Mammeonline" /></a>
+</p>
+</div>
+<br />
+
+
+
+<!-- IF S_DISPLAY_BIRTHDAY_LIST -->
+	<br clear="all" />
+
+	<table class="tablebg" width="100%" cellspacing="1">
+	<tr>
+		<td class="cat" colspan="2"><h4>{L_BIRTHDAYS}</h4></td>
+	</tr>
+	<tr>
+		<td class="row1" align="center" valign="middle"><img src="{T_THEME_PATH}/images/whosonline.gif" alt="{L_BIRTHDAYS}" /></td>
+		<td class="row1" width="100%"><p class="genmed"><!-- IF BIRTHDAY_LIST -->{L_CONGRATULATIONS}: <b>{BIRTHDAY_LIST}</b><!-- ELSE -->{L_NO_BIRTHDAYS}<!-- ENDIF --></p></td>
+	</tr>
+	</table>
+<!-- ENDIF -->
+
+<!-- Begin comScore Tag -->
+<script>
+document.write(unescape("%3Cscript src='" + (document.location.protocol == "https:" ? "https://sb" : "http://b")
++ ".scorecardresearch.com/beacon.js' %3E%3C/script%3E"));
+</script>
+<script>
+COMSCORE.beacon({
+c1:2,
+c2:"9291144",
+c3:"",
+c4:"www.mammeonline.net",
+c5:"",
+c6:"",
+c15:""
+});
+</script>
+<noscript>
+<img src="http://b.scorecardresearch.com/p?c1=2&c2=9291144&c3=&c4=www.mammeonline.net&c5=&c6=&c15=&cj=1" />
+</noscript>
+<!-- End comScore Tag -->
+
+</div><!-- #right -->
+
+
+</div><!-- #center -->
+
+
+</div><!-- #container -->

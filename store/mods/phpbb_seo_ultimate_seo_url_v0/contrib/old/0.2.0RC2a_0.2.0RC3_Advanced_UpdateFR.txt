@@ -1,0 +1,330 @@
+##############################################################
+## MOD Title: 		phpBB SEO Rewrite Avancé MAJ 0.2.0RC2a => 0.2.0RC3
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	Ceci est la procédure de mise à jour du MOD phpBB SEO Rewrite Avancé pour la transition version 0.2.0RC2a => 0.2.0RC3.
+## 			Rendez-vous sur http://www.phpbb-seo.com/
+## 			pour toujours obtenir la dernière version ou de l'aide pour ce MOD.
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Intermediate)
+## Installation Time: 	10 Minutes
+## Files To Edit: 	(6)
+##			includes/functions.php,
+##			includes/session.php,
+##			styles/prosilver/template/overall_header.html
+##			styles/prosilver/template/viewtopic_body.html
+##			viewforum.php,
+##			viewtopic.php
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## Voici les instructions de mise à jour : phpBB3 SEO Mod Rewrite Avancé 0.2.0RC2a => 0.2.0RC3
+##
+## NOTE :
+## _____________
+##
+## Il n'y a pas de mise à jour pas à pas du fichier phpbb_seo_class.php, 
+## vous devrez donc remettre vos réglages dans celui-ci.
+## De plus, il vous faudra vider le dossier phpBB/cache/ avant de pouvoir utiliser pleinement ce mod,
+## effacez simplement tout son contenu SAUF le .htaccess.
+##
+##
+##############################################################
+## MOD History:
+##
+##	2007-06-27 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+
+_____________________________________________
+>>>> INSTALLATION POUR VOTRE FORUM <<<<<
+_____________________________________________
+
+La procédure d'installation qui suit conservera votre standard d'URL actuel, 
+vous devrez cependant convenablement configurer la nouvelle option virtual_folder 
+comme expliqué dans l'installe :
+
+=> L'option 'virtual_folder' ('virtual_folder' => false,), si vous la mettez sur true ('virtual_folder' => true,), 
+Les URLs des forums seront ajoutés sous forme de dossier virtuel à celles des sujets : 
+titre-forum-fxx/titre-sujet-txx.html VS titre-sujet-txx.html for a topic URL.
+
+___________
+ATTENTION :
+___________
+L'utilisation de l'option 'virtual_folder' peut modifier toutes les URLs de vos sujets, presque trop facilement.
+Si vous l'activez sur une site déjà convenablement indexé, l'opération doit être 
+réalisé avec autant de soins et de réflexion préalable que s'il s'agissait d'une
+migration et pas trop souvent.
+
+________
+OUVREZ :
+________
+
+.htaccess
+
+_______________________________________________________
+>>> VOTRE FORUM EST INSTALLE A LA RACINE DU DOMAINE <<<
+_______________________________________________________
+TROUVEZ :
+_______________________________________________________
+
+# GLOBAL ANNOUNCES
+RewriteRule ^annonces/[a-z0-9_-]*-t([0-9]+)(-([0-9]+))?\.html$ /viewtopic.php?t=$1&start=$3 [QSA,L,NC]
+______________________________________________________
+REMPLACER PAR : 
+______________________________________________________
+
+# GLOBAL ANNOUNCES && TOPIC WITHOUT FORUM URLS
+RewriteRule ^(annonces/)?[a-z0-9_-]*-t([0-9]+)(-([0-9]+))?\.html$ /viewtopic.php?t=$2&start=$4 [QSA,L,NC]
+
+_____________________________________________________
+>>> VOTRE FORUM EST INSTALLE DANS UN SOUS-DOSSIER <<<
+_____________________________________________________
+TROUVEZ :
+_____________________________________________________
+
+# GLOBAL ANNOUNCES
+RewriteRule ^phpbb/annonces/[a-z0-9_-]*-t([0-9]+)(-([0-9]+))?\.html$ /phpbb/viewtopic.php?t=$1&start=$3 [QSA,L,NC]
+____________________________________________________
+REMPLACER PAR : 
+____________________________________________________
+
+# GLOBAL ANNOUNCES && TOPIC WITHOUT FORUM URLS
+RewriteRule ^phpbb/(annonces/)?[a-z0-9_-]*-t([0-9]+)(-([0-9]+))?\.html$ /phpbb/viewtopic.php?t=$2&start=$4 [QSA,L,NC]
+
+_______________
+AVERTISSEMENT :
+_______________
+
+Il n'y a pas de mise à jour pas à pas du fichier phpbb_seo_class.php, 
+vous devrez donc remettre vos réglages dans celui-ci.
+De plus, il vous faudra vider le dossier phpBB/cache/ avant de pouvoir utiliser pleinement ce mod,
+effacez simplement tout son contenu SAUF le .htaccess.
+
+#
+#-----[ COPY ]--------------------------------------------------
+#
+
+copy phpbb_seo/*.* to phpbb_seo/*.*
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	return str_replace('&', '&amp;', trim($redirect,'?'));
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	return (strpos($redirect, 'http://') !==FALSE ? '' : $phpbb_root_path) . str_replace('&', '&amp;', trim($redirect,'?'));
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	if ( !defined('ADMIN_START') ) {
+		$template->assign_vars( array( 'PHPBB_FULL_URL' => $phpbb_seo->seo_path['phpbb_url'] ) );
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	if ( !defined('ADMIN_START') ) {
+		$template->assign_vars( array( 'PHPBB_FULL_URL' => $phpbb_seo->seo_path['phpbb_url'], 'SEO_BASE_HREF' => $phpbb_seo->seo_opt['seo_base_href'] ) );
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions_posting.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+function submit_post($mode, $subject, $username, $topic_type, &$poll, &$data, $update_message = true)
+{
+	global $db, $auth, $user, $config, $phpEx, $template, $phpbb_root_path;
+
+#
+#-----[ AFTER, ADD]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	$url = (!$params) ? "{$phpbb_root_path}viewforum.$phpEx" : "{$phpbb_root_path}viewtopic.$phpEx";
+	$url = append_sid($url, 'f=' . $data['forum_id'] . $params) . $add_anchor;
+
+#
+#-----[ BEFORE, ADD]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	if ( $params && empty($phpbb_seo->seo_url['topic'][$data['topic_id']]) ) {
+		$phpbb_seo->seo_url['topic'][$data['topic_id']] = $phpbb_seo->format_url($data['topic_title']);
+	}
+	if ( empty($phpbb_seo->seo_url['forum'][$data['forum_id']]) ) {
+		$phpbb_seo->seo_url['forum'][$data['forum_id']] = $phpbb_seo->format_url($data['forum_name'], $phpbb_seo->seo_static['forum']);
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+search.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			if ( empty($phpbb_seo->seo_url['topic'][$result_topic_id]) ) {
+				$phpbb_seo->seo_url['topic'][$result_topic_id] = $phpbb_seo->format_url($topic_title);
+			}
+			if ( empty($phpbb_seo->seo_url['forum'][$u_forum_id]) ) {
+				$phpbb_seo->seo_url['forum'][$u_forum_id] = $phpbb_seo->format_url($row['forum_name'], $phpbb_seo->seo_static['forum']);
+			}
+			// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			if ($row['topic_type'] == POST_GLOBAL) {
+				$phpbb_seo->seo_opt['topic_type'][$result_topic_id] = POST_GLOBAL;
+			}
+			if ( empty($phpbb_seo->seo_url['topic'][$result_topic_id]) ) {
+				$phpbb_seo->seo_url['topic'][$result_topic_id] = $phpbb_seo->format_url($topic_title);
+			}
+			if ( empty($phpbb_seo->seo_url['forum'][$u_forum_id]) ) {
+				$phpbb_seo->seo_url['forum'][$u_forum_id] = $phpbb_seo->format_url($row['forum_name'], $phpbb_seo->seo_static['forum']);
+			}
+			// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+					// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+					'U_NEWEST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$u_forum_id&amp;t=$result_topic_id&amp;hilit=$u_hilit" . '&amp;view=unread#unread'),
+					// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+					// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+					'U_NEWEST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$u_forum_id&amp;t=$result_topic_id&amp;hilit=$u_hilit" . '&amp;view=unread') . '#unread',
+					// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/overall_header.html
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+<BASE HREF="{PHPBB_FULL_URL}">
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+{SEO_BASE_HREF}
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+viewforum.php
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+			'U_NEWEST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . $forum_id . '&amp;t=' . $topic_id . '&amp;view=unread#unread'),
+
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+			'U_NEWEST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . $forum_id . '&amp;t=' . $topic_id . '&amp;view=unread') . '#unread',
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+viewtopic.php
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'L_IGNORE_POST'		=> ($row['hide_post']) ? sprintf($user->lang['POST_BY_FOE'], get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']), '<a href="' . append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;p={$row['post_id']}&amp;view=show#p{$row['post_id']}") . '">', '</a>') : '',
+		// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'L_IGNORE_POST'		=> ($row['hide_post']) ? sprintf($user->lang['POST_BY_FOE'], get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']), '<a href="' . append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;p={$row['post_id']}&amp;view=show") . '#p' . $row['post_id'] . '">', '</a>') : '',
+		// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+    <header>
+        <license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+        <title lang="en"><![CDATA[User IP Logs]]></title>
+        <description lang="en"><![CDATA[This mod will log all unique ip's from all registered users as they log in.
+
+To avoid redundant logging the mod only records unique IP's for each user. If a user log's on with an IP that they have no previously logged in with, the new IP will be recorded.
+
+The mod add's a new section to the logs area in the ACP which allow's you to very easily view the User IP Logs.]]></description>
+        <author-group>
+            <author>
+                <realname><![CDATA[Typo (Jeremy)]]></realname>
+                <username><![CDATA[Typos]]></username>
+                <homepage><![CDATA[http://www.typo-it.com]]></homepage>
+            </author>
+        </author-group>
+        <mod-version>1.0.1</mod-version>
+        <installation>
+            <level>easy</level>
+            <time>600</time>
+            <target-version>3.0.7-PL1</target-version>
+        </installation>
+        <history>
+            <entry>
+                <date>2010-01-28</date>
+                <rev-version>1.0.0 RC</rev-version>
+                <changelog lang="en">
+                    <change><![CDATA[First public release.  Skipped Beta and went straight to RC.]]></change>
+                </changelog>
+            </entry>
+            <entry>
+                <date>2010-02-26</date>
+                <rev-version>1.0.0</rev-version>
+                <changelog lang="en">
+                    <change><![CDATA[First official release.  Mod accepeted into the MODDB.  Changed title from 'Log Users IP' to 'User IP Logs'.]]></change>
+                </changelog>
+            </entry>
+            <entry>
+                <date>2010-02-26</date>
+                <rev-version>1.0.1</rev-version>
+                <changelog lang="en">
+                    <change><![CDATA[Fixed an issue discovered by stokerpiller which was allowing banned users to access the board.  The problem was my mod was using $result which was already in use but I never noticed and it wasn't caught in validation.  The fix is simple, replace the var name with a more descriptive one.]]></change>
+                </changelog>
+            </entry>
+        </history>
+		<link-group>
+			<link type="template" href="./contrib/update-1_0_0-to-1_0_1.xml" lang="en"><![CDATA[Update instructions from 1.0.0 to 1.0.1]]></link>		
+		</link-group>
+    </header>
+    <action-group>
+        <copy>
+            <file from="root/user_ip_logs_installer.php" to="user_ip_logs_installer.php" />
+            <file from="root/umil/*.*" to="umil/*.*" />
+        </copy>
+        <open src="includes/constants.php">
+            <edit>
+                <find><![CDATA[define('LOG_USERS', 3);]]></find>
+                <action type="after-add"><![CDATA[// Begin -User IP Logs- mod
+define('LOG_USERS_IP', 4);
+// End -User IP Logs- mod]]></action>
+            </edit>
+		</open>
+        <open src="includes/functions.php">
+            <edit>
+                <find><![CDATA[		// The result parameter is always an array, holding the relevant information...
+		if ($result['status'] == LOGIN_SUCCESS)
+		{]]></find>
+                <action type="after-add"><![CDATA[			// Begin -User IP Logs- mod
+			$sql = 'SELECT *
+				FROM ' . LOG_TABLE . '
+				WHERE log_type = ' . LOG_USERS_IP . '
+				AND user_id = ' . $user->data['user_id'] . '
+				AND log_ip = \'' . $db->sql_escape($user->data['session_ip']) . '\'';
+			$result_log = $db->sql_query($sql);
+			$results_log = $db->sql_fetchrow($result_log);
+			if (empty($results_log))
+			{
+				add_log('users_ip', 'LOG_USER_IP');
+			}
+			$db->sql_freeresult($result_log);
+			// End -User IP Logs- mod]]></action>
+            </edit>
+            <edit>
+                <find><![CDATA[		case 'user':
+			$sql_ary += array(
+				'log_type'		=> LOG_USERS,
+				'reportee_id'	=> $reportee_id
+			);
+		break;]]></find>
+                <action type="after-add"><![CDATA[		// Begin -User IP Logs- mod
+		case 'users_ip':
+			$sql_ary += array(
+				'log_type'		=> LOG_USERS_IP,
+			);
+		break;
+		// End -User IP Logs- mod]]></action>
+            </edit>
+		</open>
+        <open src="includes/functions_admin.php">
+            <edit>
+                <find><![CDATA[		case 'users':
+			$log_type = LOG_USERS;
+			$sql_forum = '';
+		break;]]></find>
+                <action type="after-add"><![CDATA[		// Begin -User IP Logs- mod
+		case 'users_ip':
+			$log_type = LOG_USERS_IP;
+			$sql_forum = '';
+		break;
+		// End -User IP Logs- mod]]></action>
+            </edit>
+		</open>
+        <open src="includes/acp/info/acp_logs.php">
+            <edit>
+                <find><![CDATA[				'users'		=> array('title' => 'ACP_USERS_LOGS', 'auth' => 'acl_a_viewlogs', 'cat' => array('ACP_FORUM_LOGS')),]]></find>
+                <action type="after-add"><![CDATA[				// Begin -User IP Logs- mod
+				'users_ip'	=> array('title' => 'ACP_USERS_IP_LOGS', 'auth' => 'acl_a_viewlogs', 'cat' => array('ACP_FORUM_LOGS')),				
+				// End -User IP Logs- mod]]></action>
+            </edit>
+		</open>
+        <open src="language/en/acp/common.php">
+            <edit>
+                <find><![CDATA[	'ACP_USERS_LOGS'				=> 'User logs',]]></find>
+                <action type="after-add"><![CDATA[	// Begin -User IP Logs- mod
+	'ACP_USERS_IP_LOGS'				=> 'User IP logs',
+	// End -User IP Logs- mod]]></action>
+            </edit>
+            <edit>
+                <find><![CDATA[	'ACP_USERS_LOGS_EXPLAIN'	=> 'This lists all actions carried out by users or on users (reports, warnings and user notes).',]]></find>
+                <action type="after-add"><![CDATA[	// Begin -User IP Logs- mod
+	'ACP_USERS_IP_LOGS_EXPLAIN'	=> 'This lists all past recorded ip\'s of all users that have logged in.  If a user log\'s in and they have already been recorded under the current ip, nothing is recorded, if they have a new ip or are visiting for the first time, a new entry is made.',
+	// End -User IP Logs- mod]]></action>
+            </edit>
+            <edit>
+                <find><![CDATA[	'LOG_USER_INACTIVE'		=> '<strong>User deactivated</strong><br />» %s',]]></find>
+                <action type="after-add"><![CDATA[	// Begin -User IP Logs- mod
+	'LOG_USER_IP'			=> '<strong>User IP Logs</strong>',
+	// End -User IP Logs- mod]]></action>
+            </edit>
+		</open>
+		<diy-instructions lang="en"><![CDATA[After uploading all the mod's files and doing all the file edits, run user_ip_logs_installer.php from your site. An example would be http://www.example.com/user_ip_logs_installer.php .
+
+After the installer has finished, the install is complete and you should delete the user_ip_logs_installer.php file from your site.]]></diy-instructions>
+	</action-group>
+</mod>

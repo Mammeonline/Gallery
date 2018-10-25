@@ -1,0 +1,147 @@
+Index: phpbb_seo_class.php
+===================================================================
+--- phpbb_seo_class.php	(0.6.2)
++++ phpbb_seo_class.php	(0.6.4)
+@@ -2,8 +2,8 @@
+ /**
+ *
+ * @package Ultimate SEO URL phpBB SEO
+-* @version $Id: phpbb_seo_class.php 174 2009-11-21 13:11:49Z dcz $
+-* @copyright (c) 2006 - 2009 www.phpbb-seo.com
++* @version $Id: phpbb_seo_class.php 236 2010-03-03 08:20:36Z dcz $
++* @copyright (c) 2006 - 2010 www.phpbb-seo.com
+ * @license http://www.opensource.org/licenses/rpl1.5.txt Reciprocal Public License 1.5
+ *
+ */
+@@ -20,7 +20,7 @@
+ * @package Ultimate SEO URL phpBB SEO
+ */
+ class phpbb_seo extends setup_phpbb_seo {
+-	var	$version = '0.6.2';
++	var	$version = '0.6.4';
+ 	var	$modrtype = 2; // We set it to mixed as a default value
+ 	var	$seo_path = array();
+ 	var	$seo_url = array( 'forum' =>  array(), 'topic' =>  array(), 'user' => array(), 'username' => array(), 'group' => array(), 'file' => array() );
+@@ -29,12 +29,12 @@
+ 			'topic' => array('st' => 0, 'sk' => 't', 'sd' => 'a', 'hilit' => ''),
+ 			'search' => array('st' => 0, 'sk' => 't', 'sd' => 'd', 'ch' => ''),
+ 		);
+-	var	$seo_stop_files = array('posting' => 1, 'faq' => 1, 'ucp' => 1, 'swatch' => 1, 'mcp' => 1);
++	var	$seo_stop_files = array('posting' => 1, 'faq' => 1, 'ucp' => 1, 'swatch' => 1, 'mcp' => 1, 'style' => 1, 'cron' => 1);
+ 	var	$seo_stop_vars = array('view=', 'mark=', 'watch=', 'hash=');
+ 	var	$seo_stop_dirs = array();
+ 	var	$seo_delim = array( 'forum' => '-f', 'topic' => '-t', 'user' => '-u', 'group' => '-g', 'start' => '-', 'sr' => '-', 'file' => '/');
+-	var	$seo_ext = array( 'forum' => '.html', 'topic' => '.html', 'post' => '.html', 'user' => '.html', 'group' => '.html',  'index' => '', 'global_announce' => '/', 'leaders' => '.html', 'atopic' => '.html', 'utopic' => '.html', 'npost' => '.html', 'pagination' => '.html', 'gz_ext' => '');
+-	var	$seo_static = array( 'forum' => 'forum', 'topic' => 'topic', 'post' => 'post', 'user' => 'member', 'group' => 'group', 'index' => '', 'global_announce' => 'announces', 'leaders' => 'the-team', 'atopic' => 'active-topics', 'utopic' => 'unanswered', 'npost' => 'newposts', 'pagination' => 'page', 'gz_ext' => '.gz' );
++	var	$seo_ext = array( 'forum' => '.html', 'topic' => '.html', 'post' => '.html', 'user' => '.html', 'group' => '.html',  'index' => '', 'global_announce' => '/', 'leaders' => '.html', 'atopic' => '.html', 'utopic' => '.html', 'npost' => '.html', 'urpost' => '.html', 'pagination' => '.html', 'gz_ext' => '');
++	var	$seo_static = array( 'forum' => 'forum', 'topic' => 'topic', 'post' => 'post', 'user' => 'member', 'group' => 'group', 'index' => '', 'global_announce' => 'announces', 'leaders' => 'the-team', 'atopic' => 'active-topics', 'utopic' => 'unanswered', 'npost' => 'newposts', 'urpost' => 'unreadposts', 'pagination' => 'page', 'gz_ext' => '.gz' );
+ 	var	$file_hbase = array();
+ 	var	$get_vars = array();
+ 	var	$path = '';
+@@ -90,7 +90,7 @@
+ 		$server_name = trim($config['server_name'], '/ ');
+ 		$server_port = max(0, (int) $config['server_port']);
+ 		$server_port = ($server_port && $server_port <> 80) ? ':' . $server_port : '';
+-		$script_path = trim($config['script_path'], '/ ');
++		$script_path = trim($config['script_path'], './ ');
+ 		$script_path = (empty($script_path) ) ? '' : $script_path . '/';
+ 		$this->seo_path['root_url'] = strtolower($server_protocol . $server_name . $server_port . '/');
+ 		$this->seo_path['phpbb_urlR'] = $this->seo_path['phpbb_url'] =  $this->seo_path['root_url'] . $script_path;
+@@ -119,7 +119,7 @@
+ 		}
+ 		// Load settings from phpbb_seo/includes/phpbb_seo_modules.php
+ 		$this->init_phpbb_seo();
+-		$this->seo_path['phpbb_filesR'] = $this->seo_path['phpbb_url'] . $this->seo_static['file_index'] . $this->seo_delim['file'];
++		$this->seo_path['phpbb_filesR'] = $this->seo_path['phpbb_urlR'] . $this->seo_static['file_index'] . $this->seo_delim['file'];
+ 		// see if we have some custom replacement
+ 		if (!empty($this->url_replace)) {
+ 			$this->url_replace = array(
+@@ -155,6 +155,7 @@
+ 				'atopic' => $this->seo_ext['atopic'] === '/' ? 'rewrite_pagination_page' : 'rewrite_pagination',
+ 				'utopic' => $this->seo_ext['utopic'] === '/' ? 'rewrite_pagination_page' : 'rewrite_pagination',
+ 				'npost' => $this->seo_ext['npost'] === '/' ? 'rewrite_pagination_page' : 'rewrite_pagination',
++				'urpost' => $this->seo_ext['urpost'] === '/' ? 'rewrite_pagination_page' : 'rewrite_pagination',
+ 			),
+ 			$this->paginate_method
+ 		);
+@@ -231,15 +232,19 @@
+ 			$this->seo_opt['rem_ids'] = false;
+ 		}
+ 		// virtual root option
+-		if ($this->seo_opt['virtual_root']) {
++		if ($this->seo_opt['virtual_root'] && $this->seo_path['phpbb_script']) {
++			// virtual root is available and activated
+ 			$this->seo_path['phpbb_urlR'] = $this->seo_path['root_url'];
+ 			$this->file_hbase['index'] = $this->seo_path['phpbb_url'];
+ 			$this->seo_static['index'] = empty($this->seo_static['index']) ? 'forum' : $this->seo_static['index'];
++		} else {
++			// virtual root is not used or usable
++			$this->seo_opt['virtual_root'] = false;
+ 		}
+ 		$this->seo_ext['index'] = empty($this->seo_static['index']) ? '' : ( empty($this->seo_ext['index']) ? '.html' : $this->seo_ext['index']);
+ 		// In case url rewriting is deactivated
+ 		if (!$this->seo_opt['url_rewrite'] || $this->modrtype == 0) {
+-			$phpbb_seo->seo_opt['sql_rewrite'] = false;
++			$this->seo_opt['sql_rewrite'] = false;
+ 			$this->seo_opt['zero_dupe']['on'] = false;
+ 		}
+ 	}
+@@ -416,12 +421,14 @@
+ 		}
+ 		$this->filename = trim(str_replace(".$phpEx", '', $this->file));
+ 		if ( isset($this->seo_stop_files[$this->filename]) ) {
++			// add full url
++			$url = $this->path == $phpbb_root_path ? $this->seo_path['phpbb_url'] . preg_replace('`^' . $phpbb_root_path . '`', '', $url) : $url;
+ 			return ($this->seo_cache[$url] = $url);
+ 		}
+ 		parse_str(str_replace('&amp;', '&', $qs), $this->get_vars);
+ 		// strp slashes if necessary
+ 		if (defined('SEO_STRIP')) {
+-			$this->get_vars = array_map('stripslashes_deep', $this->get_vars);
++			$this->get_vars = array_map(array(&$this, 'stripslashes'), $this->get_vars);
+ 		}
+ 		if (empty($user->data['is_registered'])) {
+ 			if ( $this->seo_opt['rem_sid'] ) {
+@@ -586,6 +593,15 @@
+ 						unset($this->get_vars['sr']);
+ 					}
+ 					return;
++				case 'unreadposts':
++					$this->filter_get_var($this->phpbb_filter['search']);
++					$this->{$this->paginate_method['urpost']}($this->seo_ext['urpost']);
++					$this->url = $this->seo_static['urpost'] . $this->start;
++					unset($this->get_vars['search_id']);
++					if (@$this->get_vars['sr'] == 'topics') {
++						unset($this->get_vars['sr']);
++					}
++					return;
+ 			}
+ 		}
+ 		$this->path = $this->seo_path['phpbb_url'];
+@@ -829,6 +845,13 @@
+ 		// non-overlong 2-byte|excluding overlongs|straight 3-byte|excluding surrogates|planes 1-3|planes 4-15|plane 16
+ 		return preg_match('%(?:[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF] |\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})+%xs', $string);
+ 	}
++	/**
++	* stripslashes($value)
++	* Borrowed from php.net : http://www.php.net/stripslashes
++	*/
++	function stripslashes($value) {
++		return is_array($value) ? array_map(array(&$this, 'stripslashes'), $value) : stripslashes($value);
++	}
+ 	// --> Add on Functions <--
+ 	// --> Gen stats
+ 	/**
+@@ -839,10 +862,4 @@
+ 		return array_sum(explode(' ',microtime()));
+ 	}
+ } // End of the phpbb_seo class
+-// Borrowed from php.net : http://www.php.net/stripslashes
+-if (!function_exists('stripslashes_deep')) {
+-	function stripslashes_deep($value) {
+-		return is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value);
+-	}
+-}
+ ?>
+\ No newline at end of file
+

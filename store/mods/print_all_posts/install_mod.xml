@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+		<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+		<!--
+		$Id: print_all_posts.xml 47 2008-05-16 05:32:19Z RMcGirr83 $
+		For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.1.xsd">
+    <header>
+	   <license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
+            <title lang="en">Print all posts</title>
+                <description lang="en">This modification will allow a user to print all posts with in a topic.  Currently when clicking on the print icon in prosilver, the current posts being displayed on the screen are sent to the printable html file.  With this mod, by clicking on the print all posts link, all of the posts within the topic will be sent to the html file for printing/storage.</description>
+				<author-notes lang="en"><![CDATA[Special thanks to NearlyALaugh at phpBB.com for the idea and initial development and to dem_z for the printall graphic]]></author-notes>
+				<author-group>
+					<author>
+						<realname>Richard McGirr</realname>
+						<email>rmcgirr83@gmail.com</email>
+						<username>RMcGirr83</username>
+						<homepage>http://betraythis.com</homepage>
+					</author>
+					<author>
+						<realname>N/A</realname>
+						<email>N/A</email>
+						<username>NearlyALaugh</username>
+						<homepage>N/A</homepage>
+					</author>
+				</author-group>
+				<mod-version>1.0.0a
+				</mod-version>
+				<installation>
+					<level>easy</level>
+					<time>300</time>
+					<target-version>3.0.2
+					</target-version>
+				</installation>
+                <history>
+                    <entry>
+						<date>2008-09-18</date>
+						<rev-version>1.0.0
+						</rev-version>
+						<changelog lang="en">
+							<change>First Release</change>
+						</changelog>
+            		</entry>
+                    <entry>
+						<date>2008-10-01</date>
+						<rev-version>1.0.0a
+						</rev-version>
+						<changelog lang="en">
+							<change>"Print all" gets it's own icon for prosilver</change>
+						</changelog>
+            		</entry>
+        		</history>
+			<link-group>
+				<link type="template" href="contrib/subsilver2.xml" lang="en">subsilver2</link>
+			</link-group>
+		</header>
+		<action-group>
+		<copy>
+			<file from="root/styles/prosilver/theme/images/icon_print_all.png" to="styles/prosilver/theme/images/icon_print_all.png"></file>
+		</copy>
+		<open src="language/en/viewtopic.php">
+        	<edit>
+    			<find><![CDATA[	'PRINT_TOPIC'			=> 'Print view',]]></find>
+    			<action type="after-add"><![CDATA[// BEGIN Print all posts in topic mod
+	'PRINT_ALL_POSTS'			=> 'Print view all posts in this topic',
+// END Print all posts in topic mod]]></action>
+            </edit>
+		</open>
+		<open src="viewtopic.php">
+        	<edit>
+    			<find><![CDATA[// Make sure $start is set to the last page if it exceeds the amount]]></find>
+    			<action type="after-add"><![CDATA[// BEGIN Print all posts in topic mod
+if ($view == 'printall')
+{
+   $start = '0';
+   $config['posts_per_page'] = $total_posts;
+}
+// END Print all posts in topic mod
+// following we add an else to the if statement]]></action>
+            </edit>
+            <edit>
+                <find><![CDATA[if ($start < 0]]></find>
+                 <inline-edit>
+	                <inline-find><![CDATA[if]]></inline-find>
+					<inline-action type="before-add"><![CDATA[else]]></inline-action>
+                </inline-edit>
+            </edit>
+            <edit>
+                <find><![CDATA[	'PAGE_NUMBER' 	=> on_page($total_posts, $config['posts_per_page'], $start),]]></find>
+                <action type="replace-with"><![CDATA[// BEGIN Print all posts in topic mod
+// original code
+//'PAGE_NUMBER' 	=> on_page($total_posts, $config['posts_per_page'], $start),
+       'PAGE_NUMBER'    => ($view == 'printall') ? '' : on_page($total_posts, $config['posts_per_page'], $start),
+// END Print all posts in topic mod]]></action>
+            </edit>
+            <edit>
+                <find><![CDATA[	'U_PRINT_TOPIC'			=>]]></find>
+                <action type="after-add"><![CDATA[// BEGIN Print all posts in topic mod
+       'U_PRINT_ALL_POSTS'     => ($auth->acl_get('f_print', $forum_id)) ? $viewtopic_url . '&amp;view=printall' : '',
+// END Print all posts in topic mod
+                ]]></action>
+            </edit>
+            <edit>
+                <find><![CDATA['body' => ($view == 'print']]></find>
+                 <inline-edit>
+	                <inline-find><![CDATA['print']]></inline-find>
+					<inline-action type="after-add"><![CDATA[ || $view == 'printall']]></inline-action>
+                </inline-edit>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_header.html">
+    		<edit>
+                <find><![CDATA[L_PRINT_TOPIC}</a></li>]]></find>
+                 <inline-edit>
+	                <inline-find><![CDATA[</li>]]></inline-find>
+                	<inline-action type="after-add"><![CDATA[<li class="rightside"><a href="{U_PRINT_ALL_POSTS}" title="{L_PRINT_ALL_POSTS}" accesskey="p" class="printall">{L_PRINT_ALL_POSTS}</a></li>]]></inline-action>
+                </inline-edit>
+			</edit>
+		</open>
+		<open src="styles/prosilver/theme/buttons.css">
+    		<edit>
+                <find><![CDATA[a.print, a.sendemail, a.fontsize]]></find>
+                 <inline-edit>
+	                <inline-find><![CDATA[a.fontsize]]></inline-find>
+                	<inline-action type="after-add"><![CDATA[, a.printall]]></inline-action>
+                </inline-edit>
+			</edit>
+    		<edit>
+                <find><![CDATA[a.print]]></find>
+                 <inline-edit>
+	                <inline-find><![CDATA[a.print]]></inline-find>
+                	<inline-action type="after-add"><![CDATA[, a.printall]]></inline-action>
+                </inline-edit>
+			</edit>
+		</open>
+		<open src="styles/prosilver/theme/colours.css">
+    		<edit>
+                <find><![CDATA[a.print {
+	background-image: url("{T_THEME_PATH}/images/icon_print.gif");
+}]]></find>
+				<action type="after-add"><![CDATA[a.printall {
+	background-image: url("{T_THEME_PATH}/images/icon_print_all.png");
+}]]></action>
+            </edit>
+		</open>
+		<open src="styles/prosilver/theme/bidi.css">
+    		<edit>
+                <find><![CDATA[.rtl a.print, .rtl a.sendemail, .rtl a.fontsize]]></find>
+                 <inline-edit>
+	                <inline-find><![CDATA[a.fontsize]]></inline-find>
+                	<inline-action type="after-add"><![CDATA[, .rtl a.printall]]></inline-action>
+                </inline-edit>
+			</edit>
+		</open>
+		<diy-instructions lang="en">Refresh the prosilver style to get the new icon to show and purge the cache after installing the mod to regenerate the template files</diy-instructions>
+	</action-group>
+</mod>

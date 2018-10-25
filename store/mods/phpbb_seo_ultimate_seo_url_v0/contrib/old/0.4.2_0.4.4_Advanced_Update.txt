@@ -1,0 +1,297 @@
+##############################################################
+## MOD Title: 		phpBB SEO Advanced mod Rewrite 0.4.2 => 0.4.4 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO Advanced mod Rewrite 0.4.2 => 0.4.4 update.
+## 			Check http://www.phpbb-seo.com/boards/advanced-seo-url/advanced-phpbb3-seo-url-vt1219.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	10 Minutes
+## Files To Edit: 	(8)
+##			includes/functions.php,
+##			memberlist.php,
+##			phpbb_seo/phpbb_seo_class.php (DYI),
+##			search.php,
+##			styles/prosilver/template/simple_header.html,
+##			styles/subsilver2/template/overall_header.html,
+##			styles/subsilver2/template/simple_header.html,
+##			viewtopic.php.
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Advanced mod Rewrite 0.4.2 => 0.4.4 update.
+##
+##############################################################
+## MOD History:
+##
+##	2008-07-15 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+_________________________________________
+>>>>   INSTALLATION INSTRUCTIONS    <<<<<
+_________________________________________
+
+This update procedure will keep the previous URL standard used depending on the phpbb_seo_class.php settings.
+
+!!!!! YOU WILL HAVE TOO take the new phpbb_seo_class.php file and redo the mod you eventually made there, 
+Like the zero duplicate or the static and delimiters.
+There are many changes in this file so it is faster this way.
+
+You will need to upload / overwrite the following files :
+	includes/acp/acp_phpbb_seo.php
+	includes/acp/info/acp_phpbb_seo.php
+	language/en/acp/phpbb_seo.php
+	language/fr/acp/phpbb_seo.php
+
+Once you will have updated, you will have to refresh your theme's cache as well as phpBB's cache (ACP => STYLE, Themes => Refresh).
+
+#
+#-----[ COPY ]------------------------------------------
+#
+
+root/includes/acp/acp_phpbb_seo.php		to 	includes/acp/acp_phpbb_seo.php
+root/includes/acp/info/acp_phpbb_seo.php	to 	includes/acp/info/acp_phpbb_seo.php
+root/language/en/acp/phpbb_seo.php		to 	language/en/acp/phpbb_seo.php
+root/language/fr/acp/phpbb_seo.php		to 	language/fr/acp/phpbb_seo.php
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+function append_sid($url, $params = false, $is_amp = true, $session_id = false)
+{
+	global $_SID, $_EXTRA_URL, $phpbb_hook;
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+function append_sid($url, $params = false, $is_amp = true, $session_id = false)
+{
+	global $_SID, $_EXTRA_URL, $phpbb_hook;
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	// We bypass the hook function here, the same effect as a standalone hook, which we want, but faster ;-)
+	global $phpbb_seo;
+	if (!empty($phpbb_seo->seo_opt['url_rewrite'])) {
+		return $phpbb_seo->url_rewrite($url, $params, $is_amp, $session_id);
+	} else
+
+#
+#-----[ FIND ]------------------------------------------
+#
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$url .= (($append_url) ? $url_delim . $append_url : '') . $anchor;
+			return $phpbb_seo->url_rewrite($url, $is_amp);
+			// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+			return $url . (($append_url) ? $url_delim . $append_url : '') . $anchor;
+#
+#-----[ FIND ]------------------------------------------
+#
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			$url .= (($append_url) ? $url_delim . $append_url . $amp_delim : $url_delim) . 'sid=' . $session_id . $anchor;
+			return $phpbb_seo->url_rewrite($url, $is_amp);
+			// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+			return $url . (($append_url) ? $url_delim . $append_url . $amp_delim : $url_delim) . 'sid=' . $session_id . $anchor;
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$url .= (($append_url) ? $url_delim . $append_url . $amp_delim : $url_delim) . $params . ((!$session_id) ? '' : $amp_delim . 'sid=' . $session_id) . $anchor;
+	return $phpbb_seo->url_rewrite($url, $is_amp);
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	return $url . (($append_url) ? $url_delim . $append_url . $amp_delim : $url_delim) . $params . ((!$session_id) ? '' : $amp_delim . 'sid=' . $session_id) . $anchor;
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	if (is_object($phpbb_seo)) {
+		$phpbb_seo->seo_end();
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	if (!empty($phpbb_seo)) {
+		$phpbb_seo->seo_end();
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+memberlist.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+// Start session management
+$user->session_begin();
+$auth->acl($user->data);
+$user->setup(array('memberlist', 'groups'));
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+if (!empty($_REQUEST['un'])) {
+	$_REQUEST['un'] = rawurldecode($_REQUEST['un']);
+	if (!$phpbb_seo->is_utf8($_REQUEST['un']) && function_exists('utf8_encode')) {
+		$_REQUEST['un'] = utf8_normalize_nfc(utf8_encode($_REQUEST['un']));
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ OPEN ]------------------------------------------
+#
+search.php
+#
+#-----[ FIND ]------------------------------------------
+#
+	$u_search = trim($u_search, '&amp;');
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	$u_search = preg_replace('`(^&amp;|&amp;$)`i', '', $u_search);
+#
+#-----[ OPEN ]------------------------------------------
+#
+styles/prosilver/template/simple_header.html
+#
+#-----[ FIND ]------------------------------------------
+#
+<head>
+#
+#-----[ AFTER, ADD]------------------------------------------
+#
+{SEO_BASE_HREF}
+#
+#-----[ OPEN ]------------------------------------------
+#
+styles/subsilver2/template/overall_header.html
+#
+#-----[ FIND ]------------------------------------------
+#
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+function jumpto()
+{
+	var page = prompt('{LA_JUMP_PAGE}:', '{ON_PAGE}');
+	var perpage = '{PER_PAGE}';
+	var base_url = '{A_BASE_URL}';
+	var seo_delim_start = '{SEO_START_DELIM}';
+	var seo_static_pagination = '{SEO_SATIC_PAGE}';
+	var seo_ext_pagination = '{SEO_EXT_PAGE}';
+
+	if (page !== null && !isNaN(page) && page > 0) {
+		var seo_page = (page - 1) * per_page;
+		if ( base_url.indexOf('?') >= 0 ) {
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page;
+		} else if ( seo_page > 0 ) {
+			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
+			if (seo_type1 !== null) {
+				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1;
+			}
+			var seo_type2 = base_url.match(/\/$/);
+			if (seo_type2 !== null) {
+				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination;
+			}
+		} else {
+			document.location.href = base_url;
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+function jumpto() {
+	var page = prompt('{LA_JUMP_PAGE}:', '{ON_PAGE}');
+	var perpage = '{PER_PAGE}';
+	var base_url = '{A_BASE_URL}';
+	var seo_delim_start = '{SEO_START_DELIM}';
+	var seo_static_pagination = '{SEO_SATIC_PAGE}';
+	var seo_ext_pagination = '{SEO_EXT_PAGE}';
+	if (page !== null && !isNaN(page) && page > 0) {
+		var seo_page = (page - 1) * perpage;
+		if ( base_url.indexOf('?') >= 0 ) {
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page;
+		} else if ( seo_page > 0 ) {
+			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
+			if (seo_type1 !== null) {
+				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1;
+			}
+			var seo_type2 = base_url.match(/\/$/);
+			if (seo_type2 !== null) {
+				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination;
+			}
+		} else {
+			document.location.href = base_url;
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ OPEN ]------------------------------------------
+#
+styles/subsilver2/template/simple_header.html
+#
+#-----[ FIND ]------------------------------------------
+#
+<head>
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+{SEO_BASE_HREF}
+#
+#-----[ OPEN ]------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------
+#
+	$_REQUEST['hilit'] = urldecode($_REQUEST['hilit']);
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	$_REQUEST['hilit'] = rawurldecode($_REQUEST['hilit']);
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

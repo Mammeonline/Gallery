@@ -1,0 +1,8 @@
+Tapatalk
+PHP Version: 5.6.35-1+ubuntu16.04.1+deb.sury.org+1
+DBMS: MySQL(i) 5.7.18-ndb-7.6.3
+phpBB3 Version: 3.0.14
+
+Rimozione acp modulo: Tapatalk - In App Registration
+ERRORE: Il modulo non esiste.
+

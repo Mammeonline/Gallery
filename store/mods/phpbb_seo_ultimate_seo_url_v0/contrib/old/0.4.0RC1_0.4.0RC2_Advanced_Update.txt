@@ -1,0 +1,140 @@
+##############################################################
+## MOD Title: 		phpBB SEO Advanced mod Rewrite 0.4.0RC1 => 0.4.0RC2 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO Advanced mod Rewrite 0.4.0RC1 => 0.4.0RC2 update.
+## 			Check http://www.phpbb-seo.com/
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	2 Minutes
+## Files To Edit: 	(2)
+##			includes/functions.php,
+##			styles/prosilver/template/viewtopic_body.html,
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Advanced mod Rewrite 0.2.0RC3 => 0.4.0RC1 update.
+##
+## PLEASE NOTE :
+## _____________
+##
+## There is no step by step update of the phpbb_seo_class.php file, 
+## this mean you will have to proceed to the settings again in the file.
+## As well, you will have to empty the phpBB/cache/ folder before the mod will fully work, 
+## just delete all files BUT the .htaccess.
+## You will have to CHMOD the phpbb_seo/cache/ folder to 0777 for the cache feature to work.
+## 
+## 
+##
+##############################################################
+## MOD History:
+##
+##	2007-08-10 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+_________________________________________
+>>>>   INSTALLATION INSTRUCTIONS    <<<<<
+_________________________________________
+
+This update procedure will keep the previous URL standard used depending on the phpbb_seo_class.php settings.
+Please read the install for more information about the 0.4.0 new features. 
+They will most likely imply new URLs wich will require an .htaccess update.
+
+You will have to CHMOD the phpbb_seo/cache/ folder to 0777 for the cache feature to work.
+
+_________
+WARNING :
+_________
+
+There is no step by step update of the phpbb_seo_class.php file, but the cached settings will remain untouched.
+You will though have to mod this file again in case you added the zero duplicate.
+As well, you will have to empty the phpBB/cache/ folder before the mod will fully work, 
+just delete all files BUT the .htaccess.
+
+
+#
+#-----[ DELETE ]--------------------------------------------------
+#
+
+delete			language/en/phpbb_seo/phpbb_seo.php
+delete			phpbb_seo/cache/.htaccess
+delete			phpbb_seo/.htaccess
+delete			phpbb_seo/forum_cache.php
+delete			phpbb_seo/functions_manage.php
+delete			phpbb_seo/htaccess.php
+delete			phpbb_seo/phpbb_seo_class.php
+delete			phpbb_seo/seo_settings.php
+delete			phpbb_seo.php
+delete			styles/phpbb-seo.png
+delete			styles/prosylver/template/phpbb_seo/phpbb_seo_body.html
+delete			styles/prosylver/template/phpbb_seo/phpbb_seo_default.html
+delete			styles/prosylver/template/phpbb_seo/phpbb_seo_forum.html
+delete			styles/prosylver/template/phpbb_seo_htaccess.html
+delete			styles/prosylver/template/phpbb_seo_settings.html
+
+#
+#-----[ COPY ]--------------------------------------------------
+#
+
+copy root/*.* to *.*
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+/**
+* Generate page footer
+*/
+function page_footer($run_cron = true)
+{
+	global $db, $config, $template, $user, $auth, $cache, $starttime, $phpbb_root_path, $phpEx;
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	$phpbb_seo->seo_end();
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/overall_footer.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	<br/><a href="http://www.phpbb-seo.com/" title="Search Engine Optimization"><img src="{PHPBB_FULL_URL}styles/phpbb-seo.png" alt="phpBB SEO"/></a> 
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+# EG : Delete
+# Note : The copyright tag is now added from elsewhere
+
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

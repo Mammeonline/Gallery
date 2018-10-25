@@ -1,0 +1,213 @@
+##############################################################
+## MOD Title: 		phpBB SEO Advanced mod Rewrite 0.4.4 => 0.4.6 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO Advanced mod Rewrite 0.4.4 => 0.4.6 update.
+## 			Check http://www.phpbb-seo.com/boards/advanced-seo-url/advanced-phpbb3-seo-url-vt1219.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	10 Minutes
+## Files To Edit: 	(6)
+##			includes/functions.php,
+##			language/en/acp/common.php,
+##			memberlist.php,
+##			phpbb_seo/phpbb_seo_class.php (DIY),
+##			viewforum.php,
+##			viewtopic.php.
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Advanced mod Rewrite 0.4.4 => 0.4.6 update.
+##
+##############################################################
+## MOD History:
+##
+##	2008-11-21 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+_________________________________________
+>>>>   INSTALLATION INSTRUCTIONS    <<<<<
+_________________________________________
+
+This update procedure will keep the previous URL standard used depending on the phpbb_seo_class.php settings.
+
+!!!!! YOU WILL HAVE TOO take the new phpbb_seo_class.php file and redo the mod you eventually made there, 
+Like the zero duplicate or the static and delimiters.
+There are many changes in this file so it is faster this way.
+
+You will need to upload / overwrite the following files :
+	includes/acp/acp_phpbb_seo.php
+	includes/acp/info/acp_phpbb_seo.php
+	language/en/acp/phpbb_seo.php
+	language/fr/acp/phpbb_seo.php
+	phpbb_seo/phpbb_seo_install.php
+
+Once you will have updated, you will have to refresh your theme's cache as well as phpBB's cache (ACP => STYLE, Themes => Refresh).
+
+#
+#-----[ COPY ]------------------------------------------
+#
+
+root/includes/acp/acp_phpbb_seo.php		to 	includes/acp/acp_phpbb_seo.php
+root/includes/acp/info/acp_phpbb_seo.php	to 	includes/acp/info/acp_phpbb_seo.php
+root/language/en/acp/phpbb_seo.php		to 	language/en/acp/phpbb_seo.php
+root/language/fr/acp/phpbb_seo.php		to 	language/fr/acp/phpbb_seo.php
+root/phpbb_seo/phpbb_seo_install.php		to 	phpbb_seo/phpbb_seo_install.php
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	return strpos($redirect, 'http://') !== false ? trim($redirect, '?') : reapply_sid(str_replace('&', '&amp;', $redirect));
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	$redirect = (preg_match('`^https?://`i', $redirect) ? '' : $phpbb_root_path) . trim(str_replace('&', '&amp;', $redirect), '? ');
+	return reapply_sid($redirect);
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+language/en/acp/common.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	'SEO_LOG_INSTALL_PHPBB_SEO' => '<strong>phpBB SEO mod rewrite installed</strong>',
+	'SEO_LOG_INSTALL_PHPBB_SEO_FAIL' => '<strong>phpBB SEO mod rewrite install attempt failed</strong>',
+	'SEO_LOG_UNINSTALL_PHPBB_SEO' => '<strong>phpBB SEO mod rewrite uninstalled</strong>',
+	'SEO_LOG_UNINSTALL_PHPBB_SEO_FAIL' => '<strong>phpBB SEO mod rewrite uninstall attempts failed</strong>',
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	'SEO_LOG_INSTALL_PHPBB_SEO' => '<strong>phpBB SEO mod rewrite installed (v%s)</strong>',
+	'SEO_LOG_INSTALL_PHPBB_SEO_FAIL' => '<strong>phpBB SEO mod rewrite install attempt failed</strong><br/>%s',
+	'SEO_LOG_UNINSTALL_PHPBB_SEO' => '<strong>phpBB SEO mod rewrite uninstalled (v%s)</strong>',
+	'SEO_LOG_UNINSTALL_PHPBB_SEO_FAIL' => '<strong>phpBB SEO mod rewrite uninstall attempts failed</strong><br/>%s',
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+memberlist.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+				$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+				// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+				if ( $phpbb_seo->seo_opt['profile_inj'] && empty($phpbb_seo->seo_url['group'][$row['group_id']]) ) {
+					$phpbb_seo->seo_url['group'][$row['group_id']] = $phpbb_seo->format_url($row['group_name'], $phpbb_seo->seo_static['group']);
+				}
+				// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			'S_MODE_ACTION'		=> $pagination_url)
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			// Here we circumvent because our append_sid does not allow 
+			// an url to end with an ?, as it should.
+			'S_MODE_ACTION'		=> $pagination_url . (strpos($pagination_url, '?') !== false ? '' : '?') )
+			// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ OPEN ]------------------------------------------
+#
+viewforum.php
+#
+#-----[ FIND ]------------------------------------------
+#
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			'U_NEWEST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . $forum_id . '&amp;t=' . $topic_id . '&amp;view=unread') . '#unread',
+			'U_LAST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . $forum_id . '&amp;t=' . $topic_id . '&amp;p=' . $row['topic_last_post_id']) . '#p' . $row['topic_last_post_id'],
+			// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			'U_NEWEST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . (($row['forum_id']) ? $row['forum_id'] : $forum_id) . '&amp;t=' . $topic_id . '&amp;view=unread') . '#unread',
+			'U_LAST_POST'			=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'f=' . (($row['forum_id']) ? $row['forum_id'] : $forum_id) . '&amp;t=' . $topic_id . '&amp;p=' . $row['topic_last_post_id']) . '#p' . $row['topic_last_post_id'],
+			// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ OPEN ]------------------------------------------
+#
+viewtopic.php
+#
+#-----[ FIND ]------------------------------------------
+#
+		$phpbb_seo->seo_opt['topic_type'][$topic_id] = POST_GLOBAL;
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+		// Let's make sure user will see global annoucements
+		$auth->cache[$forum_id]['f_read'] = 1;
+#
+#-----[ FIND ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start&amp;$u_sort_param&amp;view=print" . (($highlight_match) ? "&amp;hilit=$highlight" : '')) : '',
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start&amp;" . ((strlen($u_sort_param)) ? "&amp;$u_sort_param" : '') . (($highlight_match) ? "&amp;hilit=$highlight" : '') . "&amp;view=print") : '',
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ FIND ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks']) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;bookmark=1") : '',
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	'U_BOOKMARK_TOPIC'		=> ($user->data['is_registered'] && $config['allow_bookmarks']) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;bookmark=1&amp;hash=" . generate_link_hash("topic_$topic_id")) : '',
+	// www.phpBB-SEO.com SEO TOOLKIT END
+#
+#-----[ FIND ]------------------------------------------
+#
+		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'U_MINI_POST'		=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id'] . (($topic_data['topic_type'] == POST_GLOBAL) ? '&amp;f=' . $forum_id : '')) . '#p' . $row['post_id'],
+		// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+		'U_MINI_POST'		=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id']) . (($topic_data['topic_type'] == POST_GLOBAL) ? '&amp;f=' . $forum_id : '') . '#p' . $row['post_id'],
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

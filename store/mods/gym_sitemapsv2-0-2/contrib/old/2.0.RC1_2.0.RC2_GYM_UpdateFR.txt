@@ -1,0 +1,243 @@
+##############################################################
+## MOD Title: 		phpBB SEO GYM SItemaps & RSS MAJ 2.0.RC1 => 2.0.RC2
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	Ceci est la procÈdure de mise ‡ jour du MOD GYM SItemaps & RSS pour la transition version 2.0.RC1 => 2.0.RC2
+## 			Rendez-vous sur http://www.phpbb-seo.com/forums/gym-sitemaps-rss/sitemaps-rss-google-yahoo-msn-vt3136.html
+## 			pour toujours obtenir la derniËre version ou de l'aide pour ce MOD.
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	7 Minutes
+## Files To Edit: 	(6)
+##			styles/prosilver/template/viewforum_body.html,
+##			styles/prosilver/theme/common.css,
+##			styles/subsilver2/template/viewforum_body.html,
+##			styles/subsilver2/theme/stylesheet.css,
+##			language/en/acp/common.php,
+##			language/fr/acp/common.php.
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## Voici les instructions de mise ‡ jour : phpBB3 SEO GYM SItemaps & RSS 2.0.RC1 => 2.0.RC2
+##
+##############################################################
+## MOD History:
+##
+##	2008-11-21 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+
+_____________________________________________
+>>>> INSTALLATION POUR VOTRE FORUM <<<<<
+_____________________________________________
+
+Pour mettre ‡ jour depuis n'importe quelle version 2.0.x (phpBB3), vous devrez tout d'abord uploader tous les fichiers contenus dans le dossier root/ de l'archive dans le dossier ftp de phpBB, en prenant soin de conserver vos Èventuelles modification des fichiers de template (dossier phpBB/styles/, .html, .js et .xsl) ajoutÈs par le module. 
+Une fois les fichiers en place, lancez simplement le script de mise ‡ jour (example.com/phpBB/gym_sitemaps/gym_install.php).
+Vos rÈglages seront conservÈs lors de la mise ‡ jour.
+
+Une fois les nouveaux fichiers en place, il vous faudra vider le cache de phpBB et rafraichir vos thËmes (ACP => STYLE => ThËmes => Rafraichir).
+
+Les modifications  de ce fichier concernent les fichier de phpBB3 qui ont ÈtÈ modifiÈs lors de l'installation du module.
+
+Il contient les modification pour les pack de langue Anglais et FranÁais, ignorez simplement celui que vous n'utiliseriez pas du tout.
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/viewforum_body.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+<!-- IF GYM_LINKS --><h3>{GYM_HTML_FORUM_NEWS_LINK} {GYM_HTML_FORUM_MAP_LINK} {GYM_RSS_FORUM_LINK} {GYM_GOOGLE_FORUM_LINK}</h3><!-- ENDIF -->
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+<!-- IF GYM_LINKS --><h3>{GYM_HTML_FORUM_NEWS_LINK} {GYM_HTML_FORUM_MAP_LINK} {GYM_RSS_FORUM_LINK}<!-- IF (TOTAL_PAGES * PER_PAGE) gt GYM_GOOGLE_THRESOLD --> {GYM_GOOGLE_FORUM_LINK}<!-- ENDIF --></h3><!-- ENDIF -->
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/theme/common.css
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+div.gymsublist ul {
+	display:block;
+	position:relative;
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	height:1%;
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/subsilver2/template/viewforum_body.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		<!-- IF GYM_LINKS --><br/><h3>{GYM_HTML_FORUM_NEWS_LINK} {GYM_HTML_FORUM_MAP_LINK} {GYM_RSS_FORUM_LINK} {GYM_GOOGLE_FORUM_LINK}</h3><!-- ENDIF -->
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+		<!-- IF GYM_LINKS --><h3>{GYM_HTML_FORUM_NEWS_LINK} {GYM_HTML_FORUM_MAP_LINK} {GYM_RSS_FORUM_LINK}<!-- IF (TOTAL_PAGES * PER_PAGE) gt GYM_GOOGLE_THRESOLD --> {GYM_GOOGLE_FORUM_LINK}<!-- ENDIF --></h3><!-- ENDIF -->
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/subsilver2/theme/stylesheet.css
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+div.gymsublist ul {
+	display:block;
+	position:relative;
+
+#
+#-----[ AFTER, ADD ]------------------------------------------
+#
+
+	height:1%;
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+language/en/acp/common.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'ACP_CAT_PHPBB_SEO' => 'phpBB SEO',
+	'ACP_GYM_SITEMAPS' => 'GYM Sitemaps &amp; RSS',
+	'ACP_GYM_MAIN' => 'Main configuration',
+	'ACP_GYM_GOOGLE_MAIN' => 'Google Sitemaps',
+	'ACP_GYM_RSS_MAIN' => 'RSS Feeds',
+	'ACP_GYM_YAHOO_MAIN' => 'Yahoo! url list',
+	'ACP_GYM_HTML_MAIN' => 'HTML sitemaps',
+	'GYM_LOG_CONFIG_MAIN' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; Main settings',
+	'GYM_LOG_CONFIG_GOOGLE' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; Google sitemaps',
+	'GYM_LOG_CONFIG_RSS' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; RSS Feeds',
+	'GYM_LOG_CONFIG_HTML' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; HTML sitemaps',
+	'GYM_LOG_CONFIG_YAHOO' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; Yahoo! URL lists',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'ACP_GYM_SITEMAPS' => 'GYM Sitemaps &amp; RSS',
+	'ACP_GYM_MAIN' => 'Main configuration',
+	'ACP_GYM_GOOGLE_MAIN' => 'Google Sitemaps',
+	'ACP_GYM_RSS_MAIN' => 'RSS Feeds',
+	'ACP_GYM_YAHOO_MAIN' => 'Yahoo! url list',
+	'ACP_GYM_HTML_MAIN' => 'HTML sitemaps',
+	'GYM_LOG_CONFIG_MAIN' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; Main settings',
+	'GYM_LOG_CONFIG_GOOGLE' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; Google sitemaps',
+	'GYM_LOG_CONFIG_RSS' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; RSS Feeds',
+	'GYM_LOG_CONFIG_HTML' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; HTML sitemaps',
+	'GYM_LOG_CONFIG_YAHOO' => '<strong>Altered GYM sitemaps &amp; RSS settings</strong><br/>&raquo; Yahoo! URL lists',
+	// Install Logs
+	'SEO_LOG_INSTALL_GYM_SITEMAPS' => '<strong>GYM Sitemaps &amp; RSS V%s Installed</strong>',
+	'SEO_LOG_INSTALL_GYM_SITEMAPS_FAIL' => '<strong>GYM Sitemaps &amp; RSS Un-install attemps failed</strong><br/>%s',
+	'SEO_LOG_UNINSTALL_GYM_SITEMAPS' => '<strong>GYM Sitemaps &amp; RSS V%s Un-installed</strong>',
+	'SEO_LOG_UNINSTALL_GYM_SITEMAPS_FAIL' => '<strong>GYM Sitemaps &amp; RSS Un-install attemps failed</strong><br/>%s',
+	'SEO_LOG_UPDATE_GYM_SITEMAPS' => '<strong>Updated GYM Sitemaps &amp; RSS to V%s</strong>',
+	'SEO_LOG_UPDATE_GYM_SITEMAPS_FAIL' => '<strong>GYM Sitemaps &amp; RSS Update attemps failed</strong><br/>%s',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+language/fr/acp/common.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'ACP_CAT_PHPBB_SEO' => 'phpBB SEO',
+	'ACP_GYM_SITEMAPS' => 'GYM Sitemaps &amp; RSS',
+	'ACP_GYM_MAIN' => 'Configuration g√©n√©rale',
+	'ACP_GYM_GOOGLE_MAIN' => 'Sitemaps Google',
+	'ACP_GYM_RSS_MAIN' => 'Flux RSS',
+	'ACP_GYM_YAHOO_MAIN' => 'Yahoo! urllist.txt',
+	'ACP_GYM_HTML_MAIN' => 'Plans de site HTML',
+	'GYM_LOG_CONFIG_MAIN' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Configuration g√©n√©rale',
+	'GYM_LOG_CONFIG_GOOGLE' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Sitemaps Google',
+	'GYM_LOG_CONFIG_RSS' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Flux RSS',
+	'GYM_LOG_CONFIG_HTML' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Plans de site HTML',
+	'GYM_LOG_CONFIG_YAHOO' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Liste d‚ÄôURLs Yahoo!',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'ACP_GYM_SITEMAPS' => 'GYM Sitemaps &amp; RSS',
+	'ACP_GYM_MAIN' => 'Configuration g√©n√©rale',
+	'ACP_GYM_GOOGLE_MAIN' => 'Sitemaps Google',
+	'ACP_GYM_RSS_MAIN' => 'Flux RSS',
+	'ACP_GYM_YAHOO_MAIN' => 'Yahoo! urllist.txt',
+	'ACP_GYM_HTML_MAIN' => 'Pages HTML',
+	'GYM_LOG_CONFIG_MAIN' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Configuration g√©n√©rale',
+	'GYM_LOG_CONFIG_GOOGLE' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Sitemaps Google',
+	'GYM_LOG_CONFIG_RSS' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Flux RSS',
+	'GYM_LOG_CONFIG_HTML' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Plans de site HTML',
+	'GYM_LOG_CONFIG_YAHOO' => '<strong>Modification des param√®tres de GYM Sitemaps &amp; RSS</strong><br/>&raquo; Liste d‚ÄôURLs Yahoo!',
+	// Install Logs
+	'SEO_LOG_INSTALL_GYM_SITEMAPS' => '<strong>Installation de GYM Sitemaps &amp; RSS V%s</strong>',
+	'SEO_LOG_INSTALL_GYM_SITEMAPS_FAIL' => '<strong>Echec de l‚Äôinstallation de GYM Sitemaps &amp; RSS</strong><br/>%s',
+	'SEO_LOG_UNINSTALL_GYM_SITEMAPS' => '<strong>D√©sinstallation de GYM Sitemaps &amp; RSS V%s</strong>',
+	'SEO_LOG_UNINSTALL_GYM_SITEMAPS_FAIL' => '<strong>Echec de la d√©sinstallation de GYM Sitemaps &amp; RSS</strong><br/>%s',
+	'SEO_LOG_UPDATE_GYM_SITEMAPS' => '<strong>Mise √† jour de GYM Sitemaps &amp; RSS vers V%s</strong>',
+	'SEO_LOG_UPDATE_GYM_SITEMAPS_FAIL' => '<strong>Echec de la mise √† jour de GYM Sitemaps &amp; RSS</strong><br/>%s',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

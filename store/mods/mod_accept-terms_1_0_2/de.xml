@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+
+
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.1.xsd">
+<header>
+	<license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
+	<title lang="de">Nutzungsbedingungen aktzeptieren</title>
+	<description lang="de">Wenn die Nutzungsbedingungen geändert wurden müssen sie von jedem Benutzer akzeptiert werden damit der Account wieder genutzt werden kann.</description>
+	<author-notes lang="de">Auf der Startseite im Adminbereich wird da wo auch der Cache gelehrt werden kann ein weiterer Button hinzugefügt, wenn der geklickt wird werden alle Benutzer dazu aufgefordert die neuen Regeln zu akzeptieren oder sie werden wieder ausgeloggt und bei der nächsten Anmeldung erneut dazu aufgefordert.</author-notes>
+	<author-group>
+		<author>
+			<username>tas2580</username>
+			<realname>Tobi Schäfer</realname>
+			<homepage>http://www.phpbb-seo.de/</homepage>
+			<email>tobi.schaefer@gmail.com</email>
+		</author>
+	</author-group>
+
+	<mod-version>1.0.2</mod-version>
+
+	<installation>
+		<level>easy</level>
+		<time>200</time>
+		<target-version>3.0.4</target-version>
+	</installation>
+	<link-group>
+		<link type="parent" lang="de" href="install.xml">Installations-Anleitung</link>
+		<link type="parent" lang="en-gb" href="install.xml">Installation Instructions</link> 
+    </link-group>
+	<history>
+		<entry>
+			<date>2007-06-03</date>
+			<rev-version>0.1.0</rev-version>
+			<changelog lang="de">
+				<change>Erste Veröffentlichung</change>
+			</changelog>
+		</entry>
+		<entry>
+			<date>2008-06-29</date>
+			<rev-version>1.0.0</rev-version>
+			<changelog lang="de">
+				<change>Benutzt MODX v1.2.0</change>
+				<change>Finale Veröffentlichung</change>
+			</changelog>
+		</entry>
+		<entry>
+			<date>2008-06-29</date>
+			<rev-version>1.0.1</rev-version>
+			<changelog lang="de">
+				<change>Rechtschreibfehler korrigiert</change>
+			</changelog>
+		</entry>
+		<entry>
+			<date>2009-01-18</date>
+			<rev-version>1.0.1</rev-version>
+			<changelog lang="en-GB">
+				<change>FKleine Fehler korrigiert</change>
+			</changelog>
+		</entry>
+	</history>
+</header>
+
+<action-group>
+	<open src="language/de/common.php">
+		<edit>
+		  <find><![CDATA[	'NEW_POSTS'					=> 'Neue Beiträge',]]></find>
+		  <action type="after-add"><![CDATA[	'NEW_RULES'					=> 'Die Nutzungsbedingungen haben sich geändert! Um deinen Account weiterhin benutzen zu können musst du die neuen %sNutzungsbedingungen%s akzeptieren!',
+	'UPDATE_TERMS'				=> 'Nutzungsbedingungen akzeptieren',
+	'UPDATE_TERMS_EXPLAIN'		=> 'Alle Benutzer müssen die neuen Nutzungsbedingungen akzeptieren bevor sie ihren Account wieder benutzen können.',
+	'RESET_TERMS'				=> 'Alle Benutzer müssen die Nutzungsbedingungen akzeptieren',]]></action>
+      </edit>
+    </open>
+</action-group>
+</mod>

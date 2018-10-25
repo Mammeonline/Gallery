@@ -1,0 +1,226 @@
+##############################################################
+## MOD Title: 		phpBB SEO Rewrite Avancé MAJ 0.4.0RC3 => 0.4.0RC4
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	Ceci est la procédure de mise à jour du MOD phpBB SEO Rewrite Avancé pour la transition version 0.4.0RC3 => 0.4.0RC4.
+## 			Rendez-vous sur http://www.phpbb-seo.com/
+## 			pour toujours obtenir la dernière version ou de l'aide pour ce MOD.
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	5 Minutes
+## Files To Edit: 	(4)
+##			includes/functions.php,
+##			phpbb_seo/phpbb_seo_class.php,
+##			styles/prosilver/template/forum_fn.js,
+##			styles/prosilver/template/overall_header.html.
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## Voici les instructions de mise à jour : phpBB3 SEO Mod Rewrite Avancé 0.4.0RC3 => 0.4.0RC4
+##
+##############################################################
+## MOD History:
+##
+##	2007-10-15 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+
+_____________________________________________
+>>>> INSTALLATION POUR VOTRE FORUM <<<<<
+_____________________________________________
+
+La procédure d'installation qui suit conservera votre standard d'URL actuel, en fonction des réglages de la classe phpbb_seo_class.php.
+Auncune modification des réglages et du .htaccess.
+
+#
+#-----[ COPY ]------------------------------------------
+#
+root/translations/fr/acp/phpbb_seo.php		to language/fr/acp/phpbb_seo.php
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		$tpl_prefix . 'PER_PAGE'	=> $per_page,
+		$tpl_prefix . 'PREVIOUS_PAGE'	=> $prev,
+		$tpl_prefix . 'NEXT_PAGE'	=> $next,
+		$tpl_prefix . 'TOTAL_PAGES'	=> $total_pages)
+
+#
+#-----[ BEFORE, ADD]------------------------------------------
+# Cet ajout est ici pour simplifier la mise à jour, il fait en fait parti de
+# la MAJ phpBB3.0.RC5=>RC7.
+# Il est donc possible que ce code soit déjà à sa place, si c'est le cas, ignorez ce BEFORE ADD.
+
+		'A_' . $tpl_prefix . 'BASE_URL'	=> addslashes($base_url),
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	if ( !defined('ADMIN_START') ) {
+		$template->assign_vars( array( 'PHPBB_FULL_URL' => $phpbb_seo->seo_path['phpbb_url'], 'SEO_BASE_HREF' => $phpbb_seo->seo_opt['seo_base_href'] ) );
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+# EG Delete
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	if (defined('HEADER_INC'))
+	{
+		return;
+	}
+
+#
+#-----[ AFTER, ADD]------------------------------------------
+# 
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	global $phpbb_seo;
+	$template->assign_vars( array( 'PHPBB_FULL_URL' => $phpbb_seo->seo_path['phpbb_url'], 
+			'SEO_BASE_HREF' => $phpbb_seo->seo_opt['seo_base_href'], 
+			'SEO_START_DELIM' => $phpbb_seo->seo_delim['start'], 
+			'SEO_SATIC_PAGE' => $phpbb_seo->seo_static['pagination'], 
+			'SEO_EXT_PAGE' => $phpbb_seo->seo_ext['pagination'])
+	);
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+phpbb_seo/phpbb_seo_class.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	var	$version = '0.4.0RC3';
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	var	$version = '0.4.0RC4';
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/forum_fn.js
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+function jumpto()
+{
+	var page = prompt(jump_page, on_page);
+	var seo_ext_html = '.html';
+	var seo_ext_htm = '.htm';
+	var seo_ext_slash = '/';
+	var seo_delim_start = '-';
+	if (page !== null && !isNaN(page) && page > 0)
+	{
+		base_url = base_url.replace(/&amp;/g, '&');
+		if ( ((page - 1) * per_page) > 0 ) {
+			if (base_url.indexOf(seo_ext_html) >0 && base_url.indexOf('?') < 0) {
+				document.location.href = base_url.replace(/.html/, '') + seo_delim_start + ((page - 1) * per_page) + seo_ext_html;
+			} else if (base_url.indexOf(seo_ext_htm) >0 && base_url.indexOf('?') < 0) {
+				document.location.href = base_url.replace(/.htm/, '') + seo_delim_start + ((page - 1) * per_page) + seo_ext_htm;
+			} else if (base_url.indexOf(seo_ext_slash) >0 && base_url.indexOf('?') < 0) {
+				document.location.href = base_url.replace(new RegExp(/\/$/),"") + seo_delim_start + ((page - 1) * per_page) + seo_ext_slash;
+			} else {
+				document.location.href = base_url + '&start=' + ((page - 1) * per_page);
+			}
+		} else {
+			document.location.href = base_url;
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+function jumpto() {
+	var page = prompt(jump_page, on_page);
+	if (page !== null && !isNaN(page) && page > 0) {
+		var seo_page = (page - 1) * per_page;
+		if ( base_url.indexOf('?') >= 0 ) {
+			document.location.href = base_url.replace(/&amp;/g, '&') + '&start=' + seo_page;
+		} else if ( seo_page > 0 ) {
+			var seo_type1 = base_url.match(/\.[a-z0-9]+$/i);
+			if (seo_type1 !== null) {
+				document.location.href = base_url.replace(/\.[a-z0-9]+$/i, '') + seo_delim_start + seo_page + seo_type1;
+			}
+			var seo_type2 = base_url.match(/\/$/);
+			if (seo_type2 !== null) {
+				document.location.href = base_url + seo_static_pagination + seo_page + seo_ext_pagination;
+			}
+		} else {
+			document.location.href = base_url;
+		}
+	}
+}
+// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+styles/prosilver/template/overall_header.html
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	var onload_functions = new Array();
+	var onunload_functions = new Array();
+
+#
+#-----[ AFTER, ADD]------------------------------------------
+#
+
+	// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+	var seo_delim_start = '{SEO_START_DELIM}';
+	var seo_static_pagination = '{SEO_SATIC_PAGE}';
+	var seo_ext_pagination = '{SEO_EXT_PAGE}';
+	// www.phpBB-SEO.com SEO TOOLKIT END
+
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

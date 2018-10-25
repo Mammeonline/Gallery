@@ -1,0 +1,41 @@
+##############################################################
+## MOD Title: 		phpBB SEO GYM SItemaps & RSS 2.0.RC3 => 2.0.RC4 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO GYM SItemaps & RSS 2.0.RC3 => 2.0.RC4 update.
+## 			Check http://www.phpbb-seo.com/en/gym-sitemaps-rss/google-yahoo-msn-sitemaps-rss-t2734.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	0 Minutes
+## Files To Edit: 	(0)
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO GYM SItemaps & RSS 2.0.RC3 => 2.0.RC4 update.
+##
+##############################################################
+## MOD History:
+##
+##	2009-06-4 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+
+This update does not involve phpBB file update, only the GYM file must be up to date.
+Overwrite all GYM files if you manually update from 2.0.RC3 to 2.0.RC4 and run gym_sitemaps/gym_install.php in update mode.
+
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

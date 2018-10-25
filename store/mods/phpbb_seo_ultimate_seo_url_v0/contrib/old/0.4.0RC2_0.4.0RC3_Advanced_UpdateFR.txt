@@ -1,0 +1,79 @@
+##############################################################
+## MOD Title: 		phpBB SEO Rewrite Avancé MAJ 0.4.0RC1 => 0.4.0RC2
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	Ceci est la procédure de mise à jour du MOD phpBB SEO Rewrite Avancé pour la transition version 0.4.0RC1 => 0.4.0RC2.
+## 			Rendez-vous sur http://www.phpbb-seo.com/
+## 			pour toujours obtenir la dernière version ou de l'aide pour ce MOD.
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	2 Minutes
+## Files To Edit: 	(2)
+##			includes/functions.php,
+##			styles/prosilver/template/viewtopic_body.html,
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## Voici les instructions de mise à jour : phpBB3 SEO Mod Rewrite Avancé 0.4.0RC2 => 0.4.0RC3
+##
+## NOTE :
+## _____________
+##
+## Il n'y a pas de mise à jour pas à pas du fichier phpbb_seo_class.php, 
+## vous devrez donc remettre vos réglages dans celui-ci.
+## De plus, il vous faudra vider le dossier phpBB/cache/ avant de pouvoir utiliser pleinement ce mod,
+## effacez simplement tout son contenu SAUF le .htaccess.
+## Vous devrez également CHMODer le dossier phpbb_seo/cache/ à 0777.
+##
+##
+##############################################################
+## MOD History:
+##
+##	2007-09-15 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+
+_____________________________________________
+>>>> INSTALLATION POUR VOTRE FORUM <<<<<
+_____________________________________________
+
+Cette mise à jour est la même que vous utilisiez la version 0.4.0RC2a ou la 0.4.0RC2.
+
+La procédure d'installation qui suit conservera votre standard d'URL actuel, en fonction des réglages de la classe phpbb_seo_class.php.
+Veuillez lire attentivement l'installation, vous y trouverez plus d'information à propos des nouvelles fonctionnalités de la 0.4.0.
+Il y a des chances que cela implique une envie de changer d'url, et donc de .htaccess.
+
+Vous devrez également CHMODer le dossier phpbb_seo/cache/ à 0777.
+
+N'oubliez pas de remplacer le fichier de langue français du dossier translation/.
+_______________
+AVERTISSEMENT :
+_______________
+
+Il n'y a pas de mise à jour pas à pas du fichier phpbb_seo_class.php, les réglage en cache restront inchangés.
+Vous devrez cependant effectuer de nouveau les changement du zero dupe dans ce fichier ainsi que les éventuelles configuration de délimiteur, parties statiques etc ...
+De plus, il vous faudra vider le dossier phpBB/cache/ avant de pouvoir utiliser pleinement ce mod,
+effacez simplement tout son contenu SAUF le .htaccess.
+
+#
+#-----[ COPY ]--------------------------------------------------
+# Et bien entendu, écrasez les fichiers présents.
+
+copy root/*.* to *.*
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (offline version)"/>
+		<license><![CDATA[http://opensource.org/osi3.0/licenses/lgpl-license.php GNU Lesser General Public License]]></license>
+		<title lang="en"><![CDATA[GYM sitemap & RSS - Google Yahoo Msn Bing]]></title>
+		<description lang="en"><![CDATA[Fully modular solution for generating Google Yahoo & MSN sitemaps for phpBB
+This mod will create a Google SitemapIndex and auto generated Google Sitemaps for phpBB
+It will as well create many different RSS 2.0 feeds. Uses a full support Gun-zip cache for all types of outputs and some XSL-Transform styling for Sitemaps and RSS feeds.
+Please visit the release thread for updates and further information : 
+http://www.phpbb-seo.com/en/gym-sitemaps-rss/google-yahoo-msn-sitemaps-rss-t2734.html]]></description>
+		<description lang="fr"><![CDATA[Solution modulaire pour générer des plans Sitemaps Google et des flux RSS 2.0 pour phpBB
+Ce mod va créer un SitemapIndex Google établissant la liste des Sitemaps Google installés.
+Il génère également des flux RSS 2.0.
+Utilise un système de cache supportant pleinement la compression GZip, ainsi que de la mise en forme XSLTransform pour les plans de site Google et les flux RSS.
+Visitez http://www.phpbb-seo.com/fr/gym-sitemaps-rss/sitemaps-rss-google-yahoo-msn-t3136.html pour obtenir du support et vérifier l'existence de mise à jour.]]></description>
+		<author-notes lang="en"><![CDATA[This mod is designed to allow many additional modules.
+Check http://www.phpbb-seo.com/en/gym-sitemaps-rss/.
+
+This mod is really going to help a lot to be indexed in Google, Yahoo and MSN Bing.
+ * The code is meant to be as fast and light as possible while providing many features.
+All listings can be cached, allowing a greater amount of links in listings.
+The cache fully support GZip. If activated, the sitemaps will be cached compressed and sent as is upon demand. This mean that 50 ko can be enough to send 10 000 URL sitemaps.
+It is ready for huge forums and can adapt to many situations.
+
+ * All major queries are separated into several cycles, configurable in ACP.
+Possibility to exclude forums from the listings, configurable in ACP.
+Possibility to limit the number of url outputted, configurable in ACP.
+Possibility to limit the messages selection by time when applicable, configurable in ACP.
+All outputted links are sorted according to last activity, configurable in ACP.
+Mod rewrite for the module page URLs, configurable in ACP. (Require Apache with mod_rewrite module or IIS with isapi_rewrite)
+
+Mod rewrite for outputted links, 4 Kinds configurable, none, simple, mixed and advanced, configurable in ACP.
+The phpBB SEO mod Rewrite will be auto discovered.
+Various priority settings for phpBB, configurable in ACP.
+
+ * Possibility to output (and limit) paginated topics url, configurable in ACP.
+Pagination will be limited like this :
+You can set up the upper and down limit for pagination in ACP for each typ of output, eg sitemaps, RSS feeds and urllist.php.
+
+ "begin"               "end"
+    |                       |
+    |  Down Up        |
+    |     |     |          |
+    v     v     v        v
+    1, 2, 3 ... 10, 11, 12
+
+
+ * Only valid content is listed in Google sitemaps. 100% sitemap 0.9 Valid output.
+
+ * RSS feeds supports authentication. 100% RSS 2.0 Valid output.
+
+ * Styling : All XML outputs (RSS and sitemaps) can be styled using XSL transform style-sheets.
+XSL style-sheets are generated dynamically and cached, you can apply your forum's css to the outputs when using the same theme.
+
+ * Modules provided in the package :
+	- RSS Forum : builds RSS feeds for phpBB3 with many features, support phpBB3 authorisations.
+	  Please read the release thread for more details;
+	- Sitemaps Forum : Builds sitemaps (0.9) for phpBB3 with many features.
+	- XML Sitemaps : Builds sitemaps (0.9) out of valid xml sitemaps with many features, 
+	  such as robots.txt parsing, randomization and much more.
+	- TXT Sitemaps : Builds sitemaps (0.9) out of text files (one url per line) with many features,
+	  such as robots.txt parsing, randomization and much more.]]></author-notes>
+		<author-notes lang="fr"><![CDATA[Ce MOD est conçu pour accueillir de nombreux modules, visitez le forum consacré pour plus de détails : http://www.phpbb-seo.com/fr/gym-sitemaps-rss/
+
+Ce MOD va réellement contribuer au référencement de votre site dans Google, Yahoo et MSN Bing.
+
+ * Le code source est conçu pour être le plus rapide et le plus léger possible, tout en offrant un maximum de possibilités.
+Toutes les listes (RSS, Sitemaps, etc.) peuvent être mises en cache, ce qui permet de lister plus de liens encore.
+Le cache peut lui-même utiliser la compression GZip, les plans sont alors mis en cache, compressés et envoyés tels quels à la demande. Cela signifie que 50 Ko suffisent à transférer un plan de site Google contenant 10 000 URLs.
+Ce code est prêt pour de très gros forums et peut s'adapter à de nombreuses situations.
+
+ * Toutes les requêtes SQL potentiellement gourmandes sont découpées en plusieurs cycles de requêtes, configurables dans le panneau d'administration pour chaque type de listes.
+Possibilité d'exclure certains forums de l'affichage ; configurable dans le panneau d'administration.
+Possibilité de limiter le nombre total d'URLs par Sitemap ; configurable dans le panneau d'administration.
+Possibilité de limiter la sélection de messages selon l'âge des éléments ; configurable dans le panneau d'administration.
+Tous les liens sont classés par date de dernière activité ; configurable dans le panneau d'administration.
+Réécriture d'URL pour les URLs des pages du module ; configurable dans le panneau d'admin. (Requiert Apache et mod_rewrite ou IIS et isapi_rewrite)
+
+Réécriture d'URL pour les liens listés via 4 niveaux : aucun, simple, intermédiaire et avancé ; configurable dans le panneau d'administration.
+Les MOD Rewrite phpBB SEO 0.2.x seront détectés automatiquement.
+Plusieurs options de priorité pour phpBB ; configurable dans le panneau d'administration.
+
+ * Possibilité de lister (et limiter) les sujets multi-pages ; configurable dans le panneau d'administration.
+La pagination est limitée de cette façon :
+Vous pouvez définir une limite haute et une limite basse dans le panneau d'administration pour chaque type de rendu (Sitemaps, flux RSS, etc.)
+
+ "début"               "fin"
+    |                      |
+    |    bas  haut     |
+    |     |      |         |
+    v     v     v        v
+    1, 2, 3 ... 10, 11, 12
+
+
+ * Seul le contenu valide est listé dans les Sitemaps Google ; Sitemaps 100% valides au format sitemap 0.9.
+ 
+ * Les flux RSS supportent les autorisations de phpBB, ils sont 100% valides au format RSS 2.0.
+
+ * Mise en page : les rendus au format XML (flux RSS et Sitemaps Google) peuvent être mise en forme par transformation XSL, les feuilles de style sont générées dynamiquement et mises en cache, vous pouvez appliquer la feuille de style CSS de votre forum s'il utilise le même thème que ceux fournis.
+
+ * Modules inclus dans ce package :
+	- RSS Forum : généré de nombreux flux RSS 2.0 pour phpBB3, pouvant reprendre les autorisations du forum.
+	  Veuillez vous reporter au sujet de mise à disposition pour plus de détails.
+	- Sitemaps Forum : génère des Sitemaps Google largement configurables pour phpBB3.
+	- Sitemaps XML : génère des Sitemaps Google à partir de Sitemaps externes au forum avec de nombreuses fonctions,
+	  comme la prise en compte des exclusions du fichier robots.txt et plus encore.
+	- Sitemaps TXT : génère des Sitemaps Google à partir de fichiers textes externes (une URL par ligne) avec de nombreuses fonctions, comme la prise en compte des exclusions du fichier robots.txt et plus encore.]]></author-notes>
+		<author-group>
+			<author>
+				<username phpbbcom="no"><![CDATA[phpBB SEO Team]]></username>
+				<homepage><![CDATA[http://www.phpbb-seo.com/]]></homepage>
+			</author>
+		</author-group>
+		<mod-version><![CDATA[2.0.2]]></mod-version>
+		<installation>
+			<level><![CDATA[easy]]></level>
+			<time><![CDATA[600]]></time>
+			<target-version><![CDATA[3.0.8]]></target-version>
+		</installation>
+		<history>
+			<entry>
+				<date><![CDATA[2010/11/28]]></date>
+				<rev-version><![CDATA[2.0.2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added : image size to gym links]]></change>
+					<change><![CDATA[Added : Full ssl support (sitemaps use https only if https is forced, but xsl always does the trick to maintain ssl session)]]></change>
+					<change><![CDATA[Added : Make sure that each script url is properly set in ACP.]]></change>
+					<change><![CDATA[Various minor fixes and enhancements]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2010-03-05]]></date>
+				<rev-version><![CDATA[2.0.1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to comply with phpBB 3.0.7]]></change>
+					<change><![CDATA[Fixed : Global announcement feed]]></change>
+					<change><![CDATA[Fixed : Allow to add modules with no acp]]></change>
+					<change><![CDATA[En language pack fixes from sevenalive (@phpBB SEO)]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-11-23]]></date>
+				<rev-version><![CDATA[2.0.0]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated to comply with phpBB 3.0.6,]]></change>
+					<change><![CDATA[Fixed : Profile link not rewritten on news pages,]]></change>
+					<change><![CDATA[Fixed : GYM linking when used standalone,]]></change>
+					<change><![CDATA[Fixed : Typos in language paks,]]></change>
+					<change><![CDATA[Fixed : Bug in the last topic listing dealing with global announcements,]]></change>
+					<change><![CDATA[Fixed : Bad calls to gym_sitemaps::gym_error,]]></change>
+					<change><![CDATA[Fixed : Topic tracking on last active topics,]]></change>
+					<change><![CDATA[Fixed : minor issue with passworded forums,]]></change>
+					<change><![CDATA[Fixed : Send a 404 when no forum are readable / viewable by the user,]]></change>
+					<change><![CDATA[Fixed : Standalone usage bug dealing with the no duplicate display,]]></change>
+					<change><![CDATA[Fixed : RSS parser when html is activated (preserve double escaped as escaped),]]></change>
+					<change><![CDATA[Added : Bot auth support for sitemaps,]]></change>
+					<change><![CDATA[Added : Last post link on last topic view,]]></change>
+					<change><![CDATA[Added : No html option for rss feeds,]]></change>
+					<change><![CDATA[Added : Option for displaying each type of links among the forum,]]></change>
+					<change><![CDATA[Reorganized language pack,]]></change>
+					<change><![CDATA[SEOed the prosilver templates, left col comes first now, + other display enhancements,]]></change>
+					<change><![CDATA[Removed deprecated & usage (php5.3.0) when starting the module classes.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-06-10]]></date>
+				<rev-version><![CDATA[2.0.RC5]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed : Glitch in gym_sitemaps/includes/gym_sitemaps.php.]]></change>
+					<change><![CDATA[Added : more option for displaying RSS links among the forum,]]></change>
+					<change><![CDATA[Fixed : News feeds ordering,]]></change>
+					<change><![CDATA[Added : subsilver2 html templates,]]></change>
+					<change><![CDATA[Fixed : Google ping again!,]]></change>
+					<change><![CDATA[Fixed : RSS channel validation,]]></change>
+					<change><![CDATA[Fixed : Google XML and TXT modules,]]></change>
+					<change><![CDATA[Various bug fixes and enhancement.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-06-05]]></date>
+				<rev-version><![CDATA[2.0.RC4]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added : more option for displaying RSS links among the forum,]]></change>
+					<change><![CDATA[Fixed : News feeds ordering,]]></change>
+					<change><![CDATA[Added : subsilver2 html templates,]]></change>
+					<change><![CDATA[Fixed : Google ping again!,]]></change>
+					<change><![CDATA[Fixed : RSS channel validation,]]></change>
+					<change><![CDATA[Fixed : Google XML and TXT modules,]]></change>
+					<change><![CDATA[Various bug fixes and enhancement.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-12-18]]></date>
+				<rev-version><![CDATA[2.0.RC3]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added more option for displaying links on the forum,]]></change>
+					<change><![CDATA[Fixed Google ping again,]]></change>
+					<change><![CDATA[Various bug fixes and enhancement.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-11-25]]></date>
+				<rev-version><![CDATA[2.0.RC2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed important bug with few list / cat / read auth / type combos case, Complete rewrote of the auth system,]]></change>
+					<change><![CDATA[Added : Sitemap threshold,]]></change>
+					<change><![CDATA[Added : Update script, settings will now be kept among update,]]></change>
+					<change><![CDATA[Various bug fixes and enhancement.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-11-20]]></date>
+				<rev-version><![CDATA[2.0.RC1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added HTML output with many, many features,]]></change>
+					<change><![CDATA[Added links everywhere to the mod's pages,]]></change>
+					<change><![CDATA[Added bookmark service links on item in feeds (thx lemoussel http://www.phpbb-seo.com/fr/gym-sitemaps-rss/sujet3508-15.html#p31031),]]></change>
+					<change><![CDATA[.htaccess generalization, no more rewriterules should be needed in the future,]]></change>
+					<change><![CDATA[Google XSL template now ready for crosssite sitemaps,]]></change>
+					<change><![CDATA[Google XML module now can use external sitemaps as sources,]]></change>
+					<change><![CDATA[Fixed Google ping and yahoo notifications for feeds,]]></change>
+					<change><![CDATA[Various bug fixes and enhancement.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-08-06]]></date>
+				<rev-version><![CDATA[2.0.B3]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[No empty sitemaps are outputed,]]></change>
+					<change><![CDATA[Added a basic RSS 2.0 feed parser to display list of links or posts anywhere in phpBB,]]></change>
+					<change><![CDATA[Show proper message for when GYM or a module is not activated.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-07-10]]></date>
+				<rev-version><![CDATA[2.0.B2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed auto linking bug if the mod is not installed]]></change>
+					<change><![CDATA[Fixed missing utf-8 tag in google sitemaps xsl style sheet]]></change>
+					<change><![CDATA[Fixed notice when all forum are public]]></change>
+					<change><![CDATA[Fixed broken image in footer when outside of the phpBB dir]]></change>
+					<change><![CDATA[Fixed standalone install (without the phpBB SEO mod rewrites)]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-07-01]]></date>
+				<rev-version><![CDATA[2.0.B1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Complete rewrite (OO) of all the phpBB2 script for phpBB3]]></change>
+					<change><![CDATA[Fully modular design, many new features implemented.]]></change>
+				</changelog>
+			</entry>
+		</history>
+		<link-group>
+			<link type="language" href="./xml/fr.xml" lang="en"><![CDATA[French Translation]]></link>
+			<link type="language" href="./xml/fr.xml" lang="fr"><![CDATA[Traduction Française]]></link>
+			<link type="template" href="./xml/subsilver2.xml" lang="en"><![CDATA[subsilver2 modifications]]></link>
+			<link type="template" href="./xml/subsilver2.xml" lang="fr"><![CDATA[Modification pour subsilver2]]></link>
+		</link-group>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/*.*" to="phpBB/*.*"/>
+		</copy>
+		<open src="adm/style/admin.css">
+			<edit>
+				<find><![CDATA[/* Tabbed menu
+	Based on: http://www.alistapart.com/articles/slidingdoors2/
+----------------------------------------*/
+#tabs {
+
+]]></find>
+				<action type="before-add"><![CDATA[/* www.phpbb-seo.com GYM Sitemaps & RSS 
+ * Just some more indepth tabbing */
+#gymtab, #gymtabs {
+	line-height: normal;
+	margin: 0 0 -6px 7px;
+	min-width: 600px;
+	height: 1%;
+	overflow: hidden;
+}
+
+.rtl #gymtab, .rtl #gymtabs {
+	margin: 0 7px -6px 0;
+}
+
+#gymtab ul, #gymtabs ul {
+	margin:0;
+	padding: 0;
+	list-style: none;
+}
+
+#gymtab li, #gymtabs li {
+	display: inline;
+	margin: 0;
+	padding: 0;
+	font-size: 0.85em;
+	font-weight: bold;
+}
+
+#gymtab a, #gymtabs a {
+	float: left;
+	background:url("../images/bg_tabs1.gif") no-repeat 0% -34px;
+	margin: 0 1px 0 0;
+	padding: 0 0 0 7px;
+	text-decoration: none;
+	position: relative;
+}
+
+.rtl #gymtab a, .rtl #gymtabs a {
+	float: right;
+}
+
+#gymtab a span, #gymtabs a span {
+	float: left;
+	display: block;
+	background: url("../images/bg_tabs2.gif") no-repeat 100% -34px;
+	padding: 7px 10px 4px 4px;
+	color: #767676;
+	white-space: nowrap;
+	font-family: Arial, Helvetica, sans-serif;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+.rtl #gymtab a span, .rtl #gymtabs a span {
+	float: right;
+}
+
+/* Commented Backslash Hack hides rule from IE5-Mac */
+#gymtab  a span, #gymtabs a span, .rtl #gymtab a span, .rtl #gymtabs a span { float:none;}
+/* End hack */
+
+#gymtab a:hover span, #gymtabs a:hover span {
+	color: #BC2A4D;
+}
+
+#gymtab #gymactivetab a, #gymtabs #gymactivetabs a {
+	background-position: 0 0;
+	border-bottom: 1px solid #DCDEE2;
+}
+
+#gymtab #gymactivetab a span, #gymtabs #gymactivetabs a span {
+	background-position: 100% 0;
+	padding-bottom: 5px;
+	color: #23649F;
+}
+
+#gymtab  a:hover, #gymtabs a:hover {
+	background-position: 0 -69px;
+}
+
+#gymtab a:hover span, #gymtabs a:hover span {
+	background-position: 100% -69px;
+}
+
+#gymtab #gymactivetab a:hover span , #gymtabs #gymactivetabs a:hover span {
+	color: #115098;
+}
+#gymacp, #gymacps {
+	margin: 4px 0;
+	padding: 3px 1px;
+	min-width: 550px;
+	background-color: #FFFFFF;
+	border: 1px #999999 solid;
+}
+#gymcontent, #gymcontents {
+	padding: 30px 10px 10px;
+	position: relative;
+	padding-top: 10px;
+	height: 1%;
+	overflow: hidden;
+}
+
+
+#gymcontent h1, #gymcontents h1 {
+	line-height: 1.2em;
+	margin-bottom: 0;
+	color: #115098;
+}
+
+#gymcontent h2, #gymcontents h2 {
+	margin-top: 20px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #CCCCCC;
+	padding-bottom: 5px;
+	color: #333333;
+}
+/* www.phpbb-seo.com GYM Sitemaps & RSS 
+ * Just some more indepth tabbing */
+]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions.php">
+			<edit>
+				<find><![CDATA[	define('HEADER_INC', true);
+]]></find>
+				<action type="before-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN - GYM LINKS
+	if (!empty($config['gym_installed'])) {
+		if (!function_exists('obtain_gym_links')) {
+			require_once($phpbb_root_path . 'gym_sitemaps/includes/gym_common.' . $phpEx);
+		}
+		$gym_setup = obtain_gym_links();
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END - GYM LINKS
+]]></action>
+			</edit>
+		</open>
+		<open src="language/en/common.php">
+			<edit>
+				<find><![CDATA[?>
+]]></find>
+				<action type="before-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'GYM_LINKS' => 'Links',
+	'GYM_LINK' => 'Link',
+	'GYM_RSS_SLIDE_START' => 'Start scroller',
+	'GYM_RSS_SLIDE_STOP' => 'Stop scroller',
+	'GYM_RSS_SOURCE' => 'Source',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_footer.html">
+			<edit>
+				<find><![CDATA[		<ul class="linklist">
+]]></find>
+				<action type="replace-with"><![CDATA[		<ul class="linklist<!-- IF GYM_LINKS --> navlinks<!-- ENDIF -->">
+]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		</ul>
+]]></find>
+				<action type="after-add"><![CDATA[		<!-- IF GYM_LINKS -->
+		<ul class="linklist">
+			<!-- IF GYM_HTML_NEWS_LINK --><li class="leftside">{GYM_HTML_NEWS_LINK}</li><!-- ENDIF -->
+			<!-- IF GYM_HTML_MAP_LINK --><li class="leftside">{GYM_HTML_MAP_LINK}</li><!-- ENDIF -->
+			<!-- IF GYM_GOOGLE_LINK --><li class="leftside">{GYM_GOOGLE_LINK}</li><!-- ENDIF -->
+			<!-- IF GYM_RSS_LINK --><li class="leftside">{GYM_RSS_LINK}</li><!-- ENDIF -->
+			<!-- IF GYM_RSS_CHAN_LINK --><li class="leftside">{GYM_RSS_CHAN_LINK}</li><!-- ENDIF -->
+		</ul>
+		<!-- ENDIF -->
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_header.html">
+			<edit>
+				<find><![CDATA[{META}
+
+]]></find>
+				<action type="after-add"><![CDATA[<!-- BEGIN gym_rsslinks -->
+<link rel="alternate" type="application/rss+xml" title="{gym_rsslinks.TITLE}" href="{gym_rsslinks.URL}" />
+<!-- END gym_rsslinks -->
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/viewforum_body.html">
+			<edit>
+				<find><![CDATA[<h2><a href="{U_VIEW_FORUM}">{FORUM_NAME}</a></h2>
+]]></find>
+				<action type="after-add"><![CDATA[<!-- IF GYM_LINKS_CAT --><h3>{GYM_HTML_FORUM_NEWS_LINK} {GYM_HTML_FORUM_MAP_LINK} {GYM_RSS_FORUM_LINK} {GYM_GOOGLE_FORUM_LINK}</h3><!-- ENDIF -->
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/theme/common.css">
+			<edit>
+				<find><![CDATA[.clear {
+	display: block;
+	clear: both;
+	font-size: 1px;
+	line-height: 1px;
+	background: transparent;
+}
+]]></find>
+				<action type="after-add"><![CDATA[/* GYM Sitemaps & RSS - www.phpbb-seo.com */
+div.gymsublist {
+	display:block;
+	position:relative;
+	padding-left:10px;
+	padding-top:5px;
+	padding-bottom:10px;
+	padding-right:0;
+	margin:0;
+}
+div.gymsublist ul {
+	display:block;
+	position:relative;
+	height:1%;
+	padding-left:30px;
+}
+div.gymsublist ul li {
+	display:block;
+	position:relative;
+	line-height:18px;
+	font-size:11px;
+}
+/* GYM Sitemaps & RSS - www.phpbb-seo.com */
+]]></action>
+			</edit>
+		</open>
+		<php-installer><![CDATA[gym_sitemaps/gym_install.php]]></php-installer>
+		<diy-instructions lang="en"><![CDATA[To update from all 2.0.x (phpBB3) versions you will have to upload all files in the root/ directory of the archive to your phpBB/ ftp directory, after you will have taken care manually of the eventual code change you would have implemented in the template files (directory phpBB/styles/, .html, .js and .xsl) added by the module.
+Once done, just lunch the update script (example.com/phpBB/gym_sitemaps/gym_install.php).
+Your settings will be kept during the update process.
+
+Updating from the previous version, you will need to implement the changes listed in contrib/2.0.RC5_2.0.0_GYM_Update.txt, as well displayed by the updater, to update the phpBB files modified by this module.
+
+If you previously where using the phpBB2 version, you will be able to provide the new rewritten urls to subscriber of the old feeds. 
+To do so, you will need to activate the "Handle GYM 1x rewritten URL" option in the RSS feeds main configuration, under the URL Rewriting tab.
+You will as well need to add these rewriterule :
+
+#####################################################
+# Redirect GYM 1.x RSS Feeds
+# Mais feeds
+RewriteRule ^rss-?(l|s)?-?(m)?.(xml(.gz)?)$ /gymrss.php?$1&$2&gym1x=1 [L,NC]
+# Redirect GYM 1.x RSS all
+RewriteRule ^([a-z0-9_-]+)-rss([0-9]*)-?(l|s)?-?(m)?.(xml(.gz)?)$ /gymrss.php?$1=$2&$3&$4&gym1x=1 [L,NC]
+# Redirect GYM 1.x RSS forum topics
+RewriteRule ^([a-z0-9_-]+)-rf([0-9]+)-?(l|s)?-?(m)?.(xml(.gz)?)$ /gymrss.php?forum=$2&$3&$4&gym1x=1&gymtitle=$1 [L,NC]
+# END Redirect GYM 1.x RSS Feeds
+#####################################################
+
+before : 
+
+# Google SitemapIndex
+
+in your .htaccess (once the regular rewriterules are implemented) with the proper path and slash settings.
+
+____________________
+NOTE : translations/
+____________________
+
+French Install and lang files are in the /translations folder of this release.
+
+In case you need it, here are the code changes for the FR language pack : 
+
+In language/fr/common.php
+
+FIND
+
+?>
+
+BEFORE, ADD
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'GYM_LINKS' => 'Liens',
+	'GYM_LINK' => 'Lien',
+	'GYM_RSS_SLIDE_START' => 'Lancer',
+	'GYM_RSS_SLIDE_STOP' => 'Stopper',
+	'GYM_RSS_SOURCE' => 'Source',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+
+________________________________________
+>>>>   INSTALLATION INSTRUCTIONS   <<<<<
+________________________________________
+
+NOTE : phpBB Files are Located in the root/ Folder of the release.
+
+If phpbb is installed in a sub folder and you run other pages at the root level, 
+you can take advantage of this system's modularity to include all of your site's sitemaps in this same sitemapindex.
+
+You'll have to put the sitemap.php file at the domain's root level, since no link from above the sitemap files folder are taken into consideration by Search Engines. 
+To do this, you only need to open sitemap.php, and look for :
+
+$phpbb_root_path = './';
+
+and change it to : 
+
+$phpbb_root_path = './phpbb/';
+
+Obviously replacing phpbb/ with the real folder name where phpBB would be installed.
+Then you would need to go ACP and update the "Google Sitemaps URL" parameter, in the Google sitemaps main panel, to match your domain's root location instead of the phpBB url : http://www.example.com/ instead of http://www.example.com/phpbb/
+Links to the forum will of course stay valid.
+You can do the same with gymrss.php if you wish.
+
+_____________
+Please note :
+_____________
+
+If you run phpBB in a sub directory (example.com/phpbb/) and installed the sitemap (and / or gymrss.php) file at the root level (example.com/sitemap.php) following the instructions above, you will need to change paths in the sitemap (and / or gymrss.php) rewriterules accordingly.
+And if your phpBB's .htaccess was in the phpBB/ directory, to move them to the domain's root .htaccess.
+
+
+===> To Install, just follow these five easy steps <===
+
+	1) Upload root/*.* to *.* (EG upload all files from root/ to your phpBB directory.
+
+	2) CHMOD  gym_sitemaps/cache/ to 0777
+
+	3) Connect yourself as admin and go to "http://www.yourdomain.com/phpbb_folder/gym_sitemaps/gym_install.php" to install
+
+	4) Apply the code change bellow and upload the modified files 
+	or just use the premodified file, in case you are running a vanilla phpBB3.0.3, to be found in contrib/phpbb3.0.3_files/
+
+	5) Refresh your theme's cache as well as phpBB's cache (ACP => STYLE, Themes and Templates => Refresh).
+
+!!!!! The SQL involved in the install script where tested for all mysql versions, but unfortunately not with the other possible DBAL (oracle, sqlite, postgresql etc ...), chances are great that it will work though !!!!!
+
+GYM sitemaps & RSS should work with all DBAL supported by phpBB.
+
+======> The only url to submit for all your sitemaps is "http://www.yourdomain.com/phpbb/sitemap.php" 
+======> or "http://www.yourdomain.com/phpbb/sitemapindex.xml" with URL rewriting. 
+======> You should make sure that the url is valid before you submit, just load the url in your browser to see the mod in action.
+
+
+To uninstall :
+
+	1) Connect yourself as admin and go to "http://www.yourdomain.com/phpbb_folder/gym_sitemaps/gym_install.php" to un-install
+
+	2) remove all files and code changes added
+
+
+________________
+NOTE : .htaccess
+________________
+
+If the phpBB SEO mod rewrites are installed, the .htaccess generator will automatically generate the required rewriterules for GYM sitemaps & RSS. Just generate a new .htaccess once you have installed the module and implement it.
+
+Manual install, in your phpBB's .htaccess add : 
+
+#####################################################
+# GYM Sitemaps & RSS
+# Global channels
+RewriteRule ^rss(/(news)+)?(/(digest)+)?(/(short|long)+)?/?$ /gymrss.php?channels&$2&$4&$6 [QSA,L,NC]
+# HTML Global news & map
+RewriteRule ^(news|maps)/?(page([0-9]+).html)?$ /map.php?$1&start=$3 [QSA,L,NC]
+# END GYM Sitemaps & RSS
+#####################################################
+
+After (in there with the phpBB SEO mod rewrite, if not, just add at the end of the .htaccess) :
+
+# HERE IS A GOOD PLACE TO ADD OTHER PHPBB RELATED REWRITERULES
+
+
+And then add at the end of it :
+
+#####################################################
+# GYM Sitemaps & RSS
+# MTML Module additional modes
+RewriteRule ^(news|maps)/([a-z0-9_-]+)(/([a-z0-9_-]+))?/?(page([0-9]+).html)?$ /map.php?$2=$4&$1&start=$6 [QSA,L,NC]
+# Main feeds & channels
+RewriteRule ^rss(/(news)+)?(/(digest)+)?(/(short|long)+)?(/([a-z0-9_-]+))?/([a-z0-9_]+).xml(.gz)?$ /gymrss.php?$9=$8&$2&$4&$6&gzip=$10 [QSA,L,NC]
+# Module feeds
+RewriteRule ^[a-z0-9_-]*-[a-z]+([0-9]+)(/(news)+)?(/(digest)+)?(/(short|long)+)?/([a-z0-9_]+).xml(.gz)?$ /gymrss.php?$8=$1&$3&$5&$7&gzip=$9 [QSA,L,NC]
+# Module feeds without ids
+RewriteRule ^([a-z0-9_-]+)(/(news)+)?(/(digest)+)?(/(short|long)+)?/([a-z0-9_]+).xml(.gz)?$ /gymrss.php?nametoid=$1&$3&$5&$7&modulename=$8&gzip=$9 [QSA,L,NC]
+# Google SitemapIndex
+RewriteRule ^sitemapindex.xml(.gz)?$ /sitemap.php?gzip=$1 [QSA,L,NC]
+# Module cat sitemaps
+RewriteRule ^[a-z0-9_-]+-([a-z]+)([0-9]+).xml(.gz)?$ /sitemap.php?module_sep=$1&module_sub=$2&gzip=$3 [QSA,L,NC]
+# Module sitemaps
+RewriteRule ^([a-z0-9_]+)-([a-z0-9_-]+).xml(.gz)?$ /sitemap.php?$1=$2&gzip=$3 [QSA,L,NC]
+# END GYM Sitemaps & RSS
+#####################################################
+
+
+With the proper path and slashes settings.
+For example you could need to use something like :
+
+# Module sitemaps
+RewriteRule ^phpbb/([a-z0-9_]+)-([a-z0-9_-]+).xml(.gz)?$ phpbb/sitemap.php?$1=$2&gzip=$3 [QSA,L,NC]
+
+instead of :
+
+# Module sitemaps
+RewriteRule ^([a-z0-9_]+)-([a-z0-9_-]+).xml(.gz)?$ /sitemap.php?$1=$2&gzip=$3 [QSA,L,NC]
+
+and so on for all the rewriterules.
+
+_____________________
+NOTE : RSS 2.0 Parser
+_____________________
+
+GYM Sitemaps & RSS comes with a simple yet efficient RSS 2.0 parser.
+It will cache the processed feed for a configured period of time (1 hour by default).
+It's very handy to display url rewriting links anywhere in phpBB without more efforts than if un-rewritten.
+You can easily display list of links or posts on any page within phpBB.
+
+To display a RSS 2.0 feed's content, just add :
+
+// GYM Sitemaps & RSS agregator
+if (!empty($config['gym_installed'])) {
+	if (!function_exists('display_feed')) {
+		require_once($phpbb_root_path . 'gym_sitemaps/includes/gym_common.' . $phpEx);
+	}
+	$params = array(
+		// Full URL to the RSS feed
+		'url' => 'http://www.example.com/feed_url',
+		// true | false - Scroll the link list or not ? 
+		// Default is false
+		'slide' => true,
+		// Speed of scroller higher number = slower scroller
+		// Default is 30
+		'speed' => 30,
+		// How long should we cache the result in seconds
+		// Default is 3600 (1 hour)
+		'ttl' => 3600,
+		// number of item to parse
+		// Default is 5
+		'limit' => 5,
+		// true | false - Display the items description if available as well ? 
+		// Turning this on will change the link list layout
+		// Default is false
+		'desc' => false,
+		// true | false - Allow html in the descriptions ?
+		// Default is false
+		'html' => true,
+		// true | false - if html is off, you can additionnaly strip all html tags
+		// Default is true
+		'striptags' => true,
+	);
+	/**
+	 * display_feed($params, $tpl_prefix = '')
+	 * $params : array of params or string feed URL for defaults
+	 * tpl_prefix is for using different link blocks on one page
+	 * Use display_feed('http://www.example.com/feed_url') to use default settings.
+	 * */
+	display_feed($params, '');
+}
+// GYM Sitemaps & RSS agregator
+
+before page_header() is called in any phpBB script.
+
+Then you'll just have to add :
+
+<!-- INCLUDE gym_sitemaps/gym_link_body.html -->
+
+in the template corresponding to the phpBB script, just put it where you want the output to display in the page.
+
+Only the url parameter is mandatory, others should be set only to use different values than defaults.
+The order of the parameters is not important.
+
+See this feature in action : 
+	http://demo.phpbb-seo.net/demo/rss-links.php
+	http://demo.phpbb-seo.net/demo/rss-messages.php
+
+____________________
+NOTE : URL rewriting
+____________________
+The HTML module will so far only rewrite URL to the forum if one of the phpBB SEO mod rewrite is installed.]]></diy-instructions>
+		<diy-instructions lang="fr"><![CDATA[_______________________
+===>  Mise à jour  <===
+_______________________
+
+Pour mettre à jour depuis n'importe quelle version 2.0.x (phpBB3), vous devrez tout d'abord uploader tous les fichiers contenus dans le dossier root/ de l'archive dans le dossier ftp de phpBB, en prenant soin de conserver vos éventuelles modification des fichiers de template (dossier phpBB/styles/, .html, .js et .xsl) ajoutés par le module. 
+Une fois les fichiers en place, lancez simplement le script de mise à jour (example.com/phpBB/gym_sitemaps/gym_install.php).
+Vos réglages seront conservés lors de la mise à jour.
+
+Si vous mettez à jour depuis la version précédente, vous devrez appliquer les modifications du fichier contrib/2.0.RC5_2.0.0_GYM_Update.txt, visible également sur la page de mise à jour, pour mettre à jour le fichiers de phpBB3 modifiés par ce module.
+
+Si vous mettez à jour depuis une version pour phpBB2 (GYM 1.x), vous serez en mesure de fournir automatiquement les nouvelles URL de vos flux à vos abonnés.
+Pour cela vous devrez activer l'option "Gestion des URLs réécrites de GYM 1.x" dans la catégorie Flux RSS, onglet "Réécriture d’URL".
+
+Vous devrez également ajouter ces RewriteRules dans votre .htaccess (une fois que vous aurez mis en place les nouvelles):
+
+#####################################################
+# Redirect GYM 1.x RSS Feeds
+# Mais feeds
+RewriteRule ^rss-?(l|s)?-?(m)?.(xml(.gz)?)$ /gymrss.php?$1&$2&gym1x=1 [L,NC]
+# Redirect GYM 1.x RSS all
+RewriteRule ^([a-z0-9_-]+)-rss([0-9]*)-?(l|s)?-?(m)?.(xml(.gz)?)$ /gymrss.php?$1=$2&$3&$4&gym1x=1 [L,NC]
+# Redirect GYM 1.x RSS forum topics
+RewriteRule ^([a-z0-9_-]+)-rf([0-9]+)-?(l|s)?-?(m)?.(xml(.gz)?)$ /gymrss.php?forum=$2&$3&$4&gym1x=1&gymtitle=$1 [L,NC]
+# END Redirect GYM 1.x RSS Feeds
+#####################################################
+
+Avant
+
+# Google SitemapIndex
+
+avec les bon chemins et slashes.
+
+____________________
+NOTE : traductions
+____________________
+
+Les fichiers de langue ainsi le fichier d'installation en français se trouvent dans le dossier /translations de cette archive.
+Si vous avez besoin des modifications pour le fichier de langue anglophone : 
+
+Dans language/en/common.php
+
+TROUVER
+
+?>
+
+AJOUTER AVANT
+
+// www.phpBB-SEO.com SEO TOOLKIT BEGIN -> GYM Sitemaps
+$lang = array_merge($lang, array(
+	'GYM_LINKS' => 'Links',
+	'GYM_LINK' => 'Link',
+	'GYM_RSS_SLIDE_START' => 'Start scroller',
+	'GYM_RSS_SLIDE_STOP' => 'Stop scroller',
+	'GYM_RSS_SOURCE' => 'Source',
+));
+// www.phpBB-SEO.com SEO TOOLKIT END -> GYM Sitemaps
+
+_____________________________________________
+>>>>   INSTALLATION POUR VOTRE FORUM    <<<<<
+_____________________________________________
+
+NOTE : Les fichiers à uploader se trouvent dans le dossier /root du présent package.
+
+Si phpBB est installé dans un sous-dossier, et que vous avez d'autres pages à la racine, vous pouvez utiliser la modularité du système GYM pour ajouter tous vos plans de sites Google dans le même index.
+
+Pour ce faire, vous devrez déplacer le fichier sitemap.php à la racine de votre domaine, l'éditer et remplacer :
+
+	$phpbb_root_path = './';
+
+Par : 
+
+	$phpbb_root_path = './phpbb/';
+
+
+En remplaçant, bien entendu, 'phpbb' par le nom du dossier dans lequel phpBB est installé sur votre système.
+
+Vous devrez ensuite vous rendre dans le panneau d'administration et mettre à jour l'option "URL du Sitemap Google" de la catégorie "Sitemaps Google", onglet "Paramètres des Sitemaps Google". Il faut utiliser l'URL complète du domaine au lieu de celle du forum : http://www.example.com/ au lieu de http://www.example.com/phpbb/
+Les liens vers le forum resteront bien entendu valides.
+
+Notez que la même opération est également possible pour le fichier gymrss.php et qu'il peut être pratique de les mettre tous au même endroit.
+
+___________
+Nota Bene :
+___________
+
+Si vous avez installé phpBB dans un sous dossier (example.com/phpbb/) et le fichier sitemap.php (et/ou gymrss.php) à la racine du domaine (example.com/sitemap.php) en suivant les instructions ci-dessus, vous devrez adapter les chemins dans les rewriterules liés à sitemap.php (et/ou gymrss.php) en conséquence.
+Et si le .htaccess de phpBB se trouvait dans le sous dossier (/phpbb), le déplacer dans le .htaccess de la racine du domaine.
+
+
+===> Pour installer, suivez ces cinq étapes simples <===
+
+	1) Uploadez root/*.* vers *.*
+	   c'est-à-dire uploadez tous les fichiers et dossiers contenus dans le dossier /root du package d'installation vers le dossier où se trouve phpBB
+
+	2) Paramétrez les droits du dossiers gym_sitemaps/cache/ à 0777 (CHMOD gym_sitemaps/cache/ à 0777)
+
+	3) Connectez vous en admin sur votre forum et lancez le script gym_install.php pour finir l'installation
+	   (Appelez l'URL "http://www.votredomaine.com/dossier_phpbb/gym_sitemaps/gym_install.php")
+
+	4) Appliquez les changements de code ci-dessous et uploadez les fichiers modifiés
+	ou, si vous utilisez phpBB3.0.3 sans autre mods, utilisez simplement les fichiers 
+	prémodifiés qui se trouvent dans contrib/phpbb3.0.2files/
+
+	5) Rafraîchissez vos thèmes (ACP => STYLE => Thèmes et Templates => Rafraîchir).
+	
+NOTE :
+Les requêtes d'installation ont été validés sur toutes les versions de mysql supportées par phpBB3, mais malheureusement pas sur les autres bases de données (oracle, sqlite, postgresql, etc.).
+Il y a cependant un certain espoir qu'elles fonctionnent sans autre modification !!!!!
+
+GYM Sitemaps & RSS devrait pour le reste fonctionner avec toutes les bases de données supportées par phpBB3.
+
+======> La seule URL à soumettre pour vos Sitemaps est "http://www.votredomaine.com/dossier_phpbb/sitemap.php" 
+======> ou "http://www.votredomaine.com/dossier_phpbb/sitemapindex.xml" avec réécriture d'URL activée.
+======> Vous devez vous assurer que l'URL est valide et fonctionnelle avant de la soumettre,
+======> il suffit d'appeler l'URL en question dans votre navigateur et de regarder le bon déroulement du MOD.
+
+
+
+Pour désinstaller :
+
+	1) Connectez vous en admin sur votre forum et lancez le script gym_install.php pour lancer la désinstallation
+	   (Appelez l'URL "http://www.votredomaine.com/dossier_phpbb/gym_sitemaps/gym_install.php")
+	   
+	2) Effacez tous les fichier ajoutés et les quelques ajouts de code du module dans les fichiers de phpBB.
+
+
+________________
+NOTE : .htaccess
+________________
+
+Si un des MOD Rewrite phpBB SEO est installé sur votre forum, le générateur de .htaccess générera automatiquement
+les RewriteRules nécessaires pour GYM sitemaps & RSS. Vous devrez alors simplement générer un nouveau .htaccess et le mettre en place.
+
+Installation manuelle, dans le .htaccess de votre forum ajoutez :
+
+#####################################################
+# GYM Sitemaps & RSS
+# Global channels
+RewriteRule ^rss(/(news)+)?(/(digest)+)?(/(short|long)+)?/?$ /gymrss.php?channels&$2&$4&$6 [QSA,L,NC]
+# HTML Global news & map
+RewriteRule ^(news|maps)/?(page([0-9]+).html)?$ /map.php?$1&start=$3 [QSA,L,NC]
+# END GYM Sitemaps & RSS
+#####################################################
+
+Après la ligne suivante si elle est présente (ce qui est le cas avec les mod rewrite phpBB SEO) ou en fin de .htaccess sinon :
+
+# HERE IS A GOOD PLACE TO ADD OTHER PHPBB RELATED REWRITERULES
+
+
+Et ajoutez à la fin :
+
+#####################################################
+# GYM Sitemaps & RSS
+# MTML Module additional modes
+RewriteRule ^(news|maps)/([a-z0-9_-]+)(/([a-z0-9_-]+))?/?(page([0-9]+).html)?$ /map.php?$2=$4&$1&start=$6 [QSA,L,NC]
+# Main feeds & channels
+RewriteRule ^rss(/(news)+)?(/(digest)+)?(/(short|long)+)?(/([a-z0-9_-]+))?/([a-z0-9_]+).xml(.gz)?$ /gymrss.php?$9=$8&$2&$4&$6&gzip=$10 [QSA,L,NC]
+# Module feeds
+RewriteRule ^[a-z0-9_-]*-[a-z]+([0-9]+)(/(news)+)?(/(digest)+)?(/(short|long)+)?/([a-z0-9_]+).xml(.gz)?$ /gymrss.php?$8=$1&$3&$5&$7&gzip=$9 [QSA,L,NC]
+# Module feeds without ids
+RewriteRule ^([a-z0-9_-]+)(/(news)+)?(/(digest)+)?(/(short|long)+)?/([a-z0-9_]+).xml(.gz)?$ /gymrss.php?nametoid=$1&$3&$5&$7&modulename=$8&gzip=$9 [QSA,L,NC]
+# Google SitemapIndex
+RewriteRule ^sitemapindex.xml(.gz)?$ /sitemap.php?gzip=$1 [QSA,L,NC]
+# Module cat sitemaps
+RewriteRule ^[a-z0-9_-]+-([a-z]+)([0-9]+).xml(.gz)?$ /sitemap.php?module_sep=$1&module_sub=$2&gzip=$3 [QSA,L,NC]
+# Module sitemaps
+RewriteRule ^([a-z0-9_]+)-([a-z0-9_-]+).xml(.gz)?$ /sitemap.php?$1=$2&gzip=$3 [QSA,L,NC]
+# END GYM Sitemaps & RSS
+#####################################################
+
+Avec les bon chemins et slashes.
+Vous pourriez par exemple avoir besoin d'utiliser :
+
+# Module sitemaps
+RewriteRule ^phpbb/([a-z0-9_]+)-([a-z0-9_-]+).xml(.gz)?$ phpbb/sitemap.php?$1=$2&gzip=$3 [L,NC]
+
+au lieu de  :
+
+# Module sitemaps
+RewriteRule ^([a-z0-9_]+)-([a-z0-9_-]+).xml(.gz)?$ /sitemap.php?$1=$2&gzip=$3 [L,NC]
+
+et ainsi de suite pour toutes les rewriterules.
+
+______________________
+NOTE : Parseur RSS 2.0
+______________________
+
+GYM Sitemaps & RSS inclus un parseur de flux RSS 2.0 simple et efficace.
+Il cache les informations récupérées depuis les flux rss pendant un temps configurable (1 heure par défaut).
+Il est très pratique pour mettre des liens réécris sur toutes les page de phpBB sans faire plus d'efforts que sans réécriture d'url.
+Vous pouvez facilement afficher des liste de liens ou de messages sur toutes page de phpBB.
+
+Pour afficher un flux sur une page de phpBB, ajoutez simplement :
+
+// GYM Sitemaps & RSS agregator
+if (!empty($config['gym_installed'])) {
+	if (!function_exists('display_feed')) {
+		require_once($phpbb_root_path . 'gym_sitemaps/includes/gym_common.' . $phpEx);
+	}
+	$params = array(
+		// Full URL to the RSS feed
+		'url' => 'http://www.example.com/feed_url',
+		// true | false - Scroll the link list or not ? 
+		// Default is false
+		'slide' => true,
+		// Speed of scroller higher number = slower scroller
+		// Default is 30
+		'speed' => 30,
+		// How long should we cache the result in seconds
+		// Default is 3600 (1 hour)
+		'ttl' => 3600,
+		// number of item to parse
+		// Default is 5
+		'limit' => 5,
+		// true | false - Display the items description if available as well ? 
+		// Turning this on will change the link list layout
+		// Default is false
+		'desc' => false,
+		// true | false - Allow html in the descriptions ?
+		// Default is false
+		'html' => true,
+		// true | false - if html is off, you can additionnaly strip all html tags
+		// Default is true
+		'striptags' => true,
+	);
+	/**
+	 * display_feed($params, $tpl_prefix = '')
+	 * $params : array of params or string feed URL for defaults
+	 * tpl_prefix is for using different link blocks on one page
+	 * Use display_feed('http://www.example.com/feed_url') to use default settings.
+	 * */
+	display_feed($params, '');
+}
+// GYM Sitemaps & RSS agregator
+
+avant que page_header() ne soit utilisé dans un des scripts de phpBB.
+
+Une fois fait, ajoutez :
+
+<!-- INCLUDE gym_sitemaps/gym_link_body.html -->
+
+dans le template correspondant au script de phpBB, à l'endroit ou vous voulez afficher la liste.
+
+Seulement le paramètre url est obligatoire, les autres ne devraient être utilisés uniquement si vous n'utilisez pas les valeurs par défaut.
+L'ordre des paramètres n'est pas important.
+
+Démo de cette fonctionnalité : 
+	http://demo.phpbb-seo.net/demo/rss-links.php
+	http://demo.phpbb-seo.net/demo/rss-messages.php
+
+_______________________
+NOTE : Réécriture d'url
+_______________________
+Le module HTML ne réécrit pour l'instant les URL vers le forum que si un des mod rewrite phpBB SEO est installé.]]></diy-instructions>
+	</action-group>
+</mod>

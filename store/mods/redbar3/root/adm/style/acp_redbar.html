@@ -1,0 +1,86 @@
+<!-- INCLUDE overall_header.html -->
+
+<a name="maincontent"></a>
+
+<!-- IF S_EDIT -->
+
+	<a href="{U_BACK}" style="float: {S_CONTENT_FLOW_END};">&laquo; {L_BACK}</a>
+
+	<h1>{L_ACP_REDBAR}</h1>
+
+	<p>{L_ACP_REDBAR_EXPLAIN}</p>
+
+	<form id="acp_redbar" method="post" action="{U_ACTION}">
+	
+	<fieldset>
+		<legend>{L_ACP_REDBAR}</legend>
+	<dl>
+		<dt><label for="name">{L_REDBAR_NAME}:</label></dt>
+		<dd><input name="name" type="text" id="name" value="{REDBAR_NAME}" length="100" maxlength="255" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="url">{L_REDBAR_URL}:</label></dt>
+		<dd><input name="url" type="text" id="url" maxlength="255" length="100" value="{REDBAR_URL}" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="colour">{L_REDBAR_COLOUR}:</label><br /><span>{L_REDBAR_COLOUR_EXPLAIN}</span></dt>
+		<dd><input name="colour" type="text" id="colour" value="{REDBAR_COLOUR}" size="6" maxlength="6" />&nbsp;&nbsp;<span>[ <a href="{U_SWATCH}" onclick="popup(this.href, 636, 150, '_swatch'); return false">{L_COLOUR_SWATCH}</a> ]</span></dd>
+	</dl>     
+
+	<p class="submit-buttons">
+		<input type="hidden" name="action" value="save" />
+
+		<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+		<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		{S_FORM_TOKEN}
+	</p>
+	</fieldset>
+	</form>
+
+<!-- ELSE -->
+
+	<h1>{L_ACP_REDBAR}</h1>
+
+	<p>{L_ACP_REDBAR_EXPLAIN}</p>
+
+	<form id="acp_redbar" method="post" action="{U_ACTION}">
+	<fieldset class="tabulated">
+	<legend>{L_ACP_REDBAR}</legend>
+
+	<table cellspacing="1">
+	<thead>
+	<tr>
+		<th>{L_REDBAR_NAME}</th>
+		<th>{L_REDBAR_URL}</th>
+		<th>{L_REDBAR_COLOUR}</th>
+		<th>{L_ACTION}</th>
+	</tr>
+	</thead>
+	<tbody>
+	<!-- BEGIN redbar -->
+		<!-- IF redbar.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+		<td style="text-align: center;">{redbar.REDBAR_NAME}</td>
+		<td style="text-align: center;">{redbar.REDBAR_URL}</td>
+		<td style="text-align: center;">{redbar.REDBAR_COLOUR}</td>
+		<td style="text-align: center;"><a href="{redbar.U_EDIT}">{ICON_EDIT}</a> <a href="{redbar.U_DELETE}">{ICON_DELETE}</a></td>
+	</tr>
+	<!-- END redbar -->
+	</tbody>
+	</table>
+
+<!-- IF PAGINATION -->
+<div class="pagination">
+	<a href="#" onclick="jumpto(); return false;" title="{L_JUMP_TO_PAGE}">{S_ON_PAGE}</a> &bull; <span>{PAGINATION}</span>
+</div>
+<!-- ENDIF -->
+					
+	<p class="quick">
+		<input class="button2" name="add" type="submit" value="{L_ADD_URL}" />
+		{S_FORM_TOKEN}
+	</p>
+	</fieldset>
+	</form>
+
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

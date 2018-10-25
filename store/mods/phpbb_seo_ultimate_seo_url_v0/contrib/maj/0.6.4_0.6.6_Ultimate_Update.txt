@@ -1,0 +1,363 @@
+##############################################################
+## MOD Title: 		phpBB SEO Advanced mod Rewrite 0.6.4 => Ultimate SEO URL 0.6.6 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO Advanced mod Rewrite 0.6.4 => Ultimate SEO URL 0.6.6 update.
+## 			Check http://www.phpbb-seo.com/en/phpbb-mod-rewrite/ultimate-seo-url-t4608.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Intermediate)
+## Installation Time: 	15 Minutes
+## Files To Edit: 	(10)
+##			posting.php,
+##			search.php,
+##			viewforum.php,
+##			viewtopic.php,
+##			includes/functions.php,
+##			includes/functions_display.php,
+##			includes/functions_posting.php,
+##			includes/session.php,
+##			phpbb_seo/includes/setup_phpbb_seo.php (see contrib/setup_phpbb_seo_class_0.6.4_to_0.6.6.diff)
+##			phpbb_seo/phpbb_seo_class.php (see contrib/phpbb_seo_class_0.6.4_to_0.6.6.diff)
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Advanced mod Rewrite 0.6.4 => Ultimate SEO URL 0.6.6 update.
+##
+##############################################################
+## MOD History:
+##
+##	2010-11-30 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+_________________________________________
+>>>>   INSTALLATION INSTRUCTIONS    <<<<<
+_________________________________________
+
+This update will not change any of your current URL settings, but it will add some new one.
+You WILL have to update you .htaccess once done.
+The phpbb_seo_class.php file does not hold static part and delimiters customisation any more, these are now set in the phpbb_seo/includes/setup_phpbb_seo.php. If you customized your default delimiters, static part etc, you will have to set them up in that file. Please read what's said in the install for more details about how to do it.
+
+Once you will have updated, you will have to refresh your theme's cache as well as phpBB's cache (ACP => STYLE, Themes => Refresh).
+
+You will need to upload / overwrite the following files :
+	includes/acp/acp_phpbb_seo.php
+	includes/acp/info/acp_phpbb_seo.php
+	phpbb_seo/includes/setup_phpbb_seo.php (see contrib/setup_phpbb_seo_class_0.6.4_to_0.6.6.diff)
+	phpbb_seo/phpbb_seo_class.php (see contrib/phpbb_seo_class_0.6.4_to_0.6.6.diff)
+	phpbb_seo/phpbb_seo_install.php
+	phpbb_seo/sync_url.php
+
+#
+#-----[ COPY ]------------------------------------------
+#
+
+root/includes/acp/acp_phpbb_seo.php		to 	phpBB/includes/acp/acp_phpbb_seo.php
+root/includes/acp/info/acp_phpbb_seo.php	to 	phpBB/includes/acp/info/acp_phpbb_seo.php
+root/language/en/mods/acp_phpbb_seo.php		to 	phpBB/language/en/mods/acp_phpbb_seo.php
+root/language/fr/mods/acp_phpbb_seo.php		to 	phpBB/language/fr/mods/acp_phpbb_seo.php
+root/phpbb_seo/includes/setup_phpbb_seo.php	to 	phpBB/phpbb_seo/includes/setup_phpbb_seo.php
+root/phpbb_seo/phpbb_seo_install.php		to 	phpBB/phpbb_seo/phpbb_seo_install.php
+root/phpbb_seo/sync_url.php			to 	phpBB/phpbb_seo/sync_url.php
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+posting.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($post_data['forum_name'], $forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($post_data['forum_name'], $forum_id, 'forum');
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+search.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($row['forum_name'], $u_forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($row['forum_name'], $u_forum_id, 'forum');
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+viewforum.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+$phpbb_seo->set_url($forum_data['forum_name'], $forum_data['forum_id'], $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+$phpbb_seo->set_url($forum_data['forum_name'], $forum_data['forum_id'], 'forum');
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			$cur_forum_id = ($row['forum_id']) ? (int) $row['forum_id'] : $forum_id;
+			$parent_forum = $row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : (!empty($phpbb_seo->seo_url['forum'][$cur_forum_id]) ? $phpbb_seo->seo_url['forum'][$cur_forum_id] : false);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+			$parent_forum = $row['topic_type'] == POST_GLOBAL ? $phpbb_seo->seo_static['global_announce'] : (!empty($phpbb_seo->seo_url['forum'][$topic_forum_id]) ? $phpbb_seo->seo_url['forum'][$topic_forum_id] : false);
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+viewtopic.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+$phpbb_seo->set_url($topic_data['forum_name'], $forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+$phpbb_seo->set_url($topic_data['forum_name'], $forum_id, 'forum');
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start&amp;" . ((strlen($u_sort_param)) ? "&amp;$u_sort_param" : '') . (($highlight_match) ? "&amp;hilit=$highlight" : '') . "&amp;view=print") : '',
+
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	'U_PRINT_TOPIC'			=> ($auth->acl_get('f_print', $forum_id)) ? append_sid("{$phpbb_root_path}viewtopic.$phpEx", "f=$forum_id&amp;t=$topic_id&amp;start=$start" . ((strlen($u_sort_param)) ? "&amp;$u_sort_param" : '') . (($highlight_match) ? "&amp;hilit=$highlight" : '') . "&amp;view=print") : '',
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		'U_MINI_POST'		=> append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id']) . (($topic_data['topic_type'] == POST_GLOBAL) ? '&amp;f=' . $forum_id : '') . '#p' . $row['post_id'],
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+		// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+		'U_MINI_POST' => append_sid("{$phpbb_root_path}viewtopic.$phpEx", 'p=' . $row['post_id'] . (($topic_data['topic_type'] == POST_GLOBAL) ? '&amp;f=' . $forum_id : '')) . '#p' . $row['post_id'],
+		// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		'SEO_CANONICAL_URL' => $phpbb_seo->seo_path['canonical'],
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+		'SEO_CANONICAL_URL' => !empty($phpbb_seo->seo_opt['no_dupe']['on']) ? $phpbb_seo->get_canonical() : '',
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions_display.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		$phpbb_seo->set_url($row['forum_name'], $forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+		$phpbb_seo->set_url($row['forum_name'], $forum_id, 'forum');
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($parent_name, $parent_forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($parent_name, $parent_forum_id, 'forum');
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			$pagination = str_replace( '&amp;start=0', '', $pagination );
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+# EG : Delete !
+
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+		$phpbb_seo->set_url($active_f_name, $active_f_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+		$phpbb_seo->set_url($active_f_name, $active_f_id, 'forum');
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($active_t_row['forum_name'], $active_t_forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[REPLACE WITH ]------------------------------------------
+#
+
+			$phpbb_seo->set_url($active_t_row['forum_name'], $active_t_forum_id, 'forum');
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions_posting.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+				$phpbb_seo->set_url(htmlspecialchars_decode($forum_name), $forum_id, $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+				$phpbb_seo->set_url(htmlspecialchars_decode($forum_name), $forum_id, 'forum');
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	$phpbb_seo->set_url($data['forum_name'], $data['forum_id'], $phpbb_seo->seo_static['forum']);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	$phpbb_seo->set_url($data['forum_name'], $data['forum_id'], 'forum');
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/session.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+			if (isset($_GET['sid']))
+			{
+				redirect(build_url(array('sid')));
+			}
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+			// www.phpBB-SEO.com SEO TOOLKIT BEGIN
+			// This part will be fixed in 3.0.9 (see http://tracker.phpbb.com/browse/PHPBB3-9908)
+			// But as is or updated, it will not mix well with USU and Zero Duplicate (which already removes them)
+			// Bot user, if they have a SID in the Request URI we need to get rid of it
+			// otherwise they'll index this page with the SID, duplicate content oh my!
+			/*if (isset($_GET['sid']))
+			{
+				redirect(build_url(array('sid')));
+			}*/
+			// www.phpBB-SEO.com SEO TOOLKIT END
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+web.config
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+</configuration>
+
+#
+#-----[ BEFORE, ADD ]------------------------------------------
+#
+
+	<!-- www.phpBB-SEO.com SEO TOOLKIT BEGIN -->
+	<location path="phpbb_seo">
+		<system.webServer>
+			<security>
+				<requestFiltering>
+					<hiddenSegments>
+						<add segment="cache" />
+					</hiddenSegments>
+				</requestFiltering>
+			</security>
+		</system.webServer>
+	</location>
+	<!-- www.phpBB-SEO.com SEO TOOLKIT END -->
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

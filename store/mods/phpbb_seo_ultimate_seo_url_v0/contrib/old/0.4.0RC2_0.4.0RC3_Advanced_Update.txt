@@ -1,0 +1,80 @@
+##############################################################
+## MOD Title: 		phpBB SEO Advanced mod Rewrite 0.4.0RC2 => 0.4.0RC3 update
+## MOD Author: 		dcz <n/a> http://www.phpbb-seo.com/
+## MOD Description: 	This are the update steps for the phpBB SEO Advanced mod Rewrite 0.4.0RC1 => 0.4.0RC2 update.
+## 			Check http://www.phpbb-seo.com/
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	(Eazy)
+## Installation Time: 	2 Minutes
+## Files To Edit: 	(2)
+##			includes/functions.php,
+##			styles/prosilver/template/viewtopic_body.html,
+##
+## Included Files: n/a
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB3 SEO Advanced mod Rewrite 0.4.0RC2 => 0.4.0RC3 update.
+##
+## PLEASE NOTE :
+## _____________
+##
+## There is no step by step update of the phpbb_seo_class.php file, 
+## this mean you will have to proceed to the settings again in the file.
+## As well, you will have to empty the phpBB/cache/ folder before the mod will fully work, 
+## just delete all files BUT the .htaccess.
+## You will have to CHMOD the phpbb_seo/cache/ folder to 0777 for the cache feature to work.
+## 
+## 
+##
+##############################################################
+## MOD History:
+##
+##	2007-09-15 - 1.0
+##		- First version released
+##
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+
+#
+#-----[ DIY INSTRUCTIONS ]--------------------------------------------------
+#
+_________________________________________
+>>>>   INSTALLATION INSTRUCTIONS    <<<<<
+_________________________________________
+
+This update is the same if you are upgading from 0.4.0RC2a and 0.4.0RC2.
+
+This update procedure will keep the previous URL standard used depending on the phpbb_seo_class.php settings.
+Please read the install for more information about the 0.4.0 new features. 
+They will most likely imply new URLs wich will require an .htaccess update.
+
+You will have to CHMOD the phpbb_seo/cache/ folder to 0777 for the cache feature to work.
+
+Do not forget to overwrite the other languages files if any.
+
+_________
+WARNING :
+_________
+
+There is no step by step update of the phpbb_seo_class.php file, but the cached settings will remain untouched.
+You will though have to mod this file again in case you added the zero duplicate as well as the delimiters static parts and etc ...
+As well, you will have to empty the phpBB/cache/ folder before the mod will fully work, 
+just delete all files BUT the .htaccess.
+
+#
+#-----[ COPY ]--------------------------------------------------
+#  And obviously, overwrite
+
+copy root/*.* to *.*
+
+#
+#-----[ SAVE/CLOSE ALL FILES ]------------------------------------------
+#
+# EoM

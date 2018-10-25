@@ -1,0 +1,59 @@
+##############################################################
+## MOD Title:		Update phpBB SEO Dynamic Metatags 0.4.2 => 0.4.4
+## 
+## MOD Author:		dcz <n/a> http://www.phpbb-seo.com/
+##
+## MOD Description:	This are the update steps for the phpBB SEO Dynamic Metatags 0.4.2 => 0.4.4
+##			Check http://www.phpbb-seo.com/en/phpbb-seo-toolkit/seo-dynamic-meta-tags-t1308.html
+## 			for the latest version or to get help with this MOD
+##
+## MOD Version: 	1.0
+##
+## Installation Level: 	Easy
+## Installation Time: 	1 Minutes
+## Files To Edit:	1
+##       		includes/functions.php
+##
+## Included Files: 	n/a
+##
+## License: 		http://opensource.org/licenses/gpl-license.php GNU General Public License v2
+##############################################################
+## Author Notes:
+## _____________
+##
+## This are the update steps for the phpBB SEO Dynamic Metatags 0.4.2 => 0.4.4 update.
+## 
+##############################################################
+## Before Adding This MOD To Your Forum, You Should Back Up All Files Related To This MOD
+##############################################################
+
+#
+#-----[ COPY ]--------------------------------------------------
+#
+
+copy root/*.* to phpBB/*.*
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+
+includes/functions.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+
+	$seo_meta->build_meta($page_title);
+
+#
+#-----[ REPLACE WITH ]------------------------------------------
+#
+
+	if (!empty($seo_meta)) {
+		$seo_meta->build_meta($page_title);
+	}
+
+#
+#---[ SAVE/CLOSE ALL FILES ]-----------------------
+#
+# EoM

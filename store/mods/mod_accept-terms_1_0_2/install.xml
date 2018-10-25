@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+
+
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.1.xsd">
+<header>
+	<license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
+	<title lang="en-GB">Accept terms</title>
+	<description lang="en-GB">A user have to accept the terms if they was changed to use his account</description>
+	<author-notes lang="en-GB">This MOD adds an "Accept Terms" button under "Resynchronise or reset statistics" on the page that first appears when you open the ACP</author-notes>
+	<author-group>
+		<author>
+			<username>tas2580</username>
+			<realname>Tobi Schäfer</realname>
+			<homepage>http://www.phpbb-seo.de/</homepage>
+			<email>tobi.schaefer@gmail.com</email>
+		</author>
+	</author-group>
+
+	<mod-version>1.0.2</mod-version>
+
+	<installation>
+		<level>easy</level>
+		<time>200</time>
+		<target-version>3.0.4</target-version>
+	</installation>
+	<link-group>
+		<link type="language" lang="en-GB" href="de.xml">German Language File</link>
+	</link-group>
+	<history>
+		<entry>
+			<date>2007-06-03</date>
+			<rev-version>0.1.0</rev-version>
+			<changelog lang="en-GB">
+				<change>First relase</change>
+			</changelog>
+		</entry>
+		<entry>
+			<date>2008-06-29</date>
+			<rev-version>1.0.0</rev-version>
+			<changelog lang="en-GB">
+				<change>Use MODX v1.2.0</change>
+				<change>Final relase</change>
+			</changelog>
+		</entry>
+		<entry>
+			<date>2008-06-29</date>
+			<rev-version>1.0.1</rev-version>
+			<changelog lang="en-GB">
+				<change>Corrects spelling mistakes</change>
+			</changelog>
+		</entry>
+		<entry>
+			<date>2009-01-18</date>
+			<rev-version>1.0.1</rev-version>
+			<changelog lang="en-GB">
+				<change>Fixed small Bugs</change>
+			</changelog>
+		</entry>
+	</history>
+</header>
+
+<action-group>
+	<sql>ALTER TABLE phpbb_users ADD user_accept_rules SMALLINT( 1 ) NOT NULL DEFAULT '1';</sql>
+
+	<open src="includes/functions.php">
+	<edit>
+		  <find><![CDATA[	header('Pragma: no-cache');]]></find>
+		  <action type="after-add"><![CDATA[	if ($user->data['user_accept_rules'] == 0 && $user->data['is_registered'] && !$user->data['is_bot'] && (request_var('mode', '') != 'terms'))
+	{
+		if (confirm_box(true))
+		{
+			$sql = 'UPDATE ' . USERS_TABLE . '
+				SET user_accept_rules = 1
+				WHERE user_id = ' . $user->data['user_id'];
+			$db->sql_query($sql);
+		}
+		else
+		{
+			confirm_box(false, sprintf($user->lang['NEW_RULES'], '<a href="' . append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=terms') . '">', '</a>'));
+			header("Location: " . append_sid("{$phpbb_root_path}ucp.$phpEx?mode=logout&sid=" . $user->session_id));
+		}
+	}]]></action>
+	  </edit>
+	</open>
+
+	<open src="language/en/common.php">
+		<edit>
+			<find><![CDATA[	'NEW_POSTS'					=> 'New posts',]]></find>
+			<action type="after-add"><![CDATA[	'NEW_RULES'					=> 'The Terms have been changed! To continue to use your account you have to accept %sthe new Terms%s!',
+	'UPDATE_TERMS'				=> 'Accept Terms',
+	'UPDATE_TERMS_EXPLAIN'		=> 'All Users have to accept the Terms to use there account again.',
+	'RESET_TERMS'				=> 'All Users have to accept the Terms to use there account.',]]></action>
+      </edit>
+    </open>
+
+	<open src="adm/style/acp_main.html">
+		<edit>
+			<find><![CDATA[			<form id="action_db_track_form" method="post" action="{U_ACTION}">
+					<dl>
+						<dt><label for="action_db_track">{L_RESYNC_POST_MARKING}</label><br /><span>{L_RESYNC_POST_MARKING_EXPLAIN}</span></dt>
+						<dd><input type="hidden" name="action" value="db_track" /><input class="button2" type="submit" id="action_db_track" name="action_db_track" value="{L_RUN}" /></dd>
+					</dl>
+			</form>]]></find>
+		<action type="after-add"><![CDATA[			<form id="action_terms_form" method="post" action="{U_ACTION}">
+				<dl>
+					<dt><label for="action_terms">{L_UPDATE_TERMS}</label><br /><span>{L_UPDATE_TERMS_EXPLAIN}</span></dt>
+					<dd><input type="hidden" name="action" value="terms" /><input class="button2" type="submit" id="action_terms" name="action_terms" value="{L_RUN}" /></dd>
+				</dl>
+			</form>]]></action>
+		</edit>
+    </open>	
+
+	<open src="includes/acp/acp_main.php">
+		<edit>
+			<find><![CDATA[					case 'purge_cache':
+						if ((int) $user->data['user_type'] !== USER_FOUNDER)]]></find>
+			<action type="before-add"><![CDATA[					case 'terms':
+						$sql = 'UPDATE ' . USERS_TABLE . '
+							SET user_accept_rules = 0
+							WHERE user_accept_rules = 1';
+						$db->sql_query($sql);
+						add_log('admin', 'RESET_TERMS');
+					break;]]></action>
+		</edit>
+	</open>	
+</action-group>
+</mod>

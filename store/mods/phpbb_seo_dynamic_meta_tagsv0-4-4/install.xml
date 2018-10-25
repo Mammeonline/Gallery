@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator 1.0.1 by tumba25 (phpBB version)"/>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+		<title lang="en"><![CDATA[phpBB SEO Dynamic Meta tags]]></title>
+		<description lang="en"><![CDATA[Generates dynamic metatags for phpBB.
+Check http://www.phpbb-seo.com/en/phpbb-seo-toolkit/seo-dynamic-meta-tags-t1308.htmlfor the latest version or to get help with this MOD]]></description>
+		<author-notes lang="en"><![CDATA[This mod will add dynamic meta tags build out with the ending page's content.
+It's simple and efficient, will add specific meta tags to all phpBB pages.
+A single SQL query is optionally added in viewtopic.php, to grab the first post's most used words.
+This allow for a better overall relevancy of meta keywords.
+The first post of every topic pages is used to build the meta description. 
+Bbcodes tags are stripped off as well as smilies.
+
+The mod will output index,follow robots tags for all the content found under the best URLs and will add a noindex,follow robots tags for pages such as style preview, print view, sids and highlighted URLs to prevent duplicate indexing.
+ 
+You SHOULD NOT use more than 20 keywords in the keyword meta tags
+As well, you SHOULD NOT use too long description tags
+
+In case you're using a portal, or if you whish to hard code default meta tags, you may want to change, in phpbb_seo/phpbb_seo_meta.php :
+
+			// default values, leave empty to only output the corresponding tag if filled
+			$this->meta_def['title'] = $config['sitename'];
+			$this->meta_def['description'] = $config['site_desc'];
+			$this->meta_def['keywords'] = $config['site_desc'];
+
+And hard code infos about the portal. phpBB index will still use datas from the board config.
+These are used as default, in every file not specifying meta tags.
+
+UPDATE
+0.4.2 => 0.4.4 Update : Required changes to be found in contrib/0.4.2_0.4.4_meta_Update.txt]]></author-notes>
+		<author-notes lang="fr"><![CDATA[Ce mod va ajouter des méta tags dynamiques à votre forum phpBB. Ces balises sont construites à partir du contenu final des pages.
+Simple et efficace, il crée des méta keywords et descriptions spécifiques pour les forums ainsi que l'index du forum sans ajouter de requêtes SQL.
+Une requête SQL est au besoin effectuée dans viewtopic.php pour récupérer les mots les plus utilisés du premier message du sujet. 
+Cela permet une meilleur qualité globale des méta keywords.
+Le premier message de chaque page des sujets est utilisé pour construire les meta descriptions des sujets.
+Les bbcodes et les smilies sont filtrés avant utilisation du contenu des messages.
+
+Un tag robots index,follow sera utilisé sur les meilleurs URLs de chaque page, un noindex,follow sera utilisé pour éviter les duplicates de prévisualisation des thèmes, ceux de la fonction imprimer des sujets, les urls avec sid ainsi que celles avec des highlights.
+
+Vous ne DEVRIEZ PAS utiliser plus de 20 mot-clés dans vos méta keywords.
+De même, vous ne DEVRIEZ PAS utiliser de méta description trop longues.
+
+Si vous utilisez un portail, ou si vous désirez ne pas utiliser la configuration de phpBB pour les valeurs par défaut, vous pouvez changer cette partie de includes/functions.php :
+
+			// default values, leave empty to only output the corresponding tag if filled
+			$this->meta_def['title'] = $config['sitename'];
+			$this->meta_def['description'] = $config['site_desc'];
+			$this->meta_def['keywords'] = $config['site_desc'];
+
+Pour y faire figurer les informations de celui-ci.
+L'index de phpBB continuera d'utiliser sa config pour construire les méta tags.
+Ces valeurs par défaut sont utilisées dans les pages ou les métas ne sont pas spécifiées (search.php, faq.php etc.). 
+
+MISE A JOUR
+0.4.2 => 0.4.4 Mise à Jour : Les changements à effectuer se trouvent dans contrib/0.4.2_0.4.4_meta_UpdateFR.txt]]></author-notes>
+		<author-group>
+			<author>
+				<username><![CDATA[dcz]]></username>
+				<homepage><![CDATA[http://www.phpbb-seo.com/]]></homepage>
+			</author>
+		</author-group>
+		<mod-version><![CDATA[0.4.4]]></mod-version>
+		<installation>
+			<level><![CDATA[easy]]></level>
+			<time><![CDATA[300]]></time>
+			<target-version><![CDATA[3.0.9]]></target-version>
+		</installation>
+		<history>
+			<entry>
+				<date><![CDATA[2011-07-18]]></date>
+				<rev-version><![CDATA[0.4.4]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed : Strip all bbcode regex now won't remove [text]]]></change>
+					<change><![CDATA[Add empty test in page_header to help reducing dependencies (stk)]]></change>
+					<change><![CDATA[Fix explain in acp stating the exact opposite of what it should]]></change>
+					<change><![CDATA[Allow a bit more length for settings in acp]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2010-03-05]]></date>
+				<rev-version><![CDATA[0.4.2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed : 50th keyword holding the whole string.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-11-23]]></date>
+				<rev-version><![CDATA[0.4.0]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed : Bad path when calling search_ignore_words.php,]]></change>
+					<change><![CDATA[Added : keywords are now retrieved from all post on topic page when using fulltext_native and topic_sql option,]]></change>
+					<change><![CDATA[Added : Various options that can be configured in the extended acp menu when the mod is not used in standalone mode,]]></change>
+					<change><![CDATA[Meta tag class now has its own file.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2009-06-11]]></date>
+				<rev-version><![CDATA[0.2.8]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed : Enabling search_ignore_words.php filtering (optional),]]></change>
+					<change><![CDATA[Added  : File based filtering.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-11-09]]></date>
+				<rev-version><![CDATA[0.2.6]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Enabled search_ignore_words.php filtering (optional).]]></change>
+					<change><![CDATA[Added few yet useful options in the meta class.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-07-19]]></date>
+				<rev-version><![CDATA[0.2.4]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Fixed common words filtering in viewtopic,]]></change>
+					<change><![CDATA[Added noindex tag based on GET vars to exclude many annoying URLs]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-04-21]]></date>
+				<rev-version><![CDATA[0.2.2]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added : now filter code bbcode tag by default,]]></change>
+					<change><![CDATA[Fixed : reference misuse,]]></change>
+					<change><![CDATA[Fixed : use of sql_query_limit to grab keywords in topic view.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2008-01-01]]></date>
+				<rev-version><![CDATA[0.2.0]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Added : some config options,]]></change>
+					<change><![CDATA[Various filtering bug fix and enhancements.]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date><![CDATA[2007-09-02]]></date>
+				<rev-version><![CDATA[0.2.0RC1]]></rev-version>
+				<changelog lang="en">
+					<change><![CDATA[First released version]]></change>
+				</changelog>
+			</entry>
+		</history>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/*.*" to="*.*"/>
+		</copy>
+		<open src="common.php">
+			<edit>
+				<find><![CDATA[// Grab global variables, re-cache if necessary
+$config = $cache->obtain_config();
+
+]]></find>
+				<action type="after-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN - META
+require_once($phpbb_root_path . 'phpbb_seo/phpbb_seo_meta.'.$phpEx);
+$seo_meta = new seo_meta();
+// www.phpBB-SEO.com SEO TOOLKIT END - META
+
+]]></action>
+			</edit>
+		</open>
+		<open src="index.php">
+			<edit>
+				<find><![CDATA[page_header(
+
+]]></find>
+				<action type="before-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN - META
+$seo_meta->collect('description', $config['sitename'] . ' : ' .  $config['site_desc']);
+$seo_meta->collect('keywords', $config['sitename'] . ' ' . $seo_meta->meta['description']);
+// www.phpBB-SEO.com SEO TOOLKIT END - META
+
+]]></action>
+			</edit>
+		</open>
+		<open src="viewforum.php">
+			<edit>
+				<find><![CDATA[page_header(
+
+]]></find>
+				<action type="before-add"><![CDATA[// www.phpBB-SEO.com SEO TOOLKIT BEGIN - META
+$seo_meta->collect('description', $forum_data['forum_name'] . ' : ' . (!empty($forum_data['forum_desc']) ? $forum_data['forum_desc'] : $seo_meta->meta_def['description']));
+$seo_meta->collect('keywords', $forum_data['forum_name'] . ' ' . $seo_meta->meta['description']);
+// www.phpBB-SEO.com SEO TOOLKIT END - META
+
+]]></action>
+			</edit>
+		</open>
+		<open src="viewtopic.php">
+			<edit>
+				<find><![CDATA[	// Parse the message and subject
+	$message = censor_text($row['post_text']);
+
+]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN  - META
+	if ($i == 0) {
+		$m_kewrd = '';
+		$seo_meta->collect('description', $message);
+		if ($seo_meta->mconfig['topic_sql']) {
+			$common_sql = $seo_meta->mconfig['bypass_common'] ? '' : 'AND w.word_common = 0';
+			// collect keywords from all post in page
+			$post_id_sql = $db->sql_in_set('m.post_id', $post_list, false, true);
+			$sql = "SELECT w.word_text
+				FROM " . SEARCH_WORDMATCH_TABLE . " m, " . SEARCH_WORDLIST_TABLE . " w
+				WHERE $post_id_sql
+					AND w.word_id = m.word_id
+					$common_sql
+				ORDER BY w.word_count DESC";
+			$result = $db->sql_query_limit($sql, min(25, (int) $seo_meta->mconfig['keywordlimit']));
+			while ( $meta_row = $db->sql_fetchrow($result) ) {
+				$m_kewrd .= ' ' . $meta_row['word_text'];
+			}
+			$db->sql_freeresult($result);
+		}
+		$seo_meta->collect('keywords', $topic_data['topic_title'] . ' ' . $row['post_subject'] . ' ' . (!empty($m_kewrd) ? $m_kewrd : $seo_meta->meta['description']));
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END  - META
+
+]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions.php">
+			<edit>
+				<find><![CDATA[	if (defined('HEADER_INC'))
+	{
+		return;
+	}
+
+]]></find>
+				<action type="after-add"><![CDATA[	// www.phpBB-SEO.com SEO TOOLKIT BEGIN  - META
+	global $seo_meta;
+	if (!empty($seo_meta)) {
+		$seo_meta->build_meta($page_title);
+	}
+	// www.phpBB-SEO.com SEO TOOLKIT END  - META
+
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_header.html">
+			<edit>
+				<find><![CDATA[<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+]]></find>
+				<action type="replace-with"><![CDATA[{META_TAG}
+
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/subsilver2/template/overall_header.html">
+			<edit>
+				<find><![CDATA[<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+]]></find>
+				<action type="replace-with"><![CDATA[{META_TAG}
+]]></action>
+			</edit>
+		</open>
+		<diy-instructions lang="en"><![CDATA[___________________
+NOTE : translations
+___________________
+
+French Install files are in the translations/ folder of this release.
+
+________________________________________
+>>>>   INSTALLATION INSTRUCTION    <<<<<
+________________________________________
+
+If you are using the Ultimate SEO URL mod (http://www.phpbb-seo.com/en/phpbb-mod-rewrite/ultimate-seo-url-t4608.html), you will find many settings in the phpBB SEO extended acp settings.
+
+Otherwise, you'll find some pretty obvious code you may want to modify upon your needs in phpbb_seo/phpbb_seo_meta.php :
+
+		// default values, leave empty to only output the corresponding tag if filled
+		$this->meta_def['robots'] = 'index,follow';
+		// global values, if these are empty, the corresponding meta will not show up
+		$this->meta['category'] = 'general';
+		$this->meta['distribution'] = 'global';
+		$this->meta['resource-type'] = 'document';
+...
+			// default values, leave empty to only output the corresponding tag if filled
+			$this->meta_def['title'] = $config['sitename'];
+			$this->meta_def['description'] = $config['site_desc'];
+			$this->meta_def['keywords'] = $config['site_desc'];
+			// global values, if these are empty, the corresponding meta will not show up
+			$this->meta['lang'] = $config['default_lang'];
+			$this->meta['copyright'] = $config['sitename'];
+
+You'll as well find some setting you may want to change (default are good) :
+
+	/**
+	* Some config :
+	*	=> keywordlimit : number of keywords (max) in the keyword tag,
+	*	=> wordlimit : number of words (max) in the desc tag,
+	*	=> wordminlen : only words with more than wordminlen letters will be used, default is 2,
+	*	=> bbcodestrip : | separated list of bbcode to fully delete, tag + content, default is 'img|url|flash',
+	*	=> ellipsis : ellipsis to use if clipping,
+	*	=> topic_sql : Do a SQL to build topic meta keywords or just use the meta desc tag,
+	*	=> check_ignore : Check the search_ignore_words.php list.
+	*		Please note :
+	*			This will require some more work for the server.
+	*			And this is mostly useless if you have re-enabled the search_ignore_words.php list
+	*			filtering in includes/search/fulltest_native.php (and of course use fulltest_native index).
+	*	=> bypass_common : Bypass common words in viewtopic.php.
+	*		Set to true by default because the most interesting keywords are as well among the most common.
+	*		This of course provides with even better results when fulltest_native is used
+	*		and search_ignore_words.php list was re-enabled.
+	*	=> get_filter : Disallow tag based on GET var used : coma separated list, will through a disallow meta tag.
+	*	=> file_filter : Disallow tag based on the physical script file name : coma separated list of file names
+	* Some default values are set bellow in the seo_meta_tags() method,
+	* most are acp configurable when using the Ultimate SEO URL mod :
+	* => http://www.phpbb-seo.com/en/phpbb-mod-rewrite/ultimate-seo-url-t4608.html (en)
+	* => http://www.phpbb-seo.com/fr/mod-rewrite-phpbb/ultimate-seo-url-t4489.html (fr)
+	**/
+	var $mconfig = array('keywordlimit' => 15, 'wordlimit' => 25, 'wordminlen' => 2, 'bbcodestrip' => 'img|url|flash|code', 'ellipsis' => ' ...', 'topic_sql' => true, 'check_ignore' => false, 'bypass_common' => true,
+		// Consider adding ", 'p' => 1" if your forum is no indexed yet or if no post urls are to be redirected
+		// to add a noindex tag on post urls
+		'get_filter' => 'style,hilit,sid',
+		// noindex based on physical script file name
+		'file_filter' => 'ucp',
+	);]]></diy-instructions>
+		<diy-instructions lang="fr"><![CDATA[____________________
+NOTE : translations/
+____________________
+
+Les fichier langues en Français se trouvent dans le dossier
+translations/
+de cette archive.
+
+_____________________________________________
+>>>>   INSTALLATION POUR VOTRE FORUM    <<<<<
+_____________________________________________
+
+Si vous utilisez le mod Ultimate SEO URL mod (http://www.phpbb-seo.com/fr/mod-rewrite-phpbb/ultimate-seo-url-t4489.html), vous trouverez un certain nombre de nouveaux réglages dans la configuration étendue de l'acp de phpBB SEO.
+
+Si non, dans phpbb_seo/phpbb_seo_meta.php, vous trouverez des ligne de code que vous pouvez personnaliser de façon assez évidente :
+
+		// default values, leave empty to only output the corresponding tag if filled
+		$this->meta_def['robots'] = 'index,follow';
+		// global values, if these are empty, the corresponding meta will not show up
+		$this->meta['category'] = 'general';
+		$this->meta['distribution'] = 'global';
+		$this->meta['resource-type'] = 'document';
+...
+			// default values, leave empty to only output the corresponding tag if filled
+			$this->meta_def['title'] = $config['sitename'];
+			$this->meta_def['description'] = $config['site_desc'];
+			$this->meta_def['keywords'] = $config['site_desc'];
+			// global values, if these are empty, the corresponding meta will not show up
+			$this->meta['lang'] = $config['default_lang'];
+			$this->meta['copyright'] = $config['sitename'];
+
+Vous trouverez également quelques réglages possible (ceux par défaut sont bons):
+
+	/**
+	* Some config :
+	*	=> keywordlimit : number of keywords (max) in the keyword tag,
+	*	=> wordlimit : number of words (max) in the desc tag,
+	*	=> wordminlen : only words with more than wordminlen letters will be used, default is 2,
+	*	=> bbcodestrip : | separated list of bbcode to fully delete, tag + content, default is 'img|url|flash',
+	*	=> ellipsis : ellipsis to use if clipping,
+	*	=> topic_sql : Do a SQL to build topic meta keywords or just use the meta desc tag,
+	*	=> check_ignore : Check the search_ignore_words.php list.
+	*		Please note :
+	*			This will require some more work for the server.
+	*			And this is mostly useless if you have re-enabled the search_ignore_words.php list
+	*			filtering in includes/search/fulltest_native.php (and of course use fulltest_native index).
+	*	=> bypass_common : Bypass common words in viewtopic.php.
+	*		Set to true by default because the most interesting keywords are as well among the most common.
+	*		This of course provides with even better results when fulltest_native is used
+	*		and search_ignore_words.php list was re-enabled.
+	*	=> get_filter : Disallow tag based on GET var used : coma separated list, will through a disallow meta tag.
+	*	=> file_filter : Disallow tag based on the physical script file name : coma separated list of file names
+	* Some default values are set bellow in the seo_meta_tags() method,
+	* most are acp configurable when using the Ultimate SEO URL mod :
+	* => http://www.phpbb-seo.com/en/phpbb-mod-rewrite/ultimate-seo-url-t4608.html (en)
+	* => http://www.phpbb-seo.com/fr/mod-rewrite-phpbb/ultimate-seo-url-t4489.html (fr)
+	**/
+	var $mconfig = array('keywordlimit' => 15, 'wordlimit' => 25, 'wordminlen' => 2, 'bbcodestrip' => 'img|url|flash|code', 'ellipsis' => ' ...', 'topic_sql' => true, 'check_ignore' => false, 'bypass_common' => true,
+		// Consider adding ", 'p' => 1" if your forum is no indexed yet or if no post urls are to be redirected
+		// to add a noindex tag on post urls
+		'get_filter' => 'style,hilit,sid',
+		// noindex based on physical script file name
+		'file_filter' => 'ucp',
+	);]]></diy-instructions>
+	</action-group>
+</mod>

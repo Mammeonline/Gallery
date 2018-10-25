@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+    <header>
+        <license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+        <title lang="en"><![CDATA[User IP Logs]]></title>
+        <description lang="en"><![CDATA[This is to update User IP Logs 1.0.0 to 1.0.1 and is only for users that have already installed version 1.0.0]]></description>
+        <author-group>
+            <author>
+                <realname><![CDATA[Typo (Jeremy)]]></realname>
+                <username><![CDATA[Typos]]></username>
+                <homepage><![CDATA[http://www.typo-it.com]]></homepage>
+            </author>
+        </author-group>
+        <mod-version>1.0.1</mod-version>
+        <installation>
+            <level>easy</level>
+            <time>600</time>
+            <target-version>3.0.7-PL1</target-version>
+        </installation>
+        <history>
+            <entry>
+                <date>2010-01-28</date>
+                <rev-version>1.0.0 RC</rev-version>
+                <changelog lang="en">
+                    <change><![CDATA[First public release.  Skipped Beta and went straight to RC.]]></change>
+                </changelog>
+            </entry>
+            <entry>
+                <date>2010-02-26</date>
+                <rev-version>1.0.0</rev-version>
+                <changelog lang="en">
+                    <change><![CDATA[First official release.  Mod accepeted into the MODDB.  Changed title from 'Log Users IP' to 'User IP Logs'.]]></change>
+                </changelog>
+            </entry>
+            <entry>
+                <date>2010-02-26</date>
+                <rev-version>1.0.1</rev-version>
+                <changelog lang="en">
+                    <change><![CDATA[Fixed an issue discovered by stokerpiller which was allowing banned users to access the board.  The problem was my mod was using $result which was already in use but I never noticed and it wasn't caught in validation.  The fix is simple, replace the var name with a more descriptive one.]]></change>
+                </changelog>
+            </entry>
+        </history>
+    </header>
+    <action-group>
+        <copy>
+            <file from="root/user_ip_logs_installer.php" to="user_ip_logs_installer.php" />
+            <file from="root/umil/*.*" to="umil/*.*" />
+        </copy>
+        <open src="includes/functions.php">
+            <edit>
+                <find><![CDATA[         $result = $db->sql_query($sql);
+         $results = $db->sql_fetchrow($result);
+         if (empty($results))
+         {
+            add_log('users_ip', 'LOG_USER_IP');
+         }
+         $db->sql_freeresult($result);]]></find>
+                <action type="replace-with"><![CDATA[         $result_log = $db->sql_query($sql);
+         $results_log = $db->sql_fetchrow($result_log);
+         if (empty($results_log))
+         {
+            add_log('users_ip', 'LOG_USER_IP');
+         }
+         $db->sql_freeresult($result_log);]]></action>
+            </edit>
+		</open>
+	</action-group>
+</mod>

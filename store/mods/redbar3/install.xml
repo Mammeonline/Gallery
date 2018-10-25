@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<!-- $Id: install.xml 31M 2007-08-04 21:44:15Z (local) $ -->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.1.xsd">
+	<header>
+		<license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
+
+		    <title lang="en">RedBar³</title>
+
+    <description lang="en">Places a links/navigation bar along the top and bottom of your forums which can be easily updated via the ACP</description>
+    <author-notes lang="en"><![CDATA[This is a remake of my phpBB2 MOD - please note that I will not be providing an upgrade path from the phpBB2 version to phpBB3.]]></author-notes>
+
+    <author-group>
+      <author>
+        <realname>Kenny Cameron</realname>
+        <username>cherokee red</username>
+        <homepage>http://www.sixstringmods.co.uk</homepage>
+        <email>redbar@sixstringmods.co.uk</email>
+      </author>
+    </author-group>
+
+    <mod-version>1.0.2</mod-version>
+
+    <installation>
+      <level>easy</level>
+      <time>900 </time>
+      <target-version>3.0.2</target-version>
+    </installation>
+
+    <history>
+      <entry>
+        <date>2008-04-01</date>
+          <rev-version>0.0.1</rev-version>
+        <changelog lang="en">
+          <change>1st Beta Release</change>
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-04-02</date>
+          <rev-version>0.0.2</rev-version>
+        <changelog lang="en">
+          <change>Added edits to overall_footer</change>
+          <change>Split template edits into separate prosilver XML file</change>
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-04-06</date>
+          <rev-version>0.0.3</rev-version>
+        <changelog lang="en">
+          <change>Fixed bug in acp_redbar.html</change>
+          <change>Changed links to display ASC by id instead of url</change>
+          <change>Added check for url being entered, as well as link name</change>
+          <change>Added permissions</change>
+          <change>Updated language entries</change>          
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-05-13</date>
+          <rev-version>0.0.4</rev-version>
+        <changelog lang="en">
+          <change>Added support for different coloured links</change>   
+          <change>Revmoved .redlink class from css file to accomodate above</change>
+          <change>Removed colour from CSS edits</change>
+          <change>Removed 'http://' default on url sql for the time being</change> 
+          <change>Updated includes/acp/info/acp_redbar.php to correct version</change>   
+          <change>Removed extra div from acp_redbar.html</change>          
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-05-19</date>
+          <rev-version>0.0.5</rev-version>
+        <changelog lang="en">
+          <change>Added pagination to the ACP page</change>     
+          <change>22/05/2008 - Re-pack includes updated pagination. Added Next/Prev page argument.</change>            
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-05-24</date>
+          <rev-version>0.0.6</rev-version>
+        <changelog lang="en">
+          <change>Fixed bug in pagination - acp_redbar.php</change>           
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-06-24</date>
+          <rev-version>1.0.0</rev-version>
+        <changelog lang="en">
+          <change>Submitted to MODs Database</change>           
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-07-10</date>
+          <rev-version>1.0.1</rev-version>
+        <changelog lang="en">
+          <change>Added title="" tag to the URL - uses redbar_name</change>
+          <change>Fixed some validation issues and other issues with the MODx file (including linking prosilver xml)</change>   
+        </changelog>
+      </entry>
+      <entry>
+        <date>2008-10-18</date>
+          <rev-version>1.0.2</rev-version>
+        <changelog lang="en">
+          <change>Fixed bug in template file - RedBar now doesn't show when there are no links</change>
+          <change>Links no longer output empty styles tags if there is no colour defined in the ACP</change>
+          <change>Updated for MODx 1.2.1</change>
+          <change>Removed hard-coded language from includes/acp/acp_redbar.php</change>
+          <change>Fixed missing <![CDATA[<edit>]]> tag in MODx file</change>
+        </changelog>
+      </entry>
+    </history>
+  </header>
+
+	<action-group>
+		<sql><![CDATA[CREATE TABLE phpbb_redbar (
+	redbar_id mediumint(8) UNSIGNED NOT NULL auto_increment,
+	redbar_name blob NOT NULL,
+	redbar_url varchar(255) NOT NULL,
+	redbar_colour varchar(6) NOT NULL,
+PRIMARY KEY (redbar_id)
+); ]]></sql>
+		<sql><![CDATA[INSERT INTO phpbb_acl_options (auth_option, is_global, is_local, founder_only) VALUES
+('a_redbar', 1, 0, 0);]]></sql>
+    <copy>
+      <file from="root/adm/style/acp_redbar.html" to="adm/style/acp_redbar.html" />
+      <file from="root/includes/acp/info/acp_redbar.php" to="includes/acp/info/acp_redbar.php" />
+      <file from="root/includes/acp/acp_redbar.php" to="includes/acp/acp_redbar.php" />
+    </copy>
+
+		<open src="includes/constants.php">
+			<edit>
+				<find>// Additional tables</find>
+				<action type="after-add">define('REDBAR_TABLE',			$table_prefix . 'redbar');</action>
+			</edit>
+		</open>
+		<open src="includes/functions.php">
+			<edit>
+				<find>	// The following assigns all _common_ variables that may be used at any point in a template.</find>
+				<action type="before-add">	//Pull links from RedBar db
+	$sql = 'SELECT *
+		FROM ' . REDBAR_TABLE . '
+		ORDER BY redbar_id';
+	$result = $db->sql_query($sql);
+
+	while ($row = $db->sql_fetchrow($result))
+	{
+		$rbstyle = 'style="color: #' . $row['redbar_colour'] . ';"';
+		$redbar_colour = (empty($row['redbar_colour']) ? "" : $rbstyle);
+
+		$template->assign_block_vars('redbar', array(
+			'REDBAR_NAME'		=> $row['redbar_name'],
+			'REDBAR_COLOUR'		=> $redbar_colour,
+ 			'U_REDBAR_URL'		=> $row['redbar_url'],
+		));
+	}
+	$db->sql_freeresult($result);</action>
+			</edit>
+		</open>
+		<open src="language/en/acp/common.php">
+			<edit>
+				<find><![CDATA[	'ACP_REGISTER_SETTINGS'		=> 'User registration settings',]]></find>
+				<action type="after-add"><![CDATA[	'ACP_REDBAR'			=> 'RedBar&sup3; Configuration',]]></action>
+			</edit>				
+			<edit>			
+				<find><![CDATA[	'LOG_REASON_UPDATED'	=> '<strong>Updated report/denial reason</strong><br />» %s',]]></find>
+				<action type="after-add"><![CDATA[	'LOG_REDBAR_ADDED'		=> '<strong>Added new RedBar link</strong><br />» %s',
+	'LOG_REDBAR_REMOVED'	=> '<strong>Removed RedBar link</strong><br />» %s',
+	'LOG_REDBAR_UPDATED'	=> '<strong>Updated RedBar link</strong><br />» %s',]]></action>
+			</edit>
+		</open>
+		<open src="language/en/acp/permissions_phpbb.php">
+			<edit>
+				<find>	'acl_a_search'		=> array('lang' => 'Can manage search backends and settings', 'cat' => 'misc'),</find>
+				<action type="after-add">	'acl_a_redbar'		=> array('lang' => 'Can manage RedBar links', 'cat' => 'misc'),</action>
+			</edit>
+		</open>					
+		<open src="language/en/acp/posting.php">
+			<edit>
+				<find>	'USED_IN_REPORTS'		=> 'Used in reports',
+));</find>
+				<action type="after-add"><![CDATA[// RedBar
+$lang = array_merge($lang, array(
+	'ACP_REDBAR'		=> 'RedBar&sup3;',
+	'ACP_REDBAR_EXPLAIN'	=> 'Using this form you can add, edit, view and delete links - thses links will show in the header and footer of your forum.',
+	'ADD_URL'		=> 'Add a new hyperlink.',
+
+	'MUST_SELECT_LINK'	=> 'You must specify a link.',
+	
+	'NO_REDBAR_NAME'	=> 'You haven\'t entered a name for the link.',
+	'NO_REDBAR_LINK'	=> 'You haven\'t entered a url for the link.',
+	
+	'FORUM_DEFAULT'		=> 'Forum Default',
+
+	'REDBAR_NAME'		=> 'Link Name',
+	'REDBAR_URL'		=> 'Link URL',
+	'REDBAR_COLOUR'		=> 'Link Colour',
+	'REDBAR_COLOUR_EXPLAIN'	=> 'Defines the colour the RedBar link will appear in, leave blank for theme default.',
+	'REDBAR_ADDED'		=> 'The hyperlink was successfully added.',
+	'REDBAR_REMOVED'	=> 'The hyperlink was successfully deleted.',
+	'REDBAR_UPDATED'	=> 'The hyperlink was successfully updated.',
+));]]></action>
+			</edit>
+		</open>	
+  		<open src="styles/prosilver/template/overall_footer.html">
+			<edit>
+				<find><![CDATA[		<div class="navbar">]]></find>		
+				<action type="before-add"><![CDATA[
+   <!-- IF .redbar -->
+      <div class="redbar">
+         <div class="inner"><span class="corners-top"><span></span></span>
+
+         <div id="red-bar">
+           <div style="text-align:center;">
+            <!-- BEGIN redbar --><a href="{redbar.U_REDBAR_URL}" {redbar.REDBAR_COLOUR} title="{redbar.REDBAR_NAME}">{redbar.REDBAR_NAME}</a><!-- IF redbar.S_LAST_ROW -->&nbsp;<!-- ELSE --> &nbsp; <strong>&#8249;</strong> &nbsp; <!-- ENDIF --><!-- END redbar -->
+           </div>   
+         </div>
+
+         <span class="corners-bottom"><span></span></span></div>
+      </div>      
+   <!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/overall_header.html">
+			<edit>
+				<find><![CDATA[		<div class="navbar">]]></find>		
+				<action type="before-add"><![CDATA[
+   <!-- IF .redbar -->
+      <div class="redbar">
+         <div class="inner"><span class="corners-top"><span></span></span>
+
+         <div id="red-bar">
+           <div style="text-align:center;">
+            <!-- BEGIN redbar --><a href="{redbar.U_REDBAR_URL}" {redbar.REDBAR_COLOUR} title="{redbar.REDBAR_NAME}">{redbar.REDBAR_NAME}</a><!-- IF redbar.S_LAST_ROW -->&nbsp;<!-- ELSE --> &nbsp; <strong>&#8249;</strong> &nbsp; <!-- ENDIF --><!-- END redbar -->
+           </div>   
+         </div>
+
+         <span class="corners-bottom"><span></span></span></div>
+      </div>      
+   <!-- ENDIF -->]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/theme/colours.css">
+			<edit>
+				<find><![CDATA[/* Round cornered boxes and backgrounds
+---------------------------------------- */]]></find>		
+				<action type="after-add"><![CDATA[.redbar {
+	background-color: #0076b1;
+	background-image: url("{T_THEME_PATH}/images/bg_list.gif");
+}
+
+]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/theme/common.css">
+			<edit>
+				<find><![CDATA[/* Search box
+--------------------------------------------- */]]></find>
+				<action type="before-add"><![CDATA[#red-bar {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[/* Round cornered boxes and backgrounds
+---------------------------------------- */]]></find>		
+				<action type="after-add"><![CDATA[.redbar {
+	background: #ebebeb none repeat-x 0 0;
+	margin-bottom: 4px;
+	padding: 0 5px;
+}
+
+]]></action>
+			</edit>
+		</open>		
+    <diy-instructions lang="en"><![CDATA[Go to your ACP -> System -> Module Management :: Administration Control Panel.
+At the botom of that page, type RedBar in the text box and then click "Create New Module"
+Under module enabled, select "yes" and click submit.
+Click in the module you just created.
+
+Now, next to the "Add Module" button, click the dropdown and look for/select "RedBar³ Configuration"
+Now click "Add Module" and Yes on the confirmation screen.
+Click enable to enable the module.
+Refresh the page - you might need to purge your cache / empty your temp files, but an extra tab should be available now.
+You will also have to set permissions for who can manage the links.
+This is done in the ACP: Users & Groups - Groups Permissions - Select Group - Admin Permissions - Misc Tab - 'Can manage RedBar Links'
+
+Lastly, don't forget to purge your cache after making these edits!]]></diy-instructions>
+  </action-group>
+</mod>
